@@ -34,52 +34,67 @@ const InspirationGallery: React.FC = () => {
           </p>
         </div>
 
-        {/* --- DESKTOP LAYOUT (Original) --- */}
-        <div className="hidden lg:flex flex-col items-center justify-center gap-5">
-          {[galleryRow1, galleryRow2].map((row, rowIndex) => (
-            <div key={rowIndex} className="flex flex-wrap items-center justify-center gap-5">
-              {row.map((item, itemIndex) => (
-                <div
-                  key={`${rowIndex}-${itemIndex}`}
-                  className="relative group overflow-hidden rounded-[20px]"
-                  style={{ width: `${item.width}px`, height: `${item.height}px` }}
-                >
-                  <img
-                    src={item.src}
-                    alt={item.name || `Gallery image ${rowIndex * 3 + itemIndex + 1}`}
-                    className="w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105 group-hover:brightness-75"
-                  />
-                  {item.name && (
-                    <div className="absolute inset-0 flex items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <h2 className="text-white text-4xl font-playfair font-medium text-center drop-shadow-md">
-                        {item.name}
-                      </h2>
-                    </div>
-                  )}
+        {/* --- DESKTOP LAYOUT with fixed pixel widths --- */}
+{/* --- DESKTOP LAYOUT with proportional widths --- */}
+<div className="hidden px-15 lg:flex flex-col items-center gap-5 w-full">
+  {[galleryRow1, galleryRow2].map((row, rowIndex) => {
+    const total = row.reduce((sum, item) => sum + item.width, 0);
+    return (
+      <div
+        key={rowIndex}
+        className="flex items-center justify-center gap-5 w-full"
+      >
+        {row.map((item, itemIndex) => {
+          const flexBasis = `${(item.width / total) * 100}%`;
+          return (
+            <div
+              key={`${rowIndex}-${itemIndex}`}
+              className="relative group overflow-hidden rounded-[20px] shrink-0"
+              style={{ flexBasis, aspectRatio: `${item.width}/${item.height}` }}
+            >
+              <img
+                src={item.src}
+                alt={item.name || `Gallery image ${rowIndex * 3 + itemIndex + 1}`}
+                className="w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105 group-hover:brightness-75"
+              />
+              {item.name && (
+                <div className="absolute inset-0 flex items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <h2 className="text-white text-4xl font-playfair font-medium text-center drop-shadow-md">
+                    {item.name}
+                  </h2>
                 </div>
-              ))}
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  })}
+</div>
+
+
+
+        {/* --- MOBILE & TABLET LAYOUT --- */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 lg:hidden">
+          {allGalleryItems.map((item, index) => (
+            <div
+              key={index}
+              className="relative group overflow-hidden rounded-[20px] aspect-[4/3]"
+            >
+              <img
+                src={item.src}
+                alt={item.name || `Gallery image ${index + 1}`}
+                className="w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105 group-hover:brightness-75"
+              />
+              {item.name && (
+                <div className="absolute inset-0 flex items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <h2 className="text-white text-2xl font-playfair font-medium text-center drop-shadow-md">
+                    {item.name}
+                  </h2>
+                </div>
+              )}
             </div>
           ))}
-        </div>
-        
-        {/* --- MOBILE & TABLET LAYOUT (Responsive Grid) --- */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 lg:hidden">
-            {allGalleryItems.map((item, index) => (
-                <div key={index} className="relative group overflow-hidden rounded-[20px] aspect-[4/3]">
-                    <img
-                        src={item.src}
-                        alt={item.name || `Gallery image ${index + 1}`}
-                        className="w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105 group-hover:brightness-75"
-                    />
-                    {item.name && (
-                        <div className="absolute inset-0 flex items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <h2 className="text-white text-2xl font-playfair font-medium text-center drop-shadow-md">
-                                {item.name}
-                            </h2>
-                        </div>
-                    )}
-                </div>
-            ))}
         </div>
       </div>
     </section>
