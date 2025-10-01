@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React from 'react';
 
 interface GalleryItem {
@@ -44,8 +45,10 @@ const InspirationGallery: React.FC = () => {
                   className="relative group overflow-hidden rounded-[20px]"
                   style={{ width: `${item.width}px`, height: `${item.height}px` }}
                 >
-                  <img
+                  <Image
                     src={item.src}
+                    width={item.width}
+                    height={item.height}
                     alt={item.name || `Gallery image ${rowIndex * 3 + itemIndex + 1}`}
                     className="w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105 group-hover:brightness-75"
                   />
@@ -66,8 +69,10 @@ const InspirationGallery: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 lg:hidden">
             {allGalleryItems.map((item, index) => (
                 <div key={index} className="relative group overflow-hidden rounded-[20px] aspect-[4/3]">
-                    <img
+                    <Image
                         src={item.src}
+                        width={item.width}
+                        height={item.height}
                         alt={item.name || `Gallery image ${index + 1}`}
                         className="w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105 group-hover:brightness-75"
                     />
