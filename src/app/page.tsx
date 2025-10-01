@@ -1,4 +1,8 @@
+import Creations from "@/components/Creations";
 import Hero from "@/components/Hero"; // Keeping Hero
+import TestimonialSection from "@/components/HomeOwner";
+import InspirationGallery from "@/components/Inspiration";
+import PartnersSection from "@/components/Partners";
 import Philosophy from "@/components/Philosophy"; // From remote
 import Services from "@/components/Services"; // From remote
 
@@ -14,8 +18,13 @@ export default function Home() {
       <Hero />
       <Philosophy />
       <Services />
-      {/* <InspirationToElevateLiving /> */}
-      {/* <BestOfOurCreations/>
+      <InspirationGallery/>
+      <Creations/>
+      <TestimonialSection/>
+      <PartnersSection/>
+      {/* <InspirationToElevateLiving />
+      <BestOfOurCreations/>
+
       <HomeOwnersFeels/>
       <TrustedPartners /> */}
       
