@@ -3,7 +3,6 @@ import Image from "next/image";
 import { FaInstagram, FaXTwitter, FaFacebook } from "react-icons/fa6";
 import { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
-
 export default function Hero() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -80,7 +79,7 @@ export default function Hero() {
                 backgroundRepeat: "no-repeat",
               }}
             >
-              <span className="font-serif text-[18px] tracking-wide text-white">
+              <span className="font-playfair text-[18px] tracking-wide text-white">
                 Build a modern Interior
               </span>
             </div>
@@ -111,13 +110,12 @@ export default function Hero() {
 
         {/* Hero content */}
         <div className="relative flex flex-col items-start h-full pt-28 sm:pt-32 pb-48 md:pb-6 px-4 sm:px-6 md:p-6">
-          <div className="max-w-[634px] text-white relative md:absolute md:top-1/3 md:left-[40px] w-full md:w-auto text-left">
-            <h1 className="text-[32px] sm:text-[36px] md:text-[64px] lg:text-[84px] leading-[0.95] font-serif">
+          <div className="max-w-[670px] text-white relative md:absolute md:top-1/3 md:left-[40px] w-full md:w-auto text-left">
+            <h1 className="text-[32px] sm:text-[36px] md:text-[64px] lg:text-[84px] leading-[0.95] font-playfair">
               Creating Comfort
-              <br />
               With Style
             </h1>
-            <p className="font-serif mt-4 sm:mt-6 text-lg sm:text-lg md:text-lg text-white/90 w-[75%] sm:w-full max-w-[466px]">
+            <p className="font-playfair mt-4 sm:mt-6 text-lg sm:text-lg md:text-lg text-white/90 w-[75%] sm:w-full max-w-[466px]">
               Design smart, live smart, and always choose Aceon for interiors
             </p>
 
