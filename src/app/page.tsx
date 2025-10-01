@@ -14,7 +14,7 @@ import Services from "@/components/Services"; // From remote
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="min-h-screen bg-white px-1 sm:px-4">
       <Hero />
       <Philosophy />
       <Services />
@@ -24,6 +24,7 @@ export default function Home() {
       <PartnersSection/>
       {/* <InspirationToElevateLiving />
       <BestOfOurCreations/>
+
       <HomeOwnersFeels/>
       <TrustedPartners /> */}
       
