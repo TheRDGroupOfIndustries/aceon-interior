@@ -59,7 +59,7 @@ const CreationCard: React.FC<CreationCardProps> = ({ imageSrc, title, descriptio
 
 const Creations: React.FC = () => {
   return (
-    <section className="bg-white py-16 md:py-24 px-4">
+    <section className="bg-white  py-16 md:py-12  px-4">
       <div className="container mx-auto text-center">
         <h2 className="font-playfair font-medium text-[#A97C51] text-4xl md:text-[68px] leading-tight">
           Best of our creations
