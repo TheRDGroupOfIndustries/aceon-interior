@@ -175,8 +175,8 @@ export default function Hero() {
               Furniture Design
             </h3>
             <p className="text-xs sm:text-sm text-gray-600 overflow-hidden overflow-ellipsis">
-              "Custom furniture solutions for your home or office - stylish,
-              functional, and within your budget. Serving Varanasi on time."
+              &quot;Custom furniture solutions for your home or office - stylish,
+              functional, and within your budget. Serving Varanasi on time.&quot;
             </p>
             <span className="block mt-1 sm:mt-2 text-[10px] sm:text-sm font-semibold text-gray-900 truncate">
               Style Within Your ₹ Budget

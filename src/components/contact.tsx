@@ -4,16 +4,6 @@ import React from 'react';
 const Contact: React.FC = () => {
   return (
     <div className="bg-white py-20 font-sans text-[#333]">
-         <script src="https://cdn.tailwindcss.com"></script>
-      <style>
-        {`
-          /* Applying system serif font for "playfair" and "prata" look */
-          .font-playfair, .font-prata {
-            font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-          }
-        `}
-      </style>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <div className="text-center mb-16">
         <h1 className="font-playfair font-medium text-[#A97C51] text-4xl md:text-[58px] leading-tight capitalize">Contact Us</h1>
         <p className="font-prata text-[#423F3F] text-xl md:text-[30px]">Let's start shaping your dream space together.</p>

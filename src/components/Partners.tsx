@@ -1,21 +1,10 @@
+"use client"
+
 import React from 'react';
 
 const PartnersSection: React.FC = () => {
   return (
     <section className="bg-white py-16 md:py-24 px-6">
-      {"use client"}
-      {/* Tailwind CSS Script for the component to be runnable */}
-      <script src="https://cdn.tailwindcss.com"></script>
-      <style>
-        {`
-          /* Applying system serif font for "playfair" and "prata" look */
-          .font-playfair, .font-prata {
-            font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-          }
-        `}
-      </style>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
       <div className="container mx-auto">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="font-playfair font-medium text-[#A97C51] text-4xl md:text-[58px] leading-tight capitalize">
