@@ -6,7 +6,7 @@ const Contact: React.FC = () => {
     <div className="bg-white py-20 font-sans text-[#333]">
       <div className="text-center mb-16">
         <h1 className="font-playfair font-medium text-[#A97C51] text-4xl md:text-[58px] leading-tight capitalize">Contact Us</h1>
-        <p className="font-prata text-[#423F3F] text-xl md:text-[30px]">Let's start shaping your dream space together.</p>
+        <p className="font-prata text-[#423F3F] text-xl md:text-[30px]">Let&apos;s start shaping your dream space together.</p>
       </div>
 
       <div className="flex flex-col md:flex-row max-w-[1300px] mx-auto gap-[80px] items-start px-2 lg:px-0"> {/* Adjusted max-w and gap for precise fit */}
