@@ -37,11 +37,11 @@ const CreationCard: React.FC<CreationCardProps> = ({ imageSrc, title, descriptio
           className="w-full h-full object-cover transition-transform duration-500 ease-in-out hover:scale-110"
         />
       </div>
-      <div className="mt-6 text-left">
+      <div className="mt-5 text-left">
         <h3 className="font-poppins font-semibold text-2xl md:text-[32px] text-gray-800 uppercase leading-tight h-16">
           {title}
         </h3>
-        <p className="font-poppins pt-7 text-gray-500 mt-2 text-base text-justify leading-relaxed">
+        <p className=" text-gray-500 sm:mt-2 mt-2 text-[16px] text-base text-justify leading-relaxed">
           {description}
         </p>
         <div className="mt-6 text-right">
