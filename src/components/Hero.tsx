@@ -382,6 +382,7 @@
 //     </div>
 //   );
 // }
+
 'use client'
 import Image from "next/image";
 import { FaInstagram, FaXTwitter, FaFacebook } from "react-icons/fa6";
@@ -397,7 +398,7 @@ export default function Hero() {
 
   return (
     <div className="w-full min-h-screen bg-transparent flex items-start justify-center relative sm:px-4 px-1 sm:py-2 py-1 overflow-hidden">
-      {/* Main hero card with rounded background - Use relative heights to adapt to zoom */}
+      {/* Main hero card with rounded background*/}
       <div className="relative w-full h-[100vh] md:h-[100vh] min-h-[730px] max-w-[1440px] rounded-[20px] overflow-hidden flex flex-col justify-between">
         {/* Background image - Ensure it covers without overflow */}
         <div className="absolute inset-0">
@@ -413,9 +414,9 @@ export default function Hero() {
         {/* Overlay */}
         <div className="absolute inset-0 bg-transparent pointer-events-none" />
 
-        {/* Top bar: Logo, Nav, Rectangle in flex row - Use flex to prevent overflow */}
+        {/* Top bar */}
         <div className="absolute top-0 left-2 right-0 w-full flex items-center justify-between py-2  z-50 px-2 overflow-hidden">
-          {/* Logo - Use rem for better zoom scaling */}
+          {/* Logo*/}
           <div className="w-[5.625rem] md:w-[6.875rem] h-[2.8125rem] md:h-[3.4375rem] rounded-2xl flex items-center justify-center flex-shrink-0">
             <div className="relative w-full h-full p-1">
               <Image
@@ -440,7 +441,7 @@ export default function Hero() {
             )}
           </button>
 
-          {/* Navigation for Desktop - Use flex-nowrap to prevent wrapping on zoom */}
+          {/* Navigation for Desktop  */}
           <nav className="hidden md:flex gap-6 lg:gap-8 text-white text-sm flex-shrink-0 flex-nowrap">
             <a href="/home" className="hover:underline font-semibold whitespace-nowrap">
               Home
@@ -456,7 +457,7 @@ export default function Hero() {
             </a>
           </nav>
 
-          {/* Rectangle for Desktop - Use percentage-based width for adaptability */}
+          {/* Rectangle for Desktop  */}
           <div className="hidden md:block flex-shrink-0">
             <div className="relative w-[22%] min-w-[280px] lg:w-[25%] lg:min-w-[320px] aspect-[280/50] flex items-center justify-center">
               <Image
@@ -472,7 +473,7 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Mobile Navigation Menu - Ensure it doesn't overflow screen */}
+        {/* Mobile Navigation Menu  */}
         <div
           className={`md:hidden fixed top-0 right-0 h-screen w-64 bg-white z-40 transform ${
             isMenuOpen ? "translate-x-0" : "translate-x-full"
@@ -494,7 +495,7 @@ export default function Hero() {
           </nav>
         </div>
 
-        {/* Hero content - Use relative positioning and clamp widths to prevent overflow */}
+        {/* Hero content  */}
         <div className="relative flex flex-col items-start h-full pt-24 sm:pt-32 pb-48 md:pb-6 px-4 sm:px-6 md:px-8 overflow-hidden">
           <div className="max-w-[670px] text-white relative md:absolute md:top-1/3 md:left-8 lg:left-[40px] w-full md:w-auto text-left clamp-w-[85%] max-w-[90vw]">
             <h1 className="text-[32px] sm:text-[36px] md:text-[56px] lg:text-[72px] xl:text-[84px] leading-[0.95] font-playfair">
@@ -517,7 +518,7 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Social icons - Position with percentages for zoom adaptability */}
+        {/* Social icons  */}
         <div className="absolute top-[35%] md:top-1/3 right-2 sm:right-4 flex flex-col space-y-2 bg-gray-100/20 p-1 rounded-lg z-10">
           <a
             href="#"
@@ -539,7 +540,7 @@ export default function Hero() {
           </a>
         </div>
 
-        {/* Furniture Design Card - Use percentages and clamp for no overflow */}
+        {/* Furniture Design Card */}
         <div
           className="relative md:absolute bottom-8 md:bottom-12 right-0 md:right-5 bg-white shadow-lg rounded-2xl p-3 sm:p-4
           w-[75%] sm:w-[65%] md:w-[40%] lg:w-[33%] mx-auto md:mx-0
