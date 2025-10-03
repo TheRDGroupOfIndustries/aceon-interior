@@ -29,7 +29,7 @@ const creationsData: CreationCardProps[] = [
 
 const CreationCard: React.FC<CreationCardProps> = ({ imageSrc, title, description }) => {
   return (
-    <article className="flex-1 min-w-0 max-w-[373px] shrink">
+    <article className="flex-1 min-w-0 shrink">
       <div className="aspect-[373/311] overflow-hidden">
         <img
           src={imageSrc}
@@ -59,7 +59,7 @@ const CreationCard: React.FC<CreationCardProps> = ({ imageSrc, title, descriptio
 
 const Creations: React.FC = () => {
   return (
-    <section className="bg-white py-16 md:py-24 px-4">
+    <section className="bg-white py-16 md:py-24 lg:px-36 px-4">
       <div className="container mx-auto text-center">
         <h2 className="font-playfair font-medium text-[#A97C51] text-4xl md:text-[68px] leading-tight">
           Best of our creations
@@ -68,8 +68,9 @@ const Creations: React.FC = () => {
           Comprehensive solutions tailored to your needs.
         </p>
 
-        {/* 3 cards stay in one row, shrink proportionally on window resize */}
-       <div className="mt-10 sm:mt-16 flex flex-col sm:flex-row justify-center gap-y-6 sm:gap-y-0 gap-x-0 sm:gap-x-12 items-center flex-wrap">   {creationsData.map((creation, index) => (
+        {/* 3 cards: stack on mobile, single row on tablet/desktop */}
+        <div className="mt-10 sm:mt-16 flex flex-col md:flex-row xl:flex-row justify-center gap-8 md:gap-x-12 xl:gap-x-12 items-stretch">
+          {creationsData.map((creation, index) => (
             <CreationCard
               key={index}
               imageSrc={creation.imageSrc}
@@ -84,6 +85,3 @@ const Creations: React.FC = () => {
 };
 
 export default Creations;
-
-
-
