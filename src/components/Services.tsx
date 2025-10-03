@@ -445,7 +445,7 @@ function ServiceCard({
             src={img}
             alt={title}
             fill
-            className="object-cover p-4 rounded-3xl"
+            className="object-cover p-2 rounded-3xl"
             sizes="100vw"
           />
         </motion.div>
@@ -480,10 +480,10 @@ function ServiceCard({
         </motion.div>
 
         <motion.button
-          className="absolute bottom-1 -right-0 bg-gray-200 rounded-full w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center shadow-md hover:bg-gray-300 transition"
+          className="absolute bottom-2 -right-0 bg-gray-200 rounded-full  w-16 h-16 flex items-center justify-center shadow-md hover:bg-gray-300 transition"
           variants={buttonVariants}
         >
-          <span className="text-2xl sm:text-3xl font-bold text-[#A97C51]">
+          <span className="text-3xl font-bold text-[#A97C51]">
             <IoEyeOutline />
           </span>
         </motion.button>
