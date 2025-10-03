@@ -55,7 +55,7 @@ const TestimonialSection: React.FC = () => {
             <img 
               src="/images/woman.jpg" 
               alt="A smiling Adarsh Pandit" 
-              className="w-full h-full object-cover rounded-[30px] blur-sm"
+              className="w-full h-full object-cover rounded-[30px] blur-[2.5px]"
             />
             <div className="absolute inset-0 flex items-center justify-center">
               <button aria-label="Play video" className="transform transition-transform hover:scale-110 focus:outline-none">
