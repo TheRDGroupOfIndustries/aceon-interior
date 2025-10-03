@@ -72,7 +72,7 @@ import { CiPlay1 } from 'react-icons/ci';
 const TestimonialSection: React.FC = () => {
   return (
     <section className="relative w-full text-white">
-  
+      {/* Background */}
       <div className="absolute inset-0 z-0">
         <Image
           src="/images/back.jpg"
@@ -101,13 +101,13 @@ const TestimonialSection: React.FC = () => {
           </div>
 
           <div className="space-y-2 pt-14 max-w-xl mx-auto lg:mx-0">
-            <p className="font-poppins text-base md:text-[18px] tracking-tight text-gray-300 uppercase font-light">
+            <p className=" text-base md:text-[18px] tracking-tight text-gray-300 uppercase font-light">
               CTO | DESIGNER
             </p>
-            <h2 className="font-poppins font-semibold text-3xl md:text-4xl lg:text-[48px] leading-none tracking-tight">
+            <h2 className=" font-semibold text-3xl md:text-4xl lg:text-[48px] leading-none tracking-tight">
               Adarsh Pandit
             </h2>
-            <p className="font-poppins font-light text-sm md:text-[20px] tracking-tight text-gray-300 pt-5 leading-relaxed">
+            <p className=" font-light text-sm md:text-[20px] tracking-tight text-gray-300 pt-5 leading-relaxed">
               Figma ipsum component variant main layer. Scrolling thumbnail share text team follower select flatten move. Align ipsum shadow line share duplicate comment component. Undo device comment invite bold.
             </p>
           </div>
@@ -115,7 +115,7 @@ const TestimonialSection: React.FC = () => {
 
         {/* Right Column: Image */}
         <div className="w-full lg:w-1/2 flex items-center justify-center lg:justify-end">
-          <div className="relative w-full max-w-sm md:max-w-md pt-10 lg:w-[480px] lg:h-[711px]">
+          <div className="relative w-full max-w-sm md:max-w-md lg:w-[480px] lg:h-[711px] h-[400px] sm:h-[500px] md:h-[600px]">
             <Image 
               src="/images/woman.jpg" 
               alt="A smiling Adarsh Pandit" 

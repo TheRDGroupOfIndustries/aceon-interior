@@ -26,7 +26,7 @@ const CtaBanner: React.FC = () => {
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
-            <button className="bg-[#A97C51] font-poppins text-white font-medium w-full sm:w-[340px] h-[52px] rounded-[10px] flex items-center justify-center transition-colors duration-300 text-sm sm:text-base px-4 sm:px-6">
+            <button className="bg-[#A97C51]  text-white font-medium w-full sm:w-[340px] h-[52px] rounded-[10px] flex items-center justify-center transition-colors duration-300 text-sm sm:text-base px-4 sm:px-6">
               Plan Your Paradise With Us
             </button>
             <button className="border-2 border-white hover:bg-white/10 text-white font-medium w-full sm:w-[340px] h-[52px] rounded-[10px] flex items-center justify-center transition-colors duration-300 text-sm sm:text-base px-4 sm:px-6">
