@@ -11,8 +11,8 @@ const Contact: React.FC = () => {
         <p className="font-prata text-[#423F3F] pt-5 text-xl md:text-[25px]">Let&apos;s start shaping your dream space together.</p>
       </div>
 
-      <div className="flex flex-col md:flex-row max-w-[1300px] mx-auto gap-[80px] items-start px-4 lg:px-0">
-        {/* Left Section - Contact Info */}
+   <div className="flex flex-col md:flex-row max-w-[1300px] mx-auto gap-[80px] items-start px-4 sm:px-6 lg:px-10">
+              {/* Left Section - Contact Info */}
         <div className="w-full md:w-[320px] flex-shrink-0">
           <p className="text-lg font-poppins leading-relaxed mb-8 text-[#666]">
             Feel free to reach out if you have a question, a project in mind, or want to say hello.
