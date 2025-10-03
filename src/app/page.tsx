@@ -6,6 +6,7 @@ import PartnersSection from "@/components/Partners";
 import Philosophy from "@/components/Philosophy"; 
 import Services from "@/components/Services"; 
 import Contact from "@/components/contact";
+import CtaBanner from "@/components/ctaBanner";
 import Footer from "@/components/footer";
 
 
@@ -21,6 +22,7 @@ export default function Home() {
       <Creations/>
       <TestimonialSection/>
       <PartnersSection/>
+      <CtaBanner/>
       <Contact />
       <Footer/>
       
