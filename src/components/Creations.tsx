@@ -86,8 +86,7 @@
 
 // export default Creations;
 
-
-'use client'
+"use client";
 import React from "react";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
@@ -103,23 +102,27 @@ const creationsData: CreationCardProps[] = [
     imageSrc: "/images/creation1.png",
     title: "TITLE FOR THE CARD",
     description:
-      "Figma Ipsum Component Variant Main Layer. Opacity Slice Line Distribute Inspect Font. Scrolling Italic Move Move Inspect Connection.",
+      "Figma ipsum component variant main layer. Opacity slice line distribute inspect font. Scrolling italic move move inspect connection.",
   },
   {
     imageSrc: "/images/creation2.png",
     title: "TITLE FOR THE CARD",
     description:
-      "Figma Ipsum Component Variant Main Layer. Opacity Slice Line Distribute Inspect Font. Scrolling Italic Move Move Inspect Connection.",
+      "Figma ipsum component variant main layer. Opacity slice line distribute inspect font. Scrolling italic move move inspect connection.",
   },
   {
     imageSrc: "/images/creation3.png",
     title: "TITLE FOR THE CARD",
     description:
-      "Figma Ipsum Component Variant Main Layer. Opacity Slice Line Distribute Inspect Font. Scrolling Italic Move Move Inspect Connection.",
+      "Figma ipsum component variant main layer. Opacity slice line distribute inspect font. Scrolling italic move move inspect connection.",
   },
 ];
 
-const CreationCard: React.FC<CreationCardProps> = ({ imageSrc, title, description }) => {
+const CreationCard: React.FC<CreationCardProps> = ({
+  imageSrc,
+  title,
+  description,
+}) => {
   // Reference for the card to detect visibility
   const cardRef = useRef(null);
   const isCardInView = useInView(cardRef, { margin: "-50px" }); // Removed once: true
@@ -137,17 +140,29 @@ const CreationCard: React.FC<CreationCardProps> = ({ imageSrc, title, descriptio
 
   const imageVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" } },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.5, ease: "easeOut" },
+    },
   };
 
   const textVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: "easeOut" },
+    },
   };
 
   const linkVariants = {
     hidden: { opacity: 0, x: 20 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.5, ease: "easeOut" },
+    },
   };
 
   return (
@@ -158,7 +173,10 @@ const CreationCard: React.FC<CreationCardProps> = ({ imageSrc, title, descriptio
       animate={isCardInView ? "visible" : "hidden"}
       variants={cardVariants}
     >
-      <motion.div className="aspect-[373/311] overflow-hidden" variants={imageVariants}>
+      <motion.div
+        className="aspect-[373/311] overflow-hidden"
+        variants={imageVariants}
+      >
         <img
           src={imageSrc}
           alt={title}
@@ -166,17 +184,16 @@ const CreationCard: React.FC<CreationCardProps> = ({ imageSrc, title, descriptio
         />
       </motion.div>
       <motion.div className="mt-6 text-left" variants={textVariants}>
-    
-        <h3 className="font-poppins font-semibold text-2xl md:text-[32px] text-gray-800 uppercase leading-tight h-16">
+        <h3 className="font-poppins font-semibold text-2xl  text-gray-800 uppercase leading-tight h-10">
           {title}
         </h3>
-        <p className=" text-gray-500 sm:mt-2 mt-2 text-[16px] text-base text-justify leading-relaxed">
+        <p className=" text-gray-500   text-sm text-justify leading-relaxed">
           {description}
         </p>
         <motion.div className="mt-6 text-right" variants={linkVariants}>
           <a
             href="#"
-            className="font-poppins font-medium text-lg md:text-[20px] text-[#936a53] inline-block capitalize hover:text-[#7d5945] transition-colors"
+            className="font-poppins font-medium text-lg  text-[#936a53] inline-block capitalize hover:text-[#7d5945] transition-colors"
           >
             Read More →
           </a>
@@ -194,7 +211,11 @@ const Creations: React.FC = () => {
   // Animation variants for heading and subtitle
   const textVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
   };
 
   return (

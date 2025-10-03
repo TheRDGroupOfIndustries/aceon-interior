@@ -135,28 +135,26 @@ import { BsInstagram, BsTwitterX } from "react-icons/bs";
 import { FaFacebook } from "react-icons/fa6";
 
 const Footer: React.FC = () => {
-  // Reference for the footer to detect visibility
   const footerRef = useRef(null);
-  const isFooterInView = useInView(footerRef, { margin: "-100px" }); // No once: true
+  const isFooterInView = useInView(footerRef, { margin: "-100px" });
 
-  // Animation variants for containers
+  // Faster staggered container
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15, // Faster stagger for dynamic pacing
+        staggerChildren: 0.08, // Faster stagger
       },
     },
   };
 
-  // Animation variants for text and SVG elements
   const textVariants = {
     hidden: (direction: string = "up") => ({
       opacity: 0,
-      y: direction === "up" ? 30 : 0,
-      x: direction === "left" ? -30 : direction === "right" ? 30 : 0,
-      rotate: direction === "up" ? 3 : 0, // Subtle rotation for headings
+      y: direction === "up" ? 20 : 0,
+      x: direction === "left" ? -20 : direction === "right" ? 20 : 0,
+      rotate: direction === "up" ? 2 : 0,
     }),
     visible: (index: number) => ({
       opacity: 1,
@@ -164,24 +162,23 @@ const Footer: React.FC = () => {
       x: 0,
       rotate: 0,
       transition: {
-        duration: 0.6,
+        duration: 0.4, // faster
         ease: "easeOut",
-        delay: index * 0.15,
+        delay: index * 0.08, // faster stagger
       },
     }),
   };
 
-  // Animation variants for logo and social links
   const buttonVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
+    hidden: { opacity: 0, scale: 0.85 },
     visible: (index: number) => ({
       opacity: 1,
       scale: 1,
       transition: {
         type: "spring",
-        stiffness: 100,
-        damping: 10,
-        delay: index * 0.15,
+        stiffness: 120,
+        damping: 12,
+        delay: index * 0.08,
       },
     }),
   };
@@ -219,7 +216,7 @@ const Footer: React.FC = () => {
               className="flex gap-4"
               variants={{
                 hidden: { opacity: 0 },
-                visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
+                visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
               }}
             >
               <motion.a
@@ -271,10 +268,10 @@ const Footer: React.FC = () => {
               className="list-disc list-inside space-y-1"
               variants={{
                 hidden: { opacity: 0 },
-                visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
+                visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
               }}
             >
-              <motion.li variants={textVariants} custom={6} /*custom="left"*/>
+              <motion.li variants={textVariants} custom={6}>
                 <Link
                   href="#"
                   className="text-white no-underline text-[18px] transition-colors hover:text-gray-200"
@@ -282,7 +279,7 @@ const Footer: React.FC = () => {
                   Home
                 </Link>
               </motion.li>
-              <motion.li variants={textVariants} custom={7} /*custom="left"*/>
+              <motion.li variants={textVariants} custom={7}>
                 <Link
                   href="#"
                   className="text-white no-underline text-[18px] transition-colors hover:text-gray-200"
@@ -290,7 +287,7 @@ const Footer: React.FC = () => {
                   Services
                 </Link>
               </motion.li>
-              <motion.li variants={textVariants} custom={8} /*custom="left"*/>
+              <motion.li variants={textVariants} custom={8}>
                 <Link
                   href="#"
                   className="text-white no-underline text-[18px] transition-colors hover:text-gray-200"
@@ -298,7 +295,7 @@ const Footer: React.FC = () => {
                   About Us
                 </Link>
               </motion.li>
-              <motion.li variants={textVariants} custom={9} /*custom="left"*/>
+              <motion.li variants={textVariants} custom={9}>
                 <Link
                   href="#"
                   className="text-white no-underline text-[18px] transition-colors hover:text-gray-200"
@@ -322,15 +319,10 @@ const Footer: React.FC = () => {
               className="space-y-4"
               variants={{
                 hidden: { opacity: 0 },
-                visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
+                visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
               }}
             >
-              <motion.div
-                className="flex text-[18px] items-center gap-3"
-                variants={textVariants}
-                custom={11}
-                // custom="right"
-              >
+              <motion.div className="flex text-[18px] items-center gap-3" variants={textVariants} custom={11}>
                 <svg
                   width="18"
                   height="18"
@@ -346,12 +338,7 @@ const Footer: React.FC = () => {
                 </svg>
                 <span>Ankit Sandiliya</span>
               </motion.div>
-              <motion.div
-                className="flex text-[18px] items-center gap-3"
-                variants={textVariants}
-                custom={12}
-                // custom="right"
-              >
+              <motion.div className="flex text-[18px] items-center gap-3" variants={textVariants} custom={12}>
                 <svg
                   width="18"
                   height="18"
@@ -367,12 +354,7 @@ const Footer: React.FC = () => {
                 </svg>
                 <span>+91 99197 55066</span>
               </motion.div>
-              <motion.div
-                className="flex text-[18px] items-center gap-3"
-                variants={textVariants}
-                custom={13}
-                // custom="right"
-              >
+              <motion.div className="flex text-[18px] items-center gap-3" variants={textVariants} custom={13}>
                 <svg
                   width="18"
                   height="18"
