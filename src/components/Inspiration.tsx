@@ -23,7 +23,7 @@ const allGalleryItems = [...galleryRow1, ...galleryRow2];
 
 const InspirationGallery: React.FC = () => {
   return (
-    <section className="bg-white py-16 px-4">
+    <section className="bg-white py-16 px-8">
       <div className="container mx-auto">
         <div className="text-center mb-12">
           <h1 className="font-playfair font-medium text-[#A97C51] text-4xl md:text-[58px] leading-tight">
