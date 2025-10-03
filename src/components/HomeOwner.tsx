@@ -141,85 +141,41 @@ const TestimonialSection: React.FC = () => {
       >
         {/* Left Column */}
         <div className="w-full lg:w-1/2 text-center lg:text-left">
-          <motion.h1
-            className="font-playfair font-medium text-3xl md:text-4xl lg:text-[48px] leading-none"
-            custom={0}
-            variants={textVariants}
-            initial="hidden"
-            animate={isSectionInView ? "visible" : "hidden"}
-          >
-            What Home Owners Feels
-          </motion.h1>
-          <motion.p
-            className="font-poppins text-lg md:text-xl mt-4 opacity-90"
-            custom={1}
-            variants={textVariants}
-            initial="hidden"
-            animate={isSectionInView ? "visible" : "hidden"}
-          >
-            Every Home Tells Different Story
-          </motion.p>
+          <div className="max-w-[569px] mx-auto lg:mx-0 mb-16 lg:mb-32">
+            <h1 className="font-playfair font-medium text-3xl md:text-4xl lg:text-[48px] leading-none">
+              What Home Owners Feels
+            </h1>
+            <p className="font-poppins text-lg md:text-xl mt-4 opacity-90">
+              Every Home Tells Different Story
+            </p>
+          </div>
 
-          <motion.div
-            className="space-y-2 pt-34 max-w-xl mx-auto lg:mx-0"
-            initial="hidden"
-            animate={isSectionInView ? "visible" : "hidden"}
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.2 } },
-            }}
-          >
-            <motion.p
-              className="font-poppins text-base md:text-[18px] tracking-tight text-gray-300 uppercase font-light"
-              custom={2}
-              variants={textVariants}
-            >
+          <div className="space-y-2 pt-14 max-w-xl mx-auto lg:mx-0">
+            <p className=" text-base md:text-[18px] tracking-tight text-gray-300 uppercase font-light">
               CTO | DESIGNER
-            </motion.p>
-            <motion.h2
-              className="font-poppins font-semibold text-3xl md:text-4xl lg:text-[48px] leading-none tracking-tight"
-              custom={3}
-              variants={textVariants}
-            >
+            </p>
+            <h2 className=" font-semibold text-3xl md:text-4xl lg:text-[48px] leading-none tracking-tight">
               Adarsh Pandit
-            </motion.h2>
-            <motion.p
-              className="font-poppins font-light text-sm md:text-[20px] tracking-tight text-gray-300 pt-5 leading-relaxed"
-              custom={4}
-              variants={textVariants}
-            >
+            </h2>
+            <p className=" font-light text-sm md:text-[20px] tracking-tight text-gray-300 pt-5 leading-relaxed">
               Figma ipsum component variant main layer. Scrolling thumbnail share text team follower select flatten move. Align ipsum shadow line share duplicate comment component. Undo device comment invite bold.
             </motion.p>
           </motion.div>
         </div>
 
-        {/* Right Column */}
-        <motion.div
-          className="w-full lg:w-1/2 flex items-center justify-center lg:justify-end"
-          variants={imageContainerVariants}
-          initial="hidden"
-          animate={isSectionInView ? "visible" : "hidden"}
-        >
-          <motion.div className="relative w-full max-w-sm md:max-w-md pt-10 lg:w-[480px] lg:h-[711px]">
-            <motion.div variants={imageVariants}>
-              <Image
-                src="/images/woman.jpg"
-                alt="A smiling Adarsh Pandit"
-                layout="fill"
-                objectFit="cover"
-                className="rounded-[30px] blur-[2.5px]"
-                priority
-              />
-            </motion.div>
-            <motion.div
-              className="absolute inset-0 flex items-center justify-center"
-              variants={buttonVariants}
-              whileHover="hover"
-            >
-              <button
-                aria-label="Play video"
-                className="p-3 bg-white rounded-full text-black text-3xl flex items-center justify-center shadow-lg"
-              >
+        {/* Right Column: Image */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center lg:justify-end">
+          <div className="relative w-full max-w-sm md:max-w-md lg:w-[480px] lg:h-[711px] h-[400px] sm:h-[500px] md:h-[600px]">
+            <Image 
+              src="/images/woman.jpg" 
+              alt="A smiling Adarsh Pandit" 
+              layout="fill" 
+              objectFit="cover" 
+              className="rounded-[30px] blur-[2.5px]" 
+              priority={true}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <button aria-label="Play video" className="transform transition-transform hover:scale-110 focus:outline-none p-3 bg-white rounded-full text-black text-2xl items-center justify-center">
                 <CiPlay1 />
               </button>
             </motion.div>

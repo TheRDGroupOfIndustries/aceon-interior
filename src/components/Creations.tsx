@@ -166,10 +166,11 @@ const CreationCard: React.FC<CreationCardProps> = ({ imageSrc, title, descriptio
         />
       </motion.div>
       <motion.div className="mt-6 text-left" variants={textVariants}>
+    
         <h3 className="font-poppins font-semibold text-2xl md:text-[32px] text-gray-800 uppercase leading-tight h-16">
           {title}
         </h3>
-        <p className="font-poppins pt-7 text-gray-500 mt-2 text-base text-justify leading-relaxed">
+        <p className=" text-gray-500 sm:mt-2 mt-2 text-[16px] text-base text-justify leading-relaxed">
           {description}
         </p>
         <motion.div className="mt-6 text-right" variants={linkVariants}>
