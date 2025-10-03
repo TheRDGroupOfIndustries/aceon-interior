@@ -87,82 +87,46 @@
 // export default Creations;
 
 "use client";
-import React from "react";
+import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { client } from "@/sanity/lib/sanity";
 
 interface CreationCardProps {
   imageSrc: string;
   title: string;
   description: string;
+  slug: string;
 }
-
-const creationsData: CreationCardProps[] = [
-  {
-    imageSrc: "/images/creation1.png",
-    title: "TITLE FOR THE CARD",
-    description:
-      "Figma ipsum component variant main layer. Opacity slice line distribute inspect font. Scrolling italic move move inspect connection.",
-  },
-  {
-    imageSrc: "/images/creation2.png",
-    title: "TITLE FOR THE CARD",
-    description:
-      "Figma ipsum component variant main layer. Opacity slice line distribute inspect font. Scrolling italic move move inspect connection.",
-  },
-  {
-    imageSrc: "/images/creation3.png",
-    title: "TITLE FOR THE CARD",
-    description:
-      "Figma ipsum component variant main layer. Opacity slice line distribute inspect font. Scrolling italic move move inspect connection.",
-  },
-];
 
 const CreationCard: React.FC<CreationCardProps> = ({
   imageSrc,
   title,
   description,
+  slug,
 }) => {
-  // Reference for the card to detect visibility
   const cardRef = useRef(null);
-  const isCardInView = useInView(cardRef, { margin: "-50px" }); // Removed once: true
+  const isCardInView = useInView(cardRef, { margin: "-50px" });
 
-  // Animation variants for card elements
   const cardVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
+    visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
   };
 
   const imageVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.5, ease: "easeOut" },
-    },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" } },
   };
 
   const textVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
-    },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
   };
 
   const linkVariants = {
     hidden: { opacity: 0, x: 20 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
-    },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } },
   };
 
   return (
@@ -173,61 +137,83 @@ const CreationCard: React.FC<CreationCardProps> = ({
       animate={isCardInView ? "visible" : "hidden"}
       variants={cardVariants}
     >
-      <motion.div
-        className="aspect-[373/311] overflow-hidden"
-        variants={imageVariants}
-      >
-        <img
-          src={imageSrc}
+      <motion.div className="aspect-[373/311] overflow-hidden" variants={imageVariants}>
+        <Image
+          src={imageSrc || "/placeholder.svg"}
           alt={title}
+          width={380}
+          height={285}
           className="w-full h-full object-cover transition-transform duration-500 ease-in-out hover:scale-110"
         />
       </motion.div>
       <motion.div className="mt-6 text-left" variants={textVariants}>
-        <h3 className="font-poppins font-semibold text-2xl  text-gray-800 uppercase leading-tight h-10">
+        <h3 className="font-poppins font-semibold text-2xl text-gray-800 uppercase leading-tight h-10">
           {title}
         </h3>
-        <p className=" text-gray-500   text-sm text-justify leading-relaxed">
-          {description}
-        </p>
+        <p className="text-gray-500 text-sm text-justify leading-relaxed">{description}</p>
         <motion.div className="mt-6 text-right" variants={linkVariants}>
-          <a
-            href="#"
-            className="font-poppins font-medium text-lg  text-[#936a53] inline-block capitalize hover:text-[#7d5945] transition-colors"
+          <Link
+            href={`/creations/${slug}`}
+            className="font-poppins font-medium text-lg text-[#936a53] inline-block capitalize hover:text-[#7d5945] transition-colors"
           >
             Read More →
-          </a>
+          </Link>
         </motion.div>
       </motion.div>
     </motion.article>
   );
 };
 
-const Creations: React.FC = () => {
-  // Reference for the section to detect visibility
-  const ref = useRef(null);
-  const isInView = useInView(ref, { margin: "-100px" }); // Removed once: true
+// GROQ query for Sanity
+const getCreationsQuery = `*[_type == "creation"] | order(order asc) {
+  title,
+  description,
+  "slug": slug.current,
+  "imageSrc": image.asset->url
+}`;
 
-  // Animation variants for heading and subtitle
+const Creations: React.FC = async () => {
+  const creationsData: CreationCardProps[] = await client.fetch(getCreationsQuery);
+
+  // fallback for local development
+  const fallbackData: CreationCardProps[] = [
+    {
+      imageSrc: "/images/creation1.png",
+      title: "TITLE FOR THE CARD",
+      description: "Figma ipsum component variant main layer. Opacity slice line distribute inspect font.",
+      slug: "creation-1",
+    },
+    {
+      imageSrc: "/images/creation2.png",
+      title: "TITLE FOR THE CARD",
+      description: "Figma ipsum component variant main layer. Opacity slice line distribute inspect font.",
+      slug: "creation-2",
+    },
+    {
+      imageSrc: "/images/creation3.png",
+      title: "TITLE FOR THE CARD",
+      description: "Figma ipsum component variant main layer. Opacity slice line distribute inspect font.",
+      slug: "creation-3",
+    },
+  ];
+
+  const dataToUse = creationsData.length > 0 ? creationsData : fallbackData;
+
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { margin: "-100px" });
+
   const textVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" },
-    },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
 
   return (
-    <section className="bg-white py-16 md:py-24 lg:px-36 px-4" ref={ref}>
+    <section className="bg-white py-16 md:py-24 lg:px-36 px-4" ref={sectionRef}>
       <div className="container mx-auto text-center">
         <motion.div
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
-          variants={{
-            visible: { transition: { staggerChildren: 0.2 } },
-            hidden: {},
-          }}
+          variants={{ visible: { transition: { staggerChildren: 0.2 } }, hidden: {} }}
         >
           <motion.h2
             className="font-playfair font-medium text-[#A97C51] text-4xl md:text-[68px] leading-tight"
@@ -243,14 +229,14 @@ const Creations: React.FC = () => {
           </motion.p>
         </motion.div>
 
-        {/* 3 cards: stack on mobile, single row on tablet/desktop */}
-        <div className="mt-10 sm:mt-16 flex flex-col md:flex-row xl:flex-row justify-center gap-8 md:gap-x-12 xl:gap-x-12 items-stretch">
-          {creationsData.map((creation, index) => (
+        <div className="mt-10 sm:mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          {dataToUse.map((creation, index) => (
             <CreationCard
               key={index}
               imageSrc={creation.imageSrc}
               title={creation.title}
               description={creation.description}
+              slug={creation.slug}
             />
           ))}
         </div>
