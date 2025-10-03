@@ -67,7 +67,7 @@ export default function Philosophy() {
           {/* Left column: text */}
           <div className="md:w-1/2">
             <p className="text-neutral-700 text-[16px] md:text-[20px] leading-relaxed">
-              Aceon Interio offers complete interior solutions tailored to your budget and space. Whether it's a shop, villa, hotel, restaurant, or showroom, we design with precision and style. Experience innovative space management and modern aesthetics, all under one roof. Transform your space beautifully and affordably with Aceon Interio.
+              Aceon Interio offers complete interior solutions tailored to your budget and space. Whether it&apos;s a shop, villa, hotel, restaurant, or showroom, we design with precision and style. Experience innovative space management and modern aesthetics, all under one roof. Transform your space beautifully and affordably with Aceon Interio.
             </p>
           </div>
 

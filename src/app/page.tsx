@@ -5,6 +5,8 @@ import InspirationGallery from "@/components/Inspiration";
 import PartnersSection from "@/components/Partners";
 import Philosophy from "@/components/Philosophy"; 
 import Services from "@/components/Services"; 
+import Contact from "@/components/contact";
+import Footer from "@/components/footer";
 
 
 export default function Home() {
@@ -17,7 +19,8 @@ export default function Home() {
       <Creations/>
       <TestimonialSection/>
       <PartnersSection/>
-      
+      <Contact />
+      <Footer/>
       
     </div>
   );

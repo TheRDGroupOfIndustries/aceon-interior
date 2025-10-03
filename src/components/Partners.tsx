@@ -1,8 +1,10 @@
+"use client"
+
 import React from 'react';
 
 const PartnersSection: React.FC = () => {
   return (
-    <section className="bg-white py-16 md:py-24 px-4">
+    <section className="bg-white py-16 md:py-24 px-6">
       <div className="container mx-auto">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="font-playfair font-medium text-[#A97C51] text-4xl md:text-[58px] leading-tight capitalize">
@@ -13,10 +15,22 @@ const PartnersSection: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex justify-center">
+        {/* 1. Partner Logos Image */}
+        <div className="flex justify-center mb-16 md:mb-24"> {/* Added bottom margin for separation */}
           <img 
             src="/images/partners-horizontal.png" 
             alt="A banner displaying the logos of our trusted partners like Fevicol, Pidilite, Asian Paints, and more"
+            className="w-full max-w-[1440px] h-auto"
+            loading="lazy"
+            
+          />
+        </div>
+
+        {/* 2. New Image (Banner.png) placed directly below the partners */}
+        <div className="flex justify-center pt-8"> {/* Added top padding for spacing from the logos */}
+          <img 
+            src="/images/Banner.png" 
+            alt="A separate promotional banner or message related to the company's services."
             className="w-full max-w-[1440px] h-auto"
             loading="lazy"
           />
