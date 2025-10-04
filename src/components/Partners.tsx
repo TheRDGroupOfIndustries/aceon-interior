@@ -35,7 +35,7 @@
 
 "use client";
 import React from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, Variants } from "framer-motion";
 import { useRef } from "react";
 
 const PartnersSection: React.FC = () => {
@@ -44,7 +44,7 @@ const PartnersSection: React.FC = () => {
   const isSectionInView = useInView(sectionRef, { margin: "-100px" }); // No once: true
 
   // Animation variants for container
-  const containerVariants = {
+  const containerVariants:Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -55,7 +55,7 @@ const PartnersSection: React.FC = () => {
   };
 
   // Animation variants for text and image elements
-  const elementVariants = {
+  const elementVariants:Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: (index: number) => ({
       opacity: 1,
@@ -69,7 +69,7 @@ const PartnersSection: React.FC = () => {
   };
 
   // Animation variants for the image
-  const imageVariants = {
+  const imageVariants:Variants = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: (index: number) => ({
       opacity: 1,

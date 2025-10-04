@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useState, useRef } from "react";
 import { IoEyeOutline } from "react-icons/io5";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, Variants } from "framer-motion";
 
 const servicesData = [
   {
@@ -28,7 +28,7 @@ export default function Services() {
   const isInView = useInView(ref, { margin: "-100px" }); // No once: true
 
   // Animation variants for section heading and subtitle
-  const textVariants = {
+  const textVariants:Variants = {
     hidden: (direction: string = "up") => ({
       opacity: 0,
       y: direction === "up" ? 30 : 0,
@@ -102,7 +102,7 @@ function ServiceCard({
   const isCardInView = useInView(cardRef, { margin: "-50px" });
 
   // Animation variants
-  const cardVariants = {
+  const cardVariants:Variants = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: (index: number) => ({
       opacity: 1,
@@ -116,7 +116,7 @@ function ServiceCard({
     }),
   };
 
-  const imageVariants = {
+  const imageVariants:Variants = {
     hidden: { opacity: 0, scale: 0.9 },
     visible: {
       opacity: 1,
@@ -125,7 +125,7 @@ function ServiceCard({
     },
   };
 
-  const textVariants = {
+  const textVariants:Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
@@ -134,7 +134,7 @@ function ServiceCard({
     },
   };
 
-  const buttonVariants = {
+  const buttonVariants:Variants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: {
       opacity: 1,

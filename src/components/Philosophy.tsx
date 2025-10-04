@@ -55,7 +55,7 @@
 
 'use client'
 import Image from "next/image";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, Variants } from "framer-motion";
 import { useRef } from "react";
 
 export default function Philosophy() {
@@ -64,19 +64,19 @@ export default function Philosophy() {
   const isInView = useInView(ref, { margin: "-100px" }); // Removed once: true
 
   // Animation variants for heading and subtitle
-  const textVariants = {
+  const textVariants:Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
 
   // Animation variants for the text block
-  const paragraphVariants = {
+  const paragraphVariants:Variants = {
     hidden: { opacity: 0, x: -20 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
 
   // Animation variants for the collage container
-  const collageVariants = {
+  const collageVariants:Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -87,7 +87,7 @@ export default function Philosophy() {
   };
 
   // Animation variants for individual images in the collage
-  const imageVariants = {
+  const imageVariants:Variants = {
     hidden: (direction) => ({
       opacity: 0,
       x: direction === "left" ? -20 : direction === "right" ? 20 : 0,
