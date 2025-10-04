@@ -130,7 +130,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView ,Variants} from "framer-motion";
 import { BsInstagram, BsTwitterX } from "react-icons/bs";
 import { FaFacebook } from "react-icons/fa6";
 
@@ -149,7 +149,7 @@ const Footer: React.FC = () => {
     },
   };
 
-  const textVariants = {
+  const textVariants:Variants = {
     hidden: (direction: string = "up") => ({
       opacity: 0,
       y: direction === "up" ? 20 : 0,
@@ -169,7 +169,7 @@ const Footer: React.FC = () => {
     }),
   };
 
-  const buttonVariants = {
+  const buttonVariants:Variants = {
     hidden: { opacity: 0, scale: 0.85 },
     visible: (index: number) => ({
       opacity: 1,
