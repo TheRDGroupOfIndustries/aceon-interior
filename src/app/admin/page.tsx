@@ -404,7 +404,7 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-2xl w-full max-w-md">
             <div className="p-6 border-b">
-              <h3 className="text-lg font-serif">Update Application Status</h3>
+              <h3 className="text-lg text-black font-serif">Update Application Status</h3>
               <p className="text-sm text-gray-500">{selectedApp.fullName} - {selectedApp._id}</p>
             </div>
             <form onSubmit={handleStatusUpdate}>
@@ -415,7 +415,7 @@ export default function AdminDashboard() {
                     id="status"
                     value={updateStatus}
                     onChange={e => setUpdateStatus(e.target.value as EMIApplication["status"])}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-[#A97C51]"
+                    className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-[#A97C51]"
                   >
                     <option value="pending">Pending</option>
                     <option value="under_review">Under Review</option>
@@ -430,7 +430,7 @@ export default function AdminDashboard() {
                     value={updateAdminNotes}
                     onChange={e => setUpdateAdminNotes(e.target.value)}
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-[#A97C51]"
+                    className="w-full px-3 py-2 border placeholder:text-gray-700 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-[#A97C51]"
                     placeholder="Add notes for the applicant..."
                   />
                 </div>
