@@ -26,13 +26,10 @@ interface ContactMessage {
   _id: string
   name: string
   email: string
-  phone?: string
   number?: string
   address?: string
   description: string
-  message: string
   createdAt: string
-
 }
 
 export default function AdminDashboard() {
@@ -53,15 +50,32 @@ export default function AdminDashboard() {
     total: 0,
   })
 
-  const limit = 10
+  const [selectedApp, setSelectedApp] = useState<EMIApplication | null>(null)
+  const [isUpdating, setIsUpdating] = useState(false)
+  const [updateStatus, setUpdateStatus] = useState<EMIApplication["status"]>("pending")
+  const [updateAdminNotes, setUpdateAdminNotes] = useState("")
+  const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null)
+
+  const limit = 10;
 
   useEffect(() => {
-    fetchEMIApplications()
-  }, [emiPage, emiFilter])
+    if (activeTab === "emi") {
+      fetchEMIApplications();
+    }
+  }, [emiPage, emiFilter, activeTab]);
+  
+  useEffect(() => {
+    if (activeTab === "contact") {
+      fetchContactMessages();
+    }
+  }, [contactPage, activeTab]);
 
   useEffect(() => {
-    fetchContactMessages()
-  }, [contactPage])
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [notification])
 
   const fetchEMIApplications = async () => {
     setLoading(true)
@@ -69,7 +83,6 @@ export default function AdminDashboard() {
       const statusParam = emiFilter !== "all" ? `&status=${emiFilter}` : ""
       const response = await fetch(`/api/emi?page=${emiPage}&limit=${limit}${statusParam}`)
       const data = await response.json()
-
       if (data.success) {
         setEmiApplications(data.data.applications)
         setEmiTotal(data.data.pagination.total)
@@ -87,7 +100,6 @@ export default function AdminDashboard() {
     try {
       const response = await fetch(`/api/contact?page=${contactPage}&limit=${limit}`)
       const data = await response.json()
-
       setContactMessages(data.messages)
       setContactTotal(data.pagination.total)
     } catch (error) {
@@ -97,180 +109,112 @@ export default function AdminDashboard() {
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
+  const handleStatusUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedApp) return
+
+    setIsUpdating(true)
+    setNotification(null)
+    try {
+      const response = await fetch("/api/emi", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          applicationId: selectedApp._id,
+          status: updateStatus,
+          adminNotes: updateAdminNotes,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setNotification({ message: "Application updated successfully!", type: "success" })
+        setSelectedApp(null)
+        fetchEMIApplications()
+      } else {
+        throw new Error(data.error || "Failed to update application")
+      }
+    } catch (error) {
+      setNotification({ message: (error as Error).message, type: "error" })
+    } finally {
+      setIsUpdating(false)
+    }
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(amount)
-  }
+  const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString("en-IN", {
+    day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
+  })
+
+  const formatCurrency = (amount: number) => new Intl.NumberFormat("en-IN", {
+    style: "currency", currency: "INR", maximumFractionDigits: 0
+  }).format(amount)
+  
+  const filterButtons = [
+    { key: 'all', label: 'All', count: statusStats.total },
+    { key: 'pending', label: 'Pending', count: statusStats.pending },
+    { key: 'under_review', label: 'Under Review', count: statusStats.under_review },
+    { key: 'approved', label: 'Approved', count: statusStats.approved },
+    { key: 'rejected', label: 'Rejected', count: statusStats.rejected },
+  ];
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-
-
-<div className="border-b">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex items-center gap-3">
-    <Link
-      href="/"
-      className="text-gray-600 hover:text-[#A97C51] transition-colors"
-    >
-      <BsArrowLeft className="w-6 h-6 sm:w-7 sm:h-7" />
-    </Link>
-    <div className="pl-6 sm:pl-10">
-      <h1
-        className="text-2xl sm:text-4xl font-serif mb-1 sm:mb-2"
-        style={{ color: "#A97C51" }}
-      >
-        Admin Dashboard
-      </h1>
-      <p className="text-sm sm:text-base text-gray-600">
-        Manage inquiries and applications
-      </p>
-    </div>
-  </div>
-</div>
-
-
+      <div className="border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex items-center gap-3">
+          <Link href="/" className="text-gray-600 hover:text-[#A97C51] transition-colors">
+            <BsArrowLeft className="w-6 h-6 sm:w-7 sm:h-7" />
+          </Link>
+          <div className="pl-6 sm:pl-10">
+            <h1 className="text-2xl sm:text-4xl font-serif mb-1 sm:mb-2" style={{ color: "#A97C51" }}>
+              Admin Dashboard
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600">Manage inquiries and applications</p>
+          </div>
+        </div>
+      </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Tabs */}
         <div className="flex gap-1 border-b mb-8">
           <button
             onClick={() => setActiveTab("emi")}
-            className={`px-6 py-3 font-medium transition-colors relative ${
-              activeTab === "emi" ? "text-gray-900" : "text-gray-500 hover:text-gray-700"
-            }`}
+            className={`px-6 py-3 font-medium transition-colors relative ${activeTab === "emi" ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
           >
             EMI Applications ({statusStats.total})
-            {activeTab === "emi" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ backgroundColor: "#A97C51" }} />
-            )}
+            {activeTab === "emi" && <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ backgroundColor: "#A97C51" }} />}
           </button>
           <button
             onClick={() => setActiveTab("contact")}
-            className={`px-6 py-3 font-medium transition-colors relative ${
-              activeTab === "contact" ? "text-gray-900" : "text-gray-500 hover:text-gray-700"
-            }`}
+            className={`px-6 py-3 font-medium transition-colors relative ${activeTab === "contact" ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
           >
             Contact Messages ({contactTotal})
-            {activeTab === "contact" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ backgroundColor: "#A97C51" }} />
-            )}
+            {activeTab === "contact" && <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ backgroundColor: "#A97C51" }} />}
           </button>
         </div>
 
-        
         {activeTab === "emi" && (
           <div>
-      
             <div className="flex flex-wrap gap-2 mb-8">
-              <button
-                onClick={() => {
-                  setEmiFilter("all")
-                  setEmiPage(1)
-                }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  emiFilter === "all"
-                    ? "text-white shadow-sm"
-                    : "bg-white border border-gray-200 text-gray-700 hover:border-gray-300"
-                }`}
-                style={emiFilter === "all" ? { backgroundColor: "#A97C51" } : {}}
-              >
-                All ({statusStats.total})
-              </button>
-              <button
-                onClick={() => {
-                  setEmiFilter("pending")
-                  setEmiPage(1)
-                }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  emiFilter === "pending"
-                    ? "text-white shadow-sm"
-                    : "bg-white border border-gray-200 text-gray-700 hover:border-gray-300"
-                }`}
-                style={emiFilter === "pending" ? { backgroundColor: "#A97C51" } : {}}
-              >
-                Pending ({statusStats.pending})
-              </button>
-              <button
-                onClick={() => {
-                  setEmiFilter("under_review")
-                  setEmiPage(1)
-                }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  emiFilter === "under_review"
-                    ? "text-white shadow-sm"
-                    : "bg-white border border-gray-200 text-gray-700 hover:border-gray-300"
-                }`}
-                style={emiFilter === "under_review" ? { backgroundColor: "#A97C51" } : {}}
-              >
-                Under Review ({statusStats.under_review})
-              </button>
-              <button
-                onClick={() => {
-                  setEmiFilter("approved")
-                  setEmiPage(1)
-                }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  emiFilter === "approved"
-                    ? "text-white shadow-sm"
-                    : "bg-white border border-gray-200 text-gray-700 hover:border-gray-300"
-                }`}
-                style={emiFilter === "approved" ? { backgroundColor: "#A97C51" } : {}}
-              >
-                Approved ({statusStats.approved})
-              </button>
-              <button
-                onClick={() => {
-                  setEmiFilter("rejected")
-                  setEmiPage(1)
-                }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  emiFilter === "rejected"
-                    ? "text-white shadow-sm"
-                    : "bg-white border border-gray-200 text-gray-700 hover:border-gray-300"
-                }`}
-                style={emiFilter === "rejected" ? { backgroundColor: "#A97C51" } : {}}
-              >
-                Rejected ({statusStats.rejected})
-              </button>
+                {filterButtons.map(btn => (
+                    <button key={btn.key} onClick={() => { setEmiFilter(btn.key); setEmiPage(1); }}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${emiFilter === btn.key ? "text-white shadow-sm" : "bg-white border border-gray-200 text-gray-700 hover:border-gray-300"}`}
+                        style={emiFilter === btn.key ? { backgroundColor: "#A97C51" } : {}}>
+                        {btn.label} 
+                    </button>
+                ))}
             </div>
-
-            {/* Applications List */}
             <div className="space-y-4">
               {loading ? (
                 <div className="flex items-center justify-center py-20">
-                  <div className="text-center">
-                    <div
-                      className="w-10 h-10 border-3 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-                      style={{ borderColor: "#A97C51", borderTopColor: "transparent", borderWidth: "3px" }}
-                    />
-                    <p className="text-gray-500">Loading...</p>
-                  </div>
+                  <div className="w-10 h-10 border-3 border-t-transparent rounded-full animate-spin" style={{ borderColor: "#A97C51", borderTopColor: "transparent", borderWidth: "3px" }} />
                 </div>
               ) : emiApplications.length === 0 ? (
                 <div className="text-center py-20 border border-dashed border-gray-300 rounded-lg">
-                  <p className="text-gray-500">No applications found</p>
+                  <p className="text-gray-500">No applications found for this filter.</p>
                 </div>
               ) : (
-                emiApplications.map((app) => (
-                  <div
-                    key={app._id}
-                    className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow"
-                  >
-                    {/* Header */}
+                emiApplications.map(app => (
+                  <div key={app._id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
                     <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6 pb-6 border-b">
                       <div>
                         <h3 className="text-xl font-serif text-black mb-2">{app.fullName}</h3>
@@ -280,87 +224,53 @@ export default function AdminDashboard() {
                           <p className="text-xs text-gray-500">{formatDate(app.createdAt)}</p>
                         </div>
                       </div>
-                      <div>
-                        <span
-                          className="inline-block px-3 py-1 rounded-full text-xs font-medium"
-                          style={{
-                            backgroundColor: "#A97C51",
-                            color: "white",
-                          }}
-                        >
-                          {app.status.replace("_", " ").toUpperCase()}
-                        </span>
-                      </div>
+                      <span className="inline-block px-3 py-1 rounded-full text-xs font-medium text-white" style={{ backgroundColor: "#A97C51" }}>
+                        {app.status.replace("_", " ").toUpperCase()}
+                      </span>
                     </div>
 
-                    {/* Details Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                       <div>
                         <p className="text-xs text-gray-500 mb-1">Total Amount</p>
-                        <p className="text-2xl font-semibold" style={{ color: "#A97C51" }}>
-                          {formatCurrency(app.totalAmount)}
-                        </p>
+                        <p className="text-2xl font-semibold" style={{ color: "#A97C51" }}>{formatCurrency(app.totalAmount)}</p>
                         <p className="text-sm text-gray-600 mt-1">Down Payment: {formatCurrency(app.downPayment)}</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">Monthly EMI</p>
-                        <p className="text-2xl font-semibold" style={{ color: "#A97C51" }}>
-                          {formatCurrency(app.calculatedEMI)}
-                        </p>
+                        <p className="text-2xl font-semibold" style={{ color: "#A97C51" }}>{formatCurrency(app.calculatedEMI)}</p>
                         <p className="text-sm text-gray-600 mt-1">Tenure: {app.emiTenure} months</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">Monthly Income</p>
-                        <p className="text-2xl font-semibold" style={{ color: "#A97C51" }}>
-                          {formatCurrency(app.monthlyIncome)}
-                        </p>
+                        <p className="text-2xl font-semibold" style={{ color: "#A97C51" }}>{formatCurrency(app.monthlyIncome)}</p>
                         <p className="text-sm text-gray-600 mt-1">{app.employmentType}</p>
                       </div>
                     </div>
-
-                
-                    <div className="space-y-2 text-sm">
-                      <p>
-                        <span className="text-gray-500">Package:</span>{" "}
-                        <span className="font-medium text-black">{app.interiorPackage}</span>
-                      </p>
-                      {app.bankDetails && (
-                        <p>
-                          <span className="text-gray-500">Bank Details:</span>{" "}
-                          <span className="font-medium text-black">{app.bankDetails}</span>
-                        </p>
-                      )}
-                      {app.adminNotes && (
-                        <div className="bg-gray-50 p-3 rounded-lg mt-3">
-                          <p className="text-gray-500 text-xs mb-1">Admin Notes</p>
-                          <p className="font-medium">{app.adminNotes}</p>
-                        </div>
-                      )}
+                    <div className="mt-6 pt-6 border-t flex justify-end">
+                      <button
+                        onClick={() => {
+                          setSelectedApp(app)
+                          setUpdateStatus(app.status)
+                          setUpdateAdminNotes(app.adminNotes || "")
+                        }}
+                        className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors">
+                        Update Status
+                      </button>
                     </div>
                   </div>
                 ))
               )}
             </div>
-
-            {/* Pagination */}
             {emiTotal > limit && (
               <div className="flex items-center justify-between mt-8 pt-6 border-t">
                 <p className="text-sm text-gray-600">
                   Showing {(emiPage - 1) * limit + 1} to {Math.min(emiPage * limit, emiTotal)} of {emiTotal}
                 </p>
                 <div className="flex gap-2">
-                  <button
-                    onClick={() => setEmiPage((p) => Math.max(1, p - 1))}
-                    disabled={emiPage === 1}
-                    className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:border-gray-300 transition-colors"
-                  >
+                  <button onClick={() => setEmiPage(p => Math.max(1, p - 1))} disabled={emiPage === 1} className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium disabled:opacity-50 hover:border-gray-300">
                     Previous
                   </button>
-                  <button
-                    onClick={() => setEmiPage((p) => p + 1)}
-                    disabled={emiPage * limit >= emiTotal}
-                    className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:border-gray-300 transition-colors"
-                  >
+                  <button onClick={() => setEmiPage(p => p + 1)} disabled={emiPage * limit >= emiTotal} className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium disabled:opacity-50 hover:border-gray-300">
                     Next
                   </button>
                 </div>
@@ -368,8 +278,7 @@ export default function AdminDashboard() {
             )}
           </div>
         )}
-
-        {/* Contact Messages Tab */}
+        
         {activeTab === "contact" && (
           <div>
             <div className="space-y-4">
@@ -487,9 +396,63 @@ export default function AdminDashboard() {
                 </div>
               </div>
             )}
-          </div>
+              </div>
         )}
       </div>
+
+      {selectedApp && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-md">
+            <div className="p-6 border-b">
+              <h3 className="text-lg font-serif">Update Application Status</h3>
+              <p className="text-sm text-gray-500">{selectedApp.fullName} - {selectedApp._id}</p>
+            </div>
+            <form onSubmit={handleStatusUpdate}>
+              <div className="p-6 space-y-4">
+                <div>
+                  <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <select
+                    id="status"
+                    value={updateStatus}
+                    onChange={e => setUpdateStatus(e.target.value as EMIApplication["status"])}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-[#A97C51]"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="under_review">Under Review</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="adminNotes" className="block text-sm font-medium text-gray-700 mb-1">Admin Notes</label>
+                  <textarea
+                    id="adminNotes"
+                    value={updateAdminNotes}
+                    onChange={e => setUpdateAdminNotes(e.target.value)}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-[#A97C51]"
+                    placeholder="Add notes for the applicant..."
+                  />
+                </div>
+              </div>
+              <div className="p-6 bg-gray-50 rounded-b-lg flex justify-end gap-3">
+                <button type="button" onClick={() => setSelectedApp(null)} className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-800 hover:bg-gray-50">
+                  Cancel
+                </button>
+                <button type="submit" disabled={isUpdating} className="px-4 py-2 border rounded-lg text-sm font-medium text-white shadow-sm disabled:opacity-70" style={{ backgroundColor: "#A97C51" }}>
+                  {isUpdating ? "Updating..." : "Update & Notify"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {notification && (
+        <div className="fixed bottom-5 right-5 z-50 px-6 py-4 rounded-lg shadow-lg text-white" style={{backgroundColor: notification.type === "success" ? "#10B981" : "#EF4444"}}>
+            {notification.message}
+        </div>
+      )}
     </div>
   )
 }
