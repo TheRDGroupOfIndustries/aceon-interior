@@ -23,51 +23,34 @@ const servicesData = [
 ];
 
 export default function Services() {
-  // Reference for the section to detect visibility
   const ref = useRef(null);
-  const isInView = useInView(ref, { margin: "-100px" }); // No once: true
+  const isInView = useInView(ref, { margin: "-100px" });
 
-  // Animation variants for section heading and subtitle
-  const textVariants:Variants = {
-    hidden: (direction: string = "up") => ({
-      opacity: 0,
-      y: direction === "up" ? 30 : 0,
-      rotate: direction === "up" ? 3 : 0, // Subtle rotation for heading
-    }),
-    visible: (index: number) => ({
-      opacity: 1,
-      y: 0,
-      rotate: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut",
-        delay: index * 0.15,
-      },
-    }),
+  const textVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  };
+
+  const sectionVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
   };
 
   return (
-    <section className="bg-white py-12 px-6 md:px-12" ref={ref}>
-      <div className="max-w-[1200px] mx-auto text-center">
+    <section id="services" className="bg-white py-16 md:py-20 px-6 md:px-12" ref={ref}>
+      <div className="max-w-[1200px] mx-auto">
         <motion.div
+          className="text-center mb-8"
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
-          variants={{
-            hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
-          }}
+          variants={sectionVariants}
         >
-          <motion.h2
-            className="text-[44px] sm:text-5xl font-playfair text-[#b98663]"
-            variants={textVariants}
-            custom={0} // First to appear
-          >
+          <motion.h2 className="text-5xl font-serif text-[#b98663]" variants={textVariants}>
             Our Services
           </motion.h2>
           <motion.p
-            className="text-neutral-600 mt-2 mb-8 text-base sm:text-lg"
+            className="text-sm md:text-base text-neutral-600 mt-2 font-serif"
             variants={textVariants}
-            custom={1} // Second to appear
           >
             Comprehensive solutions tailored to your needs.
           </motion.p>
@@ -97,74 +80,48 @@ function ServiceCard({
   const [expanded, setExpanded] = useState(false);
   const shortText = desc.slice(0, 140) + "...";
 
-  // Reference for the card to detect visibility
   const cardRef = useRef(null);
   const isCardInView = useInView(cardRef, { margin: "-50px" });
 
-  // Animation variants
-  const cardVariants:Variants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: (index: number) => ({
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut",
-        delay: index * 0.15 + 0.3,
-        staggerChildren: 0.15,
-      },
-    }),
-  };
-
-  const imageVariants:Variants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.6, ease: "easeOut" },
-    },
-  };
-
-  const textVariants:Variants = {
-    hidden: { opacity: 0, y: 20 },
+  const cardVariants: Variants = {
+    hidden: { opacity: 0, y: 30, scale: 0.95 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
+      scale: 1,
+      transition: { duration: 0.6, ease: "easeOut", delay: index * 0.15 },
     },
   };
 
-  const buttonVariants:Variants = {
+  const imageVariants: Variants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" } },
+  };
+
+  const textVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  };
+
+  const buttonVariants: Variants = {
     hidden: { opacity: 0, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { type: "spring", stiffness: 100, damping: 10 },
-    },
+    visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 100, damping: 10 } },
   };
 
   return (
     <motion.article
-      className="relative"
       ref={cardRef}
       initial="hidden"
       animate={isCardInView ? "visible" : "hidden"}
       variants={cardVariants}
-      custom={index + 2}
     >
       <div className="relative w-full min-h-[500px] rounded-[14px] overflow-hidden">
         {/* Background shape */}
         <motion.div variants={imageVariants}>
-          <Image
-            src="/card_shape.svg"
-            alt="card background"
-            fill
-            className="object-cover"
-            sizes="100vw"
-          />
+          <Image src="/card_shape.svg" alt="card background" fill className="object-cover" sizes="100vw" />
         </motion.div>
 
-        {/* Main Image with hover zoom */}
+        {/* Main Image */}
         <motion.div
           className="absolute top-0 left-0 w-full h-[50%] overflow-hidden group"
           variants={imageVariants}
@@ -173,23 +130,17 @@ function ServiceCard({
             src={img}
             alt={title}
             fill
-            className="object-cover p-2 rounded-3xl transition-transform duration-500 ease-in-out group-hover:scale-110"
+            className="object-cover p-2 rounded-3xl transition-transform duration-500 ease-in-out group-hover:scale-103"
             sizes="100vw"
           />
         </motion.div>
 
-        {/* Text content */}
+        {/* Text Content */}
         <motion.div
           className="absolute top-[50%] left-0 w-full h-[50%] px-4 text-black text-start flex flex-col"
-          variants={{
-            hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
-          }}
+          variants={{ visible: { transition: { staggerChildren: 0.15 } } }}
         >
-          <motion.h3
-            className="text-xl sm:text-2xl font-bold mb-2 font-playfair"
-            variants={textVariants}
-          >
+          <motion.h3 className="text-xl sm:text-2xl font-bold mb-2 font-playfair" variants={textVariants}>
             {title}
           </motion.h3>
           <motion.p

@@ -107,7 +107,7 @@
 
 "use client";
 import React from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, Variants } from "framer-motion";
 import { useRef } from "react";
 
 interface GalleryItem {
@@ -137,13 +137,13 @@ const InspirationGallery: React.FC = () => {
   const isSectionInView = useInView(sectionRef, { margin: "-100px" }); // No once: true
 
   // Animation variants for heading and subtitle
-  const textVariants = {
+  const textVariants:Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
 
   // Animation variants for gallery rows (desktop)
-  const rowVariants = {
+  const rowVariants:Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -154,7 +154,7 @@ const InspirationGallery: React.FC = () => {
   };
 
   // Animation variants for images
-  const imageVariants = {
+  const imageVariants:Variants = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: (index: number) => ({
       opacity: 1,

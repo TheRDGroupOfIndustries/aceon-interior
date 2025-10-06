@@ -443,16 +443,16 @@ export default function Hero() {
 
           {/* Navigation for Desktop  */}
           <nav className="hidden md:flex gap-6 lg:gap-8 text-white text-sm flex-shrink-0 flex-nowrap">
-            <a href="/home" className="hover:underline font-semibold whitespace-nowrap">
+            <a href="/" className="hover:underline font-semibold whitespace-nowrap">
               Home
             </a>
-            <a href="/services" className="hover:underline font-semibold whitespace-nowrap">
+            <a href="#services" className="hover:underline font-semibold whitespace-nowrap">
               Services
             </a>
-            <a href="/about" className="hover:underline font-semibold whitespace-nowrap">
+            <a href="#about" className="hover:underline font-semibold whitespace-nowrap">
               About
             </a>
-            <a href="/contact" className="hover:underline font-semibold whitespace-nowrap">
+            <a href="#contact" className="hover:underline font-semibold whitespace-nowrap">
               Contact
             </a>
           </nav>
@@ -497,7 +497,7 @@ export default function Hero() {
 
         {/* Hero content  */}
         <div className="relative flex flex-col items-start h-full pt-24 sm:pt-32 pb-48 md:pb-6 px-4 sm:px-6 md:px-8 overflow-hidden">
-          <div className="max-w-[670px] text-white relative md:absolute md:top-1/3 md:left-8 lg:left-[40px] w-full md:w-auto text-left clamp-w-[85%] max-w-[90vw]">
+          <div className=" text-white relative md:absolute md:top-1/3 md:left-8 lg:left-[40px] w-full md:w-auto text-left clamp-w-[85%] max-w-[90vw]">
             <h1 className="text-[32px] sm:text-[36px] md:text-[56px] lg:text-[72px] xl:text-[84px] leading-[0.95] font-playfair">
               Creating Comfort
               With Style
