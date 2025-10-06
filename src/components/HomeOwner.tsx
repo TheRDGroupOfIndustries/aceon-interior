@@ -414,7 +414,7 @@
 import React from "react";
 import Image from "next/image";
 import { CiPlay1 } from "react-icons/ci";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, Variants } from "framer-motion";
 import { useRef } from "react";
 
 const TestimonialSection: React.FC = () => {
@@ -423,7 +423,7 @@ const TestimonialSection: React.FC = () => {
   const isSectionInView = useInView(sectionRef, { margin: "-100px" }); // No once: true
 
   // Animation variants for containers
-  const containerVariants = {
+  const containerVariants:Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -434,7 +434,7 @@ const TestimonialSection: React.FC = () => {
   };
 
   // Animation variants for image container
-  const imageContainerVariants = {
+  const imageContainerVariants:Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -445,7 +445,7 @@ const TestimonialSection: React.FC = () => {
   };
 
   // Animation variants for text elements
-  const textVariants = {
+  const textVariants:Variants = {
     hidden: (direction: string = "up") => ({
       opacity: 0,
       y: direction === "up" ? 30 : 0,
@@ -466,7 +466,7 @@ const TestimonialSection: React.FC = () => {
   };
 
   // Animation variants for background image
-  const backgroundVariants = {
+  const backgroundVariants:Variants = {
     hidden: { opacity: 0 },
     visible: (index: number) => ({
       opacity: 1,
@@ -479,7 +479,7 @@ const TestimonialSection: React.FC = () => {
   };
 
   // Animation variants for right-side image
-  const imageVariants = {
+  const imageVariants:Variants = {
     hidden: { opacity: 0, scale: 0.9, y: 40 },
     visible: (index: number) => ({
       opacity: 1,
@@ -494,7 +494,7 @@ const TestimonialSection: React.FC = () => {
   };
 
   // Animation variants for play button
-  const buttonVariants = {
+  const buttonVariants:Variants = {
     hidden: { opacity: 0, scale: 0.8, rotate: -10 },
     visible: (index: number) => ({
       opacity: 1,

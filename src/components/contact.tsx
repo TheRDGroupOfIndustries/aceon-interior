@@ -76,6 +76,7 @@ const Contact: React.FC = () => {
       whileInView="visible"
       viewport={{ once: false, amount: 0.2 }}
     >
+      <section id="contact">
       {/* Heading */}
       <motion.div
         className="text-center mb-16"
@@ -221,6 +222,7 @@ const Contact: React.FC = () => {
           </form>
         </motion.div>
       </div>
+      </section>
     </motion.div>
   );
 };
