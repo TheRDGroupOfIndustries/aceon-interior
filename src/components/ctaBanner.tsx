@@ -1,23 +1,18 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import Image from "next/image";
 import { motion, useInView, Variants } from "framer-motion";
-import { useRef } from "react";
 import EMIApplicationModal from "./EMIApplicationModal";
 
 const CtaBanner: React.FC = () => {
-  const sectionRef = useRef(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
   const isSectionInView = useInView(sectionRef, { margin: "-100px" });
   const [isEMIModalOpen, setIsEMIModalOpen] = useState(false);
 
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.3,
-      },
-    },
+    visible: { opacity: 1, transition: { staggerChildren: 0.3 } },
   };
 
   const elementVariants: Variants = {
@@ -25,11 +20,7 @@ const CtaBanner: React.FC = () => {
     visible: (index: number) => ({
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-        delay: index * 0.3,
-      },
+      transition: { duration: 0.5, ease: "easeOut", delay: index * 0.3 },
     }),
   };
 
@@ -38,17 +29,16 @@ const CtaBanner: React.FC = () => {
     visible: (index: number) => ({
       opacity: 1,
       scale: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-        delay: index * 0.3,
-      },
+      transition: { duration: 0.5, ease: "easeOut", delay: index * 0.3 },
     }),
   };
 
   return (
     <>
-      <section className="relative w-full h-[400px] overflow-hidden" ref={sectionRef}>
+      <section
+        className="relative w-full h-[400px] overflow-hidden"
+        ref={sectionRef}
+      >
         {/* Background Image and Overlay */}
         <motion.div
           className="absolute inset-0 z-0"
@@ -57,10 +47,12 @@ const CtaBanner: React.FC = () => {
           variants={imageVariants}
           custom={0}
         >
-          <img
+          <Image
             src="/images/modern.png"
             alt="Elegant modern dining room"
-            className="absolute inset-0 w-full h-full object-cover object-center"
+            fill
+            style={{ objectFit: "cover", objectPosition: "center" }}
+            priority
           />
           <div className="absolute inset-0 z-10 bg-black/50"></div>
         </motion.div>
@@ -74,10 +66,7 @@ const CtaBanner: React.FC = () => {
         >
           <motion.div
             className="flex flex-col items-center"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: { opacity: 1, transition: { staggerChildren: 0.3 } },
-            }}
+            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.3 } } }}
           >
             <motion.h3
               className="font-playfair font-medium text-4xl md:text-[48px] leading-tight"
@@ -96,10 +85,7 @@ const CtaBanner: React.FC = () => {
 
             <motion.div
               className="mt-8 flex flex-col sm:flex-row items-center gap-4"
-              variants={{
-                hidden: { opacity: 0 },
-                visible: { opacity: 1, transition: { staggerChildren: 0.3 } },
-              }}
+              variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.3 } } }}
             >
               <motion.button
                 className="bg-[#A97C51] font-poppins text-white font-medium w-full sm:w-[340px] h-[52px] rounded-[10px] flex items-center justify-center transition-colors duration-300 text-sm sm:text-base px-4 sm:px-6 hover:bg-[#8b6e5b]"
@@ -122,9 +108,9 @@ const CtaBanner: React.FC = () => {
       </section>
 
       {/* EMI Application Modal */}
-      <EMIApplicationModal 
-        isOpen={isEMIModalOpen} 
-        onClose={() => setIsEMIModalOpen(false)} 
+      <EMIApplicationModal
+        isOpen={isEMIModalOpen}
+        onClose={() => setIsEMIModalOpen(false)}
       />
     </>
   );

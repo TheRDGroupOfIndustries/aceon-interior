@@ -1,5 +1,5 @@
-// schemas/creation.js
-export default {
+
+const creationSchema = {
   name: 'creation',
   title: 'Creation',
   type: 'document',
@@ -8,7 +8,7 @@ export default {
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: Rule => Rule.required()
+      validation: Rule => Rule.required(),
     },
     {
       name: 'slug',
@@ -26,23 +26,22 @@ export default {
       options: {
         hotspot: true,
       },
-      validation: Rule => Rule.required()
+      validation: Rule => Rule.required(),
     },
     {
       name: 'description',
       title: 'Description',
       type: 'text',
-      validation: Rule => Rule.required()
+      validation: Rule => Rule.required(),
     },
-   
   ],
   orderings: [
     {
       title: 'Manual Order',
       name: 'manualOrder',
-      by: [
-        {field: 'order', direction: 'asc'}
-      ]
-    }
-  ]
-}
+      by: [{ field: 'order', direction: 'asc' }],
+    },
+  ],
+};
+
+export default creationSchema;
