@@ -1,576 +1,241 @@
-// // 'use client'
-// // import Image from "next/image";
-// // import { FaInstagram, FaXTwitter, FaFacebook } from "react-icons/fa6";
-// // import { useState } from "react";
-// // import { FaBars, FaTimes } from "react-icons/fa";
-// // export default function Hero() {
-// //   const [isMenuOpen, setIsMenuOpen] = useState(false);
+"use client";
 
-// //   const toggleMenu = () => {
-// //     setIsMenuOpen(!isMenuOpen);
-// //   };
+import { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { FaInstagram, FaXTwitter, FaFacebook, FaBars, FaX } from "react-icons/fa6";
+import { motion, AnimatePresence } from 'framer-motion';
 
-// //   return (
-// //     <div className="w-full min-h-screen bg-transparent flex items-start justify-center relative px-4">
-// //       {/* Main hero card with rounded background */}
-// //       <div className="relative w-full md:h-[720px] h-auto min-h-[620px] max-w-[1440px] rounded-[20px] overflow-hidden flex flex-col justify-between">
-// //         {/* Background image */}
-// //         <div className="absolute inset-0">
-// //           <Image
-// //             src="/Rectangle 263.svg"
-// //             alt="Living room interior"
-// //             fill
-// //             priority
-// //             className="object-cover md:object-fill"
-// //             sizes="(max-width: 768px) 100vw, 1440px"
-// //           />
-// //         </div>
-// //         {/* Overlay */}
-// //         <div className="absolute inset-0 bg-transparent pointer-events-none" />
-
-// //         {/* Top bar: Logo, Nav, Rectangle in flex row */}
-// //         <div className="absolute top-6 left-0 w-full flex items-center justify-between py-3 z-50 ">
-// //           {/* Logo */}
-// //           <div className="w-[100px] h-[50px] rounded-2xl border-4 border-white flex items-center justify-center bg-white ml-4">
-// //             <Image
-// //               src="/aceonlogo.svg"
-// //               alt="Aceon Interio"
-// //               width={112}
-// //               height={80}
-// //               className="object-contain"
-// //             />
-// //           </div>
-// //           {/* Hamburger Icon for Mobile */}
-// //           <button
-// //             className="md:hidden text-black z-50 relative mr-5"
-// //             onClick={toggleMenu}
-// //             aria-label="Toggle navigation menu"
-// //           >
-// //             {isMenuOpen ? (
-// //               <FaTimes className="w-6 h-6 text-black" />
-// //             ) : (
-// //               <FaBars className="w-6 h-6 text-black" />
-// //             )}
-// //           </button>
-// //           {/* Navigation for Desktop */}
-// //           <nav className="hidden md:flex gap-8 text-white text-sm ml-60">
-// //             <a href="/home" className="hover:underline font-semibold">
-// //               Home
-// //             </a>
-// //             <a href="/services" className="hover:underline font-semibold">
-// //               Services
-// //             </a>
-// //             <a href="/about" className="hover:underline font-semibold">
-// //               About
-// //             </a>
-// //             <a href="/contact" className="hover:underline font-semibold">
-// //               Contact
-// //             </a>
-// //           </nav>
-// //           {/* Rectangle for Desktop */}
-// //           <div className="hidden md:block">
-// //             <div
-// //               className="text-black h-[50px] flex items-center justify-center px-4"
-// //               style={{
-// //                 width: "320px",
-// //                 backgroundImage: "url('/buildrectangle.svg')",
-// //                 backgroundSize: "100% 100%",
-// //                 backgroundPosition: "center",
-// //                 backgroundRepeat: "no-repeat",
-// //               }}
-// //             >
-// //               <span className="font-playfair text-[18px] tracking-wide text-white">
-// //                 Build a modern Interior
-// //               </span>
-// //             </div>
-// //           </div>
-// //         </div>
-
-// //         {/* Mobile Navigation Menu */}
-// //         <div
-// //           className={`md:hidden fixed top-0 right-0 h-full w-64 bg-white z-40 transform ${
-// //             isMenuOpen ? "translate-x-0" : "translate-x-full"
-// //           } transition-transform duration-300 ease-in-out flex flex-col items-center pt-20`}
-// //         >
-// //           <nav className="flex flex-col gap-6 text-black text-lg font-semibold">
-// //             <a href="/home" className="hover:underline" onClick={toggleMenu}>
-// //               Home
-// //             </a>
-// //             <a href="/services" className="hover:underline" onClick={toggleMenu}>
-// //               Services
-// //             </a>
-// //             <a href="/about" className="hover:underline" onClick={toggleMenu}>
-// //               About
-// //             </a>
-// //             <a href="/contact" className="hover:underline" onClick={toggleMenu}>
-// //               Contact
-// //             </a>
-// //           </nav>
-// //         </div>
-
-// //         {/* Hero content */}
-// //         <div className="relative flex flex-col items-start h-full pt-28 sm:pt-32 pb-48 md:pb-6 px-4 sm:px-6 md:p-6">
-// //           <div className="max-w-[670px] text-white relative md:absolute md:top-1/3 md:left-[40px] w-full md:w-auto text-left">
-// //             <h1 className="text-[32px] sm:text-[36px] md:text-[64px] lg:text-[84px] leading-[0.95] font-playfair">
-// //               Creating Comfort
-// //               With Style
-// //             </h1>
-// //             <p className="font-playfair mt-4 sm:mt-6 text-lg sm:text-lg md:text-lg text-white/90 w-[75%] sm:w-full max-w-[466px]">
-// //               Design smart, live smart, and always choose Aceon for interiors
-// //             </p>
-
-// //             {/* CTA Buttons */}
-// //             <div className="mt-6 sm:mt-8 flex flex-row gap-4 items-start w-full md:w-auto">
-// //               <button className="bg-[#b98663] text-white rounded-2xl font-semibold shadow-md w-[140px] sm:w-[159px] h-[48px] sm:h-[52px] flex items-center justify-center hover:bg-[#a87147] transition-colors">
-// //                 Get Started
-// //               </button>
-// //               <button className="border border-white/60 text-white rounded-2xl font-medium w-[140px] sm:w-[159px] h-[48px] sm:h-[52px] flex items-center justify-center hover:bg-white hover:text-[#b98663] transition-colors">
-// //                 Contact Us
-// //               </button>
-// //             </div>
-// //           </div>
-// //         </div>
-
-// //         {/* Social icons */}
-// //         <div className="absolute top-1/3 right-2 sm:right-4 flex flex-col space-y-2 bg-gray-100/20 p-1 rounded-lg z-10">
-// //           <a
-// //             href="#"
-// //             className="p-1 rounded-full hover:bg-[#a87147] transition-colors"
-// //           >
-// //             <FaInstagram className="w-6 h-6 md:w-7 md:h-7 text-current" />
-// //           </a>
-// //           <a
-// //             href="#"
-// //             className="p-1 rounded-full hover:bg-[#a87147] transition-colors"
-// //           >
-// //             <FaFacebook className="w-6 h-6 md:w-7 md:h-7 text-current" />
-// //           </a>
-// //           <a
-// //             href="#"
-// //             className="p-1 rounded-full hover:bg-[#a87147] transition-colors"
-// //           >
-// //             <FaXTwitter className="w-6 h-6 md:w-7 md:h-7 text-current" />
-// //           </a>
-// //         </div>
-
-// //         {/* Furniture Design Card */}
-// //         <div
-// //           className="relative md:absolute bottom-12 right-0 md:right-5 bg-white shadow-lg rounded-2xl p-3 sm:p-4
-// //           w-[75%] sm:w-[65%] md:w-2/6 mx-auto md:mx-0
-// //           h-auto min-h-[140px] sm:min-h-[180px] md:h-[200px] flex flex-col sm:flex-row z-10"
-// //         >
-// //           <div className="relative w-full sm:w-1/3 h-[120px] sm:h-full rounded-lg overflow-hidden flex-shrink-0">
-// //             <Image
-// //               src="/Rectangle 269.svg"
-// //               alt="Designed room"
-// //               fill
-// //               className="object-cover"
-// //               sizes="(max-width: 768px) 75vw, 33vw"
-// //               priority
-// //             />
-// //           </div>
-
-// //           <div className="flex-1 min-w-0 mt-3 sm:mt-0 sm:ml-3 flex flex-col justify-center">
-// //             <h3 className="text-sm sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2">
-// //               Furniture Design
-// //             </h3>
-// //             <p className="text-xs sm:text-sm text-gray-600 overflow-hidden overflow-ellipsis">
-// //               &quot;Custom furniture solutions for your home or office - stylish,
-// //               functional, and within your budget. Serving Varanasi on time.&quot;
-// //             </p>
-// //             <span className="block mt-1 sm:mt-2 text-[10px] sm:text-sm font-semibold text-gray-900 truncate">
-// //               Style Within Your ₹ Budget
-// //             </span>
-// //           </div>
-// //         </div>
-// //       </div>
-// //     </div>
-// //   );
-// // }
-
-
-
-
-// 'use client'
-// import Image from "next/image";
-// import { FaInstagram, FaXTwitter, FaFacebook } from "react-icons/fa6";
-// import { useState } from "react";
-// import { FaBars, FaTimes } from "react-icons/fa";
-
-// export default function Hero() {
-//   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-//   const toggleMenu = () => {
-//     setIsMenuOpen(!isMenuOpen);
-//   };
-
-//   return (
-//     <div className="w-full min-h-screen bg-transparent flex items-start justify-center relative sm:px-4 px-1 sm:py-0 py-1">
-//       {/* Main hero card with rounded background */}
-//       <div className="relative w-full md:h-[720px] h-auto min-h-[620px] max-w-[1440px] rounded-[20px] overflow-hidden flex flex-col justify-between">
-//         {/* Background image */}
-//         <div className="absolute inset-0">
-//           <Image
-//             src="/Rectangle 263.svg"
-//             alt="Living room interior"
-//             fill
-//             priority
-//             className="object-cover md:object-fill"
-//             sizes="(max-width: 768px) 100vw, 1440px"
-//           />
-//         </div>
-//         {/* Overlay */}
-//         <div className="absolute inset-0 bg-transparent pointer-events-none" />
-
-//         {/* Top bar: Logo, Nav, Rectangle in flex row */}
-//         <div className="absolute top-0 left-2 right-0 w-full flex items-center justify-between py-4 md:py-10 z-50 px-4">
-//           {/* Logo - Using percentage-based sizing */}
-//           <div className="w-[90px] md:w-[110px] h-[45px] md:h-[55px] rounded-2xl  flex items-center justify-center  flex-shrink-0">
-//             <div className="relative w-full h-full p-1">
-//               <Image
-//                 src="/aceonlogo.svg"
-//                 alt="Aceon Interio"
-//                 fill
-//                 className="object-contain"
-//               />
-//             </div>
-//           </div>
-
-//           {/* Hamburger Icon for Mobile */}
-//           <button
-//             className="md:hidden text-black z-50 relative flex-shrink-0"
-//             onClick={toggleMenu}
-//             aria-label="Toggle navigation menu"
-//           >
-//             {isMenuOpen ? (
-//               <FaTimes className="w-6 h-6 text-black" />
-//             ) : (
-//               <FaBars className="w-6 h-6 text-black" />
-//             )}
-//           </button>
-
-//           {/* Navigation for Desktop */}
-//           <nav className="hidden md:flex gap-6 lg:gap-8 text-white text-sm flex-shrink-0">
-//             <a href="/home" className="hover:underline font-semibold whitespace-nowrap">
-//               Home
-//             </a>
-//             <a href="/services" className="hover:underline font-semibold whitespace-nowrap">
-//               Services
-//             </a>
-//             <a href="/about" className="hover:underline font-semibold whitespace-nowrap">
-//               About
-//             </a>
-//             <a href="/contact" className="hover:underline font-semibold whitespace-nowrap">
-//               Contact
-//             </a>
-//           </nav>
-
-//           {/* Rectangle for Desktop - Using aspect ratio */}
-//           <div className="hidden md:block flex-shrink-0">
-//             <div className="relative w-[280px] lg:w-[320px] h-[50px] flex items-center justify-center">
-//               <Image
-//                 src="/buildrectangle.svg"
-//                 alt="Build rectangle background"
-//                 fill
-//                 className="object-contain"
-//               />
-//               <span className="relative z-10 font-playfair text-base lg:text-[18px] tracking-wide text-white whitespace-nowrap">
-//                 Build a modern Interior
-//               </span>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Mobile Navigation Menu */}
-//         <div
-//           className={`md:hidden fixed top-0 right-0 h-full w-64 bg-white z-40 transform ${
-//             isMenuOpen ? "translate-x-0" : "translate-x-full"
-//           } transition-transform duration-300 ease-in-out flex flex-col items-center pt-20`}
-//         >
-//           <nav className="flex flex-col gap-6 text-black text-lg font-semibold">
-//             <a href="/home" className="hover:underline" onClick={toggleMenu}>
-//               Home
-//             </a>
-//             <a href="/services" className="hover:underline" onClick={toggleMenu}>
-//               Services
-//             </a>
-//             <a href="/about" className="hover:underline" onClick={toggleMenu}>
-//               About
-//             </a>
-//             <a href="/contact" className="hover:underline" onClick={toggleMenu}>
-//               Contact
-//             </a>
-//           </nav>
-//         </div>
-
-//         {/* Hero content */}
-//         <div className="relative flex flex-col items-start h-full pt-24 sm:pt-32 pb-48 md:pb-6 px-4 sm:px-6 md:px-8">
-//           <div className="max-w-[670px] text-white relative md:absolute md:top-1/3 md:left-8 lg:left-[40px] w-full md:w-auto text-left">
-//             <h1 className="text-[32px] sm:text-[36px] md:text-[56px] lg:text-[72px] xl:text-[84px] leading-[0.95] font-playfair">
-//               Creating Comfort
-//               With Style
-//             </h1>
-//             <p className="font-playfair mt-4 sm:mt-6 text-base sm:text-lg md:text-lg text-white/90 w-[85%] sm:w-full max-w-[466px]">
-//               Design smart, live smart, and always choose Aceon for interiors
-//             </p>
-
-//             {/* CTA Buttons */}
-//             <div className="mt-6 sm:mt-8 flex flex-row gap-4 items-start w-full md:w-auto">
-//               <button className="bg-[#b98663] text-white rounded-2xl font-semibold shadow-md w-[140px] sm:w-[159px] h-[48px] sm:h-[52px] flex items-center justify-center hover:bg-[#a87147] transition-colors">
-//                 Get Started
-//               </button>
-//               <button className="border border-white/60 text-white rounded-2xl font-medium w-[140px] sm:w-[159px] h-[48px] sm:h-[52px] flex items-center justify-center hover:bg-white hover:text-[#b98663] transition-colors">
-//                 Contact Us
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Social icons - Using percentage positioning */}
-//         <div className="absolute top-[35%] md:top-1/3 right-2 sm:right-4 flex flex-col space-y-2 bg-gray-100/20 p-1 rounded-lg z-10">
-//           <a
-//             href="#"
-//             className="p-1 rounded-full hover:bg-[#a87147] transition-colors"
-//           >
-//             <FaInstagram className="w-6 h-6 md:w-7 md:h-7 text-current" />
-//           </a>
-//           <a
-//             href="#"
-//             className="p-1 rounded-full hover:bg-[#a87147] transition-colors"
-//           >
-//             <FaFacebook className="w-6 h-6 md:w-7 md:h-7 text-current" />
-//           </a>
-//           <a
-//             href="#"
-//             className="p-1 rounded-full hover:bg-[#a87147] transition-colors"
-//           >
-//             <FaXTwitter className="w-6 h-6 md:w-7 md:h-7 text-current" />
-//           </a>
-//         </div>
-
-//         {/* Furniture Design Card */}
-//         <div
-//           className="relative md:absolute bottom-8 md:bottom-12 right-0 md:right-5 bg-white shadow-lg rounded-2xl p-3 sm:p-4
-//           w-[75%] sm:w-[65%] md:w-[40%] lg:w-2/6 mx-auto md:mx-0
-//           h-auto min-h-[140px] sm:min-h-[180px] md:h-[200px] flex flex-col sm:flex-row z-10"
-//         >
-//           <div className="relative w-full sm:w-1/3 h-[120px] sm:h-full rounded-lg overflow-hidden flex-shrink-0">
-//             <Image
-//               src="/Rectangle 269.svg"
-//               alt="Designed room"
-//               fill
-//               className="object-cover"
-//               sizes="(max-width: 768px) 75vw, 33vw"
-//               priority
-//             />
-//           </div>
-
-//           <div className="flex-1 min-w-0 mt-3 sm:mt-0 sm:ml-3 flex flex-col justify-center">
-//             <h3 className="text-sm sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2">
-//               Furniture Design
-//             </h3>
-//             <p className="text-xs sm:text-sm text-gray-600 overflow-hidden overflow-ellipsis line-clamp-3">
-//               &quot;Custom furniture solutions for your home or office - stylish,
-//               functional, and within your budget. Serving Varanasi on time.&quot;
-//             </p>
-//             <span className="block mt-1 sm:mt-2 text-[10px] sm:text-sm font-semibold text-gray-900 truncate">
-//               Style Within Your ₹ Budget
-//             </span>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-'use client'
-import Image from "next/image";
-import { FaInstagram, FaXTwitter, FaFacebook } from "react-icons/fa6";
-import { useState } from "react";
-import { FaBars, FaTimes } from "react-icons/fa";
-
-export default function Hero() {
+function Elements() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  
+  const links = [
+    { name: "Home", link: "#home" },
+    { name: "About", link: "#about-us" },
+    { name: "Services", link: "#services" },
+    { name: "Contacts", link: "#contacts" },
+  ];
 
   return (
-    <div className="w-full min-h-screen bg-transparent flex items-start justify-center relative sm:px-4 px-1 sm:py-2 py-1 overflow-hidden">
-      {/* Main hero card with rounded background*/}
-      <div className="relative w-full h-[100vh] md:h-[100vh] min-h-[730px] max-w-[1440px] rounded-[20px] overflow-hidden flex flex-col justify-between">
-        {/* Background image - Ensure it covers without overflow */}
-        <div className="absolute inset-0">
+    <div className="w-full h-full absolute inset-0 z-50">
+      {/* Desktop Navigation - unchanged */}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="hidden md:flex w-3/4 h-10 mt-4 justify-end items-center gap-10 px-8"
+      >
+        {links.map((items, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 + i * 0.1 }}
+          >
+            <Link className='text-white text-xl' href={items.link}>
+              {items.name}
+            </Link>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Mobile Navigation */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="md:hidden flex justify-end items-center w-full px-4 mt-4 h-10"
+      >
+        <button 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="text-white text-2xl z-[100] p-2"
+          aria-label="Toggle menu"
+        >
+          {isMenuOpen ? <FaX /> : <FaBars />}
+        </button>
+      </motion.div>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden fixed inset-0 bg-black/95 z-[90] flex flex-col items-center justify-center gap-8"
+          >
+            {links.map((items, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.3, delay: i * 0.1 }}
+              >
+                <Link 
+                  className='text-white text-2xl hover:text-[#b98663] transition-colors' 
+                  href={items.link}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {items.name}
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Content */}
+      <div className="h-full flex justify-center items-start flex-col px-4 sm:px-6 md:px-8">
+        <motion.h1 
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className='text-4xl sm:text-5xl md:text-8xl font-playfair text-white leading-tight md:leading-normal'
+        >
+          creating comfort <br /> with style
+        </motion.h1>
+        <motion.p 
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className='text-base sm:text-xl md:text-3xl mt-4 md:mt-6 font-light font-playfair text-white leading-relaxed'
+        >
+          Design smart, live smart, and always <br /> choose Aceon for interiors
+        </motion.p>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+          className="flex flex-col sm:flex-row gap-3 md:gap-4 items-stretch sm:items-center mt-6 md:mt-8 w-full sm:w-auto"
+        >
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className='px-6 py-2.5 rounded-xl bg-[#b98663] text-white text-lg md:text-xl font-medium hover:bg-white hover:text-[#b98663] transition-all'
+          >
+            Get Started
+          </motion.button>
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className='px-6 py-2 rounded-xl border hover:bg-white hover:text-[#b98663] transition-all border-white text-white text-lg md:text-xl font-medium'
+          >
+            Contact Us
+          </motion.button>
+        </motion.div>
+      </div>
+
+      {/* Social Media Links */}
+      <motion.div 
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.8 }}
+        className="py-2 px-1 bg-white/20 rounded-xl absolute right-2 md:right-4 top-1/6 flex flex-col justify-center items-center gap-2"
+      >
+          <Link href="#" className="rounded-full hover:bg-[#a87147] transition-colors p-2">
+            <FaInstagram className="w-5 h-5 md:w-6 md:h-6 text-current" />
+          </Link>
+          <Link href="#" className="rounded-full hover:bg-[#a87147] transition-colors p-2">
+            <FaFacebook className="w-5 h-5 md:w-6 md:h-6 text-current" />
+          </Link>
+          <Link href="#" className="rounded-full hover:bg-[#a87147] transition-colors p-2">
+            <FaXTwitter className="w-5 h-5 md:w-6 md:h-6 text-current" />
+          </Link>
+      </motion.div>
+
+      {/* Feature Card */}
+      <motion.div 
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.9 }}
+        className="relative md:absolute bottom-4 sm:bottom-6 md:bottom-6 right-0 left-0 mx-auto md:right-5 md:left-auto md:mx-0 bg-white shadow-lg rounded-2xl p-3 sm:p-4 w-[90%] sm:w-[75%] md:w-[40%] lg:w-[33%] h-auto min-h-[140px] sm:min-h-[180px] md:h-[200px] flex flex-col sm:flex-row z-10 overflow-hidden max-w-[90vw]"
+      >
+        <div className="relative w-full sm:w-1/3 h-[120px] sm:h-full rounded-lg overflow-hidden flex-shrink-0">
           <Image
-            src="/Rectangle 263.svg"
-            alt="Living room interior"
+            src="/Rectangle 269.svg"
+            alt="Designed room"
             fill
-            priority
             className="object-cover"
-            sizes="(max-width: 768px) 100vw, 1440px"
+            sizes="(max-width: 768px) 75vw, 33vw"
+            priority
           />
         </div>
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-transparent pointer-events-none" />
 
-        {/* Top bar */}
-        <div className="absolute top-0 left-2 right-0 w-full flex items-center justify-between py-2  z-50 px-2 overflow-hidden">
-          {/* Logo*/}
-          <div className="w-[5.625rem] md:w-[6.875rem] h-[2.8125rem] md:h-[3.4375rem] rounded-2xl flex items-center justify-center flex-shrink-0">
-            <div className="relative w-full h-full p-1">
-              <Image
-                src="/aceonlogo.svg"
-                alt="Aceon Interio"
-                fill
-                className="object-contain"
-              />
-            </div>
-          </div>
-
-          {/* Hamburger Icon for Mobile */}
-          <button
-            className="md:hidden text-black z-50 relative flex-shrink-0"
-            onClick={toggleMenu}
-            aria-label="Toggle navigation menu"
-          >
-            {isMenuOpen ? (
-              <FaTimes className="w-6 h-6 text-black" />
-            ) : (
-              <FaBars className="w-6 h-6 text-black" />
-            )}
-          </button>
-
-          {/* Navigation for Desktop  */}
-          <nav className="hidden md:flex gap-6 lg:gap-8 text-white text-sm flex-shrink-0 flex-nowrap">
-            <a href="/" className="hover:underline font-semibold whitespace-nowrap">
-              Home
-            </a>
-            <a href="#services" className="hover:underline font-semibold whitespace-nowrap">
-              Services
-            </a>
-            <a href="#about" className="hover:underline font-semibold whitespace-nowrap">
-              About
-            </a>
-            <a href="#contact" className="hover:underline font-semibold whitespace-nowrap">
-              Contact
-            </a>
-          </nav>
-
-          {/* Rectangle for Desktop  */}
-          <div className="hidden md:block flex-shrink-0">
-            <div className="relative w-[22%] min-w-[280px] lg:w-[25%] lg:min-w-[320px] aspect-[280/50] flex items-center justify-center">
-              <Image
-                src="/buildrectangle.svg"
-                alt="Build rectangle background"
-                fill
-                className="object-contain"
-              />
-              <span className="relative z-10 font-playfair text-base lg:text-[18px] tracking-wide text-white whitespace-nowrap">
-                Build a modern Interior
-              </span>
-            </div>
-          </div>
+        <div className="flex-1 min-w-0 mt-3 sm:mt-0 sm:ml-3 flex flex-col justify-center overflow-hidden">
+          <h3 className="text-sm sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2 line-clamp-1">
+            Furniture Design
+          </h3>
+          <p className="text-xs sm:text-sm text-gray-600 overflow-hidden line-clamp-3 pr-1">
+            &quot;Custom furniture solutions for your home or office - stylish,
+            functional, and within your budget. Serving Varanasi on time.&quot;
+          </p>
+          <span className="block mt-1 sm:mt-2 text-[10px] sm:text-sm font-semibold text-gray-900 truncate line-clamp-1">
+            Style Within Your ₹ Budget
+          </span>
         </div>
+      </motion.div>
+    </div>
+  );
+}
 
-        {/* Mobile Navigation Menu  */}
-        <div
-          className={`md:hidden fixed top-0 right-0 h-screen w-64 bg-white z-40 transform ${
-            isMenuOpen ? "translate-x-0" : "translate-x-full"
-          } transition-transform duration-300 ease-in-out flex flex-col items-center pt-20 overflow-y-auto`}
+function Hero() {
+  return (
+    <div className='w-screen h-screen overflow-hidden grid place-items-center'>
+      <div className="w-full h-full md:w-[90%] md:h-[95%] relative">
+        <Elements />
+
+        <motion.div
+          initial={{ opacity: 0, scale: 1.1 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1 }}
+          className="w-full h-full"
         >
-          <nav className="flex flex-col gap-6 text-black text-lg font-semibold w-full px-4">
-            <a href="/home" className="hover:underline py-2" onClick={toggleMenu}>
-              Home
-            </a>
-            <a href="/services" className="hover:underline py-2" onClick={toggleMenu}>
-              Services
-            </a>
-            <a href="/about" className="hover:underline py-2" onClick={toggleMenu}>
-              About
-            </a>
-            <a href="/contact" className="hover:underline py-2" onClick={toggleMenu}>
-              Contact
-            </a>
-          </nav>
-        </div>
-
-        {/* Hero content  */}
-        <div className="relative flex flex-col items-start h-full pt-24 sm:pt-32 pb-48 md:pb-6 px-4 sm:px-6 md:px-8 overflow-hidden">
-          <div className=" text-white relative md:absolute md:top-1/3 md:left-8 lg:left-[40px] w-full md:w-auto text-left clamp-w-[85%] max-w-[90vw]">
-            <h1 className="text-[32px] sm:text-[36px] md:text-[56px] lg:text-[72px] xl:text-[84px] leading-[0.95] font-playfair">
-              Creating Comfort
-              With Style
-            </h1>
-            <p className="font-playfair mt-4 sm:mt-6 text-base sm:text-lg md:text-lg text-white/90 w-[85%] sm:w-full max-w-[466px] clamp-w-[90%]">
-              Design smart, live smart, and always choose Aceon for interiors
-            </p>
-
-            {/* CTA Buttons - Use min-width and flex to adapt */}
-            <div className="mt-6 sm:mt-8 flex flex-row gap-4 items-start w-full md:w-auto">
-              <button className="bg-[#b98663] text-white rounded-2xl font-semibold shadow-md min-w-[140px] sm:min-w-[159px] h-[48px] sm:h-[52px] flex items-center justify-center hover:bg-[#a87147] transition-colors flex-shrink-0">
-                Get Started
-              </button>
-              <button className="border border-white/60 text-white rounded-2xl font-medium min-w-[140px] sm:min-w-[159px] h-[48px] sm:h-[52px] flex items-center justify-center hover:bg-white hover:text-[#b98663] transition-colors flex-shrink-0">
-                Contact Us
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Social icons  */}
-        <div className="absolute top-[35%] md:top-1/3 right-2 sm:right-4 flex flex-col space-y-2 bg-gray-100/20 p-1 rounded-lg z-10">
-          <a
-            href="#"
-            className="p-1 rounded-full hover:bg-[#a87147] transition-colors"
-          >
-            <FaInstagram className="w-6 h-6 md:w-7 md:h-7 text-current" />
-          </a>
-          <a
-            href="#"
-            className="p-1 rounded-full hover:bg-[#a87147] transition-colors"
-          >
-            <FaFacebook className="w-6 h-6 md:w-7 md:h-7 text-current" />
-          </a>
-          <a
-            href="#"
-            className="p-1 rounded-full hover:bg-[#a87147] transition-colors"
-          >
-            <FaXTwitter className="w-6 h-6 md:w-7 md:h-7 text-current" />
-          </a>
-        </div>
-
-        {/* Furniture Design Card */}
-        <div
-          className="relative md:absolute bottom-8 md:bottom-12 right-0 md:right-5 bg-white shadow-lg rounded-2xl p-3 sm:p-4
-          w-[75%] sm:w-[65%] md:w-[40%] lg:w-[33%] mx-auto md:mx-0
-          h-auto min-h-[140px] sm:min-h-[180px] md:h-[200px] flex flex-col sm:flex-row z-10 overflow-hidden max-w-[90vw]"
+          <Image 
+            src="/Rectangle 263.svg"
+            alt='bg'
+            fill
+            className='scale-x-105 object-cover md:object-contain'
+            priority
+          />
+        </motion.div>
+        
+        <motion.div 
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="w-24 h-12 sm:w-28 sm:h-14 md:w-32 md:h-16 absolute top-1 left-2 sm:left-3 md:left-0 md:top-0 z-[60]"
         >
-          <div className="relative w-full sm:w-1/3 h-[120px] sm:h-full rounded-lg overflow-hidden flex-shrink-0">
-            <Image
-              src="/Rectangle 269.svg"
-              alt="Designed room"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 75vw, 33vw"
-              priority
-            />
-          </div>
-
-          <div className="flex-1 min-w-0 mt-3 sm:mt-0 sm:ml-3 flex flex-col justify-center overflow-hidden">
-            <h3 className="text-sm sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2 line-clamp-1">
-              Furniture Design
-            </h3>
-            <p className="text-xs sm:text-sm text-gray-600 overflow-hidden line-clamp-3 pr-1">
-              &quot;Custom furniture solutions for your home or office - stylish,
-              functional, and within your budget. Serving Varanasi on time.&quot;
-            </p>
-            <span className="block mt-1 sm:mt-2 text-[10px] sm:text-sm font-semibold text-gray-900 truncate line-clamp-1">
-              Style Within Your ₹ Budget
-            </span>
-          </div>
-        </div>
+          <Image
+            src="/aceonlogo.svg"
+            alt="Aceon Interio"
+            width={10}
+            height={10}
+            className="w-full h-full object-contain md:ml-4 md:mt-1.5"
+          />
+        </motion.div>
+        
+        <motion.div 
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          whileHover={{ scale: 1.02 }}
+          className="w-72 h-14 sm:w-80 sm:h-14 md:w-96 md:h-16 absolute right-2 top-0 z-[90] hidden sm:flex justify-center items-center cursor-pointer"
+        >
+          <Image 
+            src="/buildrectangle.svg"
+            alt='Rect'
+            fill
+            className='w-full h-full object-contain scale-105'
+          />
+          <span className='text-white text-lg sm:text-xl md:text-2xl relative text-center z-50 font-playfair px-2'>
+            Build a modern Interior
+          </span>
+        </motion.div>
       </div>
     </div>
   );
 }
+
+export default Hero;
