@@ -120,7 +120,7 @@ const EMIApplicationModal: React.FC<EMIApplicationModalProps> = ({ isOpen, onClo
       } else {
         setMessage(data.error || "Something went wrong. Please try again.");
       }
-    } catch (error) {
+    } catch  {
       setMessage("Failed to submit application. Please try again.");
     } finally {
       setIsSubmitting(false);

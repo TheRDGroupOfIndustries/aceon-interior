@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { BsArrowLeft } from "react-icons/bs"
 
 interface EMIApplication {
@@ -58,17 +58,9 @@ export default function AdminDashboard() {
 
   const limit = 10;
 
-  useEffect(() => {
-    if (activeTab === "emi") {
-      fetchEMIApplications();
-    }
-  }, [emiPage, emiFilter, activeTab]);
+ 
   
-  useEffect(() => {
-    if (activeTab === "contact") {
-      fetchContactMessages();
-    }
-  }, [contactPage, activeTab]);
+ 
 
   useEffect(() => {
     if (notification) {
@@ -77,38 +69,43 @@ export default function AdminDashboard() {
     }
   }, [notification])
 
-  const fetchEMIApplications = async () => {
-    setLoading(true)
-    try {
-      const statusParam = emiFilter !== "all" ? `&status=${emiFilter}` : ""
-      const response = await fetch(`/api/emi?page=${emiPage}&limit=${limit}${statusParam}`)
-      const data = await response.json()
-      if (data.success) {
-        setEmiApplications(data.data.applications)
-        setEmiTotal(data.data.pagination.total)
-        setStatusStats(data.data.filters.status)
-      }
-    } catch (error) {
-      console.error("Error fetching EMI applications:", error)
-    } finally {
-      setLoading(false)
+  const fetchEMIApplications = useCallback(async () => {
+  setLoading(true);
+  try {
+    const statusParam = emiFilter !== "all" ? `&status=${emiFilter}` : "";
+    const response = await fetch(`/api/emi?page=${emiPage}&limit=${limit}${statusParam}`);
+    const data = await response.json();
+    if (data.success) {
+      setEmiApplications(data.data.applications);
+      setEmiTotal(data.data.pagination.total);
+      setStatusStats(data.data.filters.status);
     }
+  } catch (error) {
+    console.error("Error fetching EMI applications:", error);
+  } finally {
+    setLoading(false);
   }
+}, [emiPage, emiFilter, limit]);
+useEffect(() => {
+  if (activeTab === "emi") fetchEMIApplications();
+}, [fetchEMIApplications, activeTab]);
 
-  const fetchContactMessages = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch(`/api/contact?page=${contactPage}&limit=${limit}`)
-      const data = await response.json()
-      setContactMessages(data.messages)
-      setContactTotal(data.pagination.total)
-    } catch (error) {
-      console.error("Error fetching contact messages:", error)
-    } finally {
-      setLoading(false)
-    }
+ const fetchContactMessages = useCallback(async () => {
+  setLoading(true);
+  try {
+    const response = await fetch(`/api/contact?page=${contactPage}&limit=${limit}`);
+    const data = await response.json();
+    setContactMessages(data.messages);
+    setContactTotal(data.pagination.total);
+  } catch (error) {
+    console.error("Error fetching contact messages:", error);
+  } finally {
+    setLoading(false);
   }
-
+}, [contactPage, limit]);
+useEffect(() => {
+  if (activeTab === "contact") fetchContactMessages();
+}, [fetchContactMessages, activeTab]);
   const handleStatusUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedApp) return

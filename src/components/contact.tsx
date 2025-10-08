@@ -62,7 +62,7 @@ const Contact: React.FC = () => {
       } else {
         setMessage(data.error || "Something went wrong. Please try again.");
       }
-    } catch (error) {
+    } catch  {
       setMessage("Failed to send message. Please try again.");
     } finally {
       setIsSubmitting(false);

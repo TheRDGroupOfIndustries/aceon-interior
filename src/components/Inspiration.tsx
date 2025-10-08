@@ -24,13 +24,48 @@ const galleryRow2: GalleryItem[] = [
 
 const allGalleryItems = [...galleryRow1, ...galleryRow2];
 
+const MobileGalleryItem: React.FC<{ item: GalleryItem; index: number }> = ({ item, index }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { margin: "-50px" });
+
+  const imageVariants: Variants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.5, ease: "easeOut", delay: index * 0.3 },
+    },
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      className="relative group overflow-hidden rounded-[20px] aspect-[4/3]"
+      initial="hidden"
+      animate={inView ? "visible" : "hidden"}
+      variants={imageVariants}
+      custom={index}
+    >
+      <Image
+        src={item.src}
+        alt={item.name || `Gallery image ${index + 1}`}
+        fill
+        className="object-cover transition-all duration-500 ease-in-out group-hover:scale-105 group-hover:brightness-75"
+      />
+      {item.name && (
+        <div className="absolute inset-0 flex items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <h2 className="text-white text-2xl font-playfair font-medium text-center drop-shadow-md">
+            {item.name}
+          </h2>
+        </div>
+      )}
+    </motion.div>
+  );
+};
+
 const InspirationGallery: React.FC = () => {
   const sectionRef = useRef(null);
   const isSectionInView = useInView(sectionRef, { margin: "-100px" });
-
-  // Fixed refs array for all mobile items
-  const mobileRefs = useRef(allGalleryItems.map(() => React.createRef<HTMLDivElement>())).current;
-  const mobileInView = mobileRefs.map(ref => useInView(ref, { margin: "-50px" }));
 
   const textVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
@@ -60,10 +95,16 @@ const InspirationGallery: React.FC = () => {
           animate={isSectionInView ? "visible" : "hidden"}
           variants={{ visible: { transition: { staggerChildren: 0.2 } }, hidden: {} }}
         >
-          <motion.h1 className="font-playfair font-medium text-[#A97C51] text-4xl md:text-[58px] leading-tight" variants={textVariants}>
+          <motion.h1
+            className="font-playfair font-medium text-[#A97C51] text-4xl md:text-[58px] leading-tight"
+            variants={textVariants}
+          >
             Inspiration to Elevate Your Living
           </motion.h1>
-          <motion.p className="font-prata text-[#423F3F] text-lg md:text-[20px] mt-4" variants={textVariants}>
+          <motion.p
+            className="font-prata text-[#423F3F] text-lg md:text-[20px] mt-4"
+            variants={textVariants}
+          >
             From cozy corners to luxury living, explore designs that match your taste.
           </motion.p>
         </motion.div>
@@ -98,7 +139,9 @@ const InspirationGallery: React.FC = () => {
                       />
                       {item.name && (
                         <div className="absolute inset-0 flex items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <h2 className="text-white text-4xl font-playfair font-medium text-center drop-shadow-md">{item.name}</h2>
+                          <h2 className="text-white text-4xl font-playfair font-medium text-center drop-shadow-md">
+                            {item.name}
+                          </h2>
                         </div>
                       )}
                     </motion.div>
@@ -112,27 +155,7 @@ const InspirationGallery: React.FC = () => {
         {/* Mobile & Tablet */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 lg:hidden">
           {allGalleryItems.map((item, index) => (
-            <motion.div
-              key={index}
-              className="relative group overflow-hidden rounded-[20px] aspect-[4/3]"
-              ref={mobileRefs[index]}
-              initial="hidden"
-              animate={mobileInView[index] ? "visible" : "hidden"}
-              variants={imageVariants}
-              custom={index}
-            >
-              <Image
-                src={item.src}
-                alt={item.name || `Gallery image ${index + 1}`}
-                fill
-                className="object-cover transition-all duration-500 ease-in-out group-hover:scale-105 group-hover:brightness-75"
-              />
-              {item.name && (
-                <div className="absolute inset-0 flex items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <h2 className="text-white text-2xl font-playfair font-medium text-center drop-shadow-md">{item.name}</h2>
-                </div>
-              )}
-            </motion.div>
+            <MobileGalleryItem key={index} item={item} index={index} />
           ))}
         </div>
       </div>

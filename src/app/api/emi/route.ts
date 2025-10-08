@@ -224,13 +224,13 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Build filter object
-    const filter: any = {};
+    const filter: Record<string, string> = {};
     if (status && status !== 'all') {
       filter.status = status;
     }
 
     // Build sort object
-    const sort: any = {};
+    const sort: Record<string, 1 | -1> = {};
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
     // Get applications with pagination
@@ -264,7 +264,7 @@ export async function GET(request: NextRequest) {
       total: total
     };
 
-    statusCounts.forEach((stat: any) => {
+    statusCounts.forEach((stat: { _id: string; count: number }) => {
       statusStats[stat._id as keyof typeof statusStats] = stat.count;
     });
 
