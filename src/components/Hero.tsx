@@ -100,7 +100,7 @@ function Elements() {
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className='text-base sm:text-xl md:text-3xl mt-4 md:mt-6 font-light font-playfair text-white leading-relaxed'
+          className='text-base sm:text-xl md:text-3xl mt-4 md:mt-3 font-light font-playfair text-white leading-relaxed'
         >
           Design smart, live smart, and always <br /> choose Aceon for interiors
         </motion.p>
