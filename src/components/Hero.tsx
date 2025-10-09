@@ -11,9 +11,9 @@ function Elements() {
 
   const links = [
     { name: "Home", link: "#home" },
-    { name: "About", link: "#about-us" },
+    { name: "About", link: "#about" },
     { name: "Services", link: "#services" },
-    { name: "Contacts", link: "#contacts" },
+    { name: "Contact", link: "#contact" },
   ];
 
   return (
