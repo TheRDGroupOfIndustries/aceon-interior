@@ -35,7 +35,7 @@ const CtaBanner: React.FC = () => {
 
   return (
     <>
-      <section
+      <section id="cta"
         className="relative w-full h-[400px] overflow-hidden"
         ref={sectionRef}
       >
