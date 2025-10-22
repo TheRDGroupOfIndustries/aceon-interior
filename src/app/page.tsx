@@ -4,6 +4,7 @@ import TestimonialSection from "@/components/HomeOwner";
 import InspirationGallery from "@/components/Inspiration";
 import PartnersSection from "@/components/Partners";
 import Philosophy from "@/components/Philosophy"; 
+import Products from "@/components/ProductSection";
 import Services from "@/components/Services"; 
 import Contact from "@/components/contact";
 import CtaBanner from "@/components/ctaBanner";
@@ -18,6 +19,7 @@ export default function Home() {
       <Hero />
       <Philosophy />
       <Services />
+      <Products />
       <InspirationGallery/>
       <Creations/>
       <TestimonialSection/>
