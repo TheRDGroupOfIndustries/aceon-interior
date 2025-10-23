@@ -13,7 +13,7 @@ import { RootState } from "@/redux/store";
 
 // Main Services Component (No changes here)
 export default function ProductSection() {
-  const { products } = useSelector((state: RootState) => state.product);
+  const { fearureProducts } = useSelector((state: RootState) => state.product);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
@@ -60,8 +60,7 @@ export default function ProductSection() {
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {products.slice(-3).map((product, i) => (
-            // <ServiceCard key={i} {...service} index={i} />
+          {fearureProducts.map((product, i) => (
             <ProductCard key={i} product={product} />
           ))}
         </div>

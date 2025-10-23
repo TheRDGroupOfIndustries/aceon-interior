@@ -13,7 +13,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
         {/* Replace with your actual image component or Next.js Image component */}
         <div className="h-[250px] w-full overflow-hidden">
           <img
-            className="w-full h-auto object-cover"
+            className="w-full h-full object-cover"
             src={product.media.main_image} // Placeholder path
             alt="Scandinavian Minimalist Bed Frame"
           />
@@ -47,7 +47,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
         </div>
 
         {/* Product Title */}
-        <h2 className="text-lg font-bold text-gray-900 mb-3 leading-snug">
+        <h2 className="text-lg font-bold text-gray-900 mb-3 leading-snug line-clamp-1">
           {product.name}
         </h2>
 

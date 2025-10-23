@@ -1,12 +1,30 @@
 import { IProduct } from "@/models/Product";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
+export const fetchFeatureProducts = createAsyncThunk(
+  "product/fetchFeatureProducts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const params = new URLSearchParams();
+      params.append("limit", '3');
+
+      const response = await fetch(`/api/product?${params.toString()}`);
+      if (!response.ok) {
+        rejectWithValue("Failed to fetch products");
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 export const fetchProducts = createAsyncThunk(
   "product/fetchProducts",
   async (
     {
       page,
-      limit,
+      limit = 12,
       category,
       search,
       sortBy,
@@ -43,6 +61,7 @@ export const fetchProducts = createAsyncThunk(
 );
 
 interface ProductState {
+  fearureProducts: IProduct[];
   products: IProduct[];
   pagination?: {
     page: number;
@@ -57,6 +76,7 @@ interface ProductState {
 }
 
 const initialState: ProductState = {
+  fearureProducts: [],
   products: [],
   pagination: {
     page: 1,
@@ -105,20 +125,38 @@ const productSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchProducts.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(fetchProducts.fulfilled, (state, action) => {
-      console.log(action.payload);
-      state.products = action.payload.data.products;
-      state.pagination = action.payload.data.pagination;
-      state.loading = false;
-    });
-    builder.addCase(fetchProducts.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string;
-    });
+    // Fetch Feature Products
+    builder
+      .addCase(fetchFeatureProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchFeatureProducts.fulfilled, (state, action) => {
+        console.log(action.payload);
+        state.fearureProducts = action.payload.data.products;
+        state.loading = false;
+      })
+      .addCase(fetchFeatureProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Fetch Products
+    builder
+      .addCase(fetchProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProducts.fulfilled, (state, action) => {
+        console.log(action.payload);
+        state.products = action.payload.data.products;
+        state.pagination = action.payload.data.pagination;
+        state.loading = false;
+      })
+      .addCase(fetchProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
   },
 });
 
@@ -132,4 +170,3 @@ export const {
   setLoading,
   setError,
 } = productSlice.actions;
-

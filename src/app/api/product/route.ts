@@ -19,8 +19,8 @@ export async function GET(request: NextRequest) {
 
     // Build filter object
     const filter: any = {};
-    if (category) filter.category = category;
-    if (subcategory) filter.subcategory = subcategory;
+    if (category) filter.category = { $regex: category, $options: "i" };
+    if (subcategory) filter.subcategory = { $regex: subcategory, $options: "i" };
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
