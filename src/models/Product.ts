@@ -1,6 +1,6 @@
 // --- Sub-Schemas ---
 
-import { model, models, Schema } from "mongoose";
+import { Model, model, models, Schema } from "mongoose";
 
 // Schema for images used in the product page media gallery
 const ImageSchema = new Schema(
@@ -129,9 +129,10 @@ const ProductSchema = new Schema(
   { timestamps: true }
 );
 
-const Product = models.Product || model("Product", ProductSchema);
+const Product =
+  (models.Product as Model<IProduct>) ||
+  model<IProduct>("Product", ProductSchema);
 export default Product;
-
 
 export interface IProduct {
   _id: string;

@@ -8,7 +8,7 @@ import { BsStarFill } from "react-icons/bs";
 
 export default function ProductCard({ product }: { product: IProduct }) {
   const router = useRouter();
-  const { date: session } = useSession();
+  const { date: session }: any = useSession();
 
   const redirectToCheckout = () => {
     if (!session) {

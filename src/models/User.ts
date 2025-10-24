@@ -1,6 +1,6 @@
 // --- User Model for NextAuth Google Provider ---
 
-import { model, models, Schema } from "mongoose";
+import { Model, model, models, Schema } from "mongoose";
 
 const UserSchema = new Schema(
   {
@@ -16,7 +16,7 @@ const UserSchema = new Schema(
   { timestamps: true }
 );
 
-const User = models.User || model("User", UserSchema);
+const User = (models.User as Model<IUser>) || model<IUser>("User", UserSchema);
 export default User;
 
 export interface IUser {

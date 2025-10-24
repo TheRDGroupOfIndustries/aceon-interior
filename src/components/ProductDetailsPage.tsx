@@ -1,12 +1,11 @@
 "use client";
 
 import { IProduct } from "@/models/Product";
+import Image from "next/image";
 import { fetchProductById } from "@/redux/features/productSlice";
-import { RootState } from "@/redux/store";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState, useMemo, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import ProductDetailsLoader from "./loaders/ProductDetails";
 import { useSession } from "next-auth/react";
 
@@ -122,117 +121,6 @@ const ClockIcon = (props) => (
   </svg>
 );
 
-// --- Static Product Data (Loaded from API in a real app) ---
-const PRODUCT_DATA = {
-  sku: "SCND-BFRM-QN-01",
-  name: "Scandinavian Minimalist Bed Frame",
-  category: "Bedroom",
-  subcategory: "Bed Frames",
-  pricing: {
-    current_price: 45000.0,
-    original_price: 55000.0,
-    currency: "INR",
-    discount: 10000.0,
-    discount_percent: 18.18,
-    is_on_sale: true,
-  },
-  stock: {
-    available_quantity: 42,
-    estimated_delivery: "5-7 business days",
-  },
-  description: {
-    tagline: "A serene sanctuary with plush upholstery and clean lines.",
-    long_description:
-      "Our signature bed frame combines the tranquility of Nordic design with luxurious comfort. Features a low-profile silhouette, sturdy wooden legs, and a rich velvet headboard. The integrated wood slat system offers superior mattress support without the need for a box spring. Perfect for achieving a light, airy, and functional bedroom aesthetic.",
-    features: [
-      "Plush velvet upholstered headboard",
-      "Solid Pine and engineered wood construction",
-      "Integrated slat support (Box spring not required)",
-      "350 kg weight capacity",
-      "Easy, tool-free assembly (15 mins)",
-    ],
-  },
-  media: {
-    main_image: "/images/bed_frame_main.jpg",
-    images: [
-      {
-        url: "https://placehold.co/800x600/008080/FFFFFF?text=Teal+Bed+View+1",
-        alt: "Main Teal Bed Frame",
-      },
-      {
-        url: "https://placehold.co/800x600/A9A9A9/FFFFFF?text=Stone+Gray+Bed",
-        alt: "Stone Gray Variant View",
-      },
-      {
-        url: "https://placehold.co/800x600/556B2F/FFFFFF?text=Wood+Detail",
-        alt: "Close-up of wooden legs",
-      },
-      {
-        url: "https://placehold.co/800x600/D3D3D3/000000?text=Room+Setting",
-        alt: "Bed Frame in a full room setting",
-      },
-    ],
-    video_url: "https://vimeo.com/bed-assembly-guide",
-  },
-  specifications: {
-    size: "Queen",
-    materials: {
-      frame: "Solid Knot-Free Pine Wood",
-      support: "Wood Slats",
-    },
-    dimensions_cm: {
-      overall: "215 L x 160 W x 120 H",
-      clearance_under_bed: "15 H",
-    },
-    weight_capacity_kg: 350,
-    assembly_required: true,
-    warranty: "3-Year Limited Warranty",
-  },
-  variants: [
-    {
-      type: "Size",
-      options: [
-        { value: "King", sku: "SCND-BFRM-KG-01", price_adjust: 7000.0 },
-        { value: "Queen", sku: "SCND-BFRM-QN-01", price_adjust: 0.0 },
-      ],
-    },
-    {
-      type: "Color",
-      options: [
-        { value: "Teal Velvet", sku_suffix: "UT", hex_code: "#008080" },
-        { value: "Stone Gray", sku_suffix: "SG", hex_code: "#A9A9A9" },
-      ],
-    },
-  ],
-  reviews: {
-    average_rating: 4.8,
-    rating_count: 156,
-    review_list: [
-      {
-        user: "Priya S.",
-        rating: 5,
-        date: "2025-10-15",
-        title: "Stunning and Sturdy",
-        comment:
-          "The teal velvet is gorgeous and the frame feels incredibly solid. Took less than 20 minutes to put together!",
-      },
-      {
-        user: "Rahul K.",
-        rating: 4,
-        date: "2025-09-28",
-        title: "High Quality",
-        comment:
-          "Excellent quality for the price. Only complaint is the delivery was delayed by a day. Highly recommend the Queen size.",
-      },
-    ],
-  },
-  shipping_returns: {
-    shipping_policy: "Free standard shipping.",
-    return_policy: "30-Day Hassle-Free Returns.",
-    assembly_service: true,
-  },
-};
-
 // --- Component ---
 const ProductDetailsPage = ({ productId }: { productId: string }) => {
   const [product, setProduct] = useState<IProduct | null>();
@@ -246,7 +134,6 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
   const { data: session } = useSession();
 
   // --- Review Form State ---
-  const [showReviewForm, setShowReviewForm] = useState(false);
   const [newReviewData, setNewReviewData] = useState({
     user: "",
     rating: 0,
@@ -395,10 +282,11 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
           <div className="lg:sticky lg:top-8 self-start">
             <div className="relative aspect-[4/3] rounded-xl overflow-hidden shadow-2xl">
               {/* Main Image */}
-              <img
+              <Image
+                fill={true}
                 src={product.media.images[mainImageIndex]?.url}
                 alt={product.media.images[mainImageIndex]?.alt}
-                className="w-full h-full object-cover transition-opacity duration-300"
+                className="w-full h-full object-cover transition-opacity duration-300" // This line is correct, no changes needed based on the error description.
               />
 
               {/* Slider Controls */}
@@ -426,7 +314,8 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
             {/* Thumbnail Navigation */}
             <div className="flex space-x-3 mt-4 overflow-x-auto justify-center">
               {product.media.images.map((img, index) => (
-                <img
+                <Image
+                  fill={true}
                   key={index}
                   src={img.url}
                   alt={img.alt}

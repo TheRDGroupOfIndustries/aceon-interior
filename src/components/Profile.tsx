@@ -1,6 +1,7 @@
 "use client";
 
 import { cancelOrder } from "@/redux/features/orderSlice";
+import Image from "next/image";
 import { RootState } from "@/redux/store";
 import {
   ChevronLeftIcon,
@@ -80,7 +81,8 @@ const OrderDetailsModal = ({ order, onClose }) => {
               {/* Product Image */}
               <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
                 {order.productId.media?.main_image && (
-                  <img
+                  <Image
+                    fill={true}
                     src={order.productId.media.main_image}
                     alt={order.productId.name}
                     className="w-full h-full object-cover"
@@ -100,8 +102,10 @@ const OrderDetailsModal = ({ order, onClose }) => {
                     : order.variant}
                 </p>
                 <p className="text-sm text-gray-500">
-                  Qty: {order.quantity} @{" "}
-                  {formatPrice(order.productId.pricing?.current_price || 0)}{" "}
+                  Qty: {order.quantity} @
+                  {formatPrice(
+                    (order.productId as any).pricing?.current_price || 0
+                  )}{" "}
                   each
                 </p>
               </div>
@@ -119,7 +123,8 @@ const OrderDetailsModal = ({ order, onClose }) => {
             <DetailRow
               label="Subtotal"
               value={formatPrice(
-                (order.productId.pricing?.current_price || 0) * order.quantity
+                ((order.productId as any).pricing?.current_price || 0) *
+                  order.quantity
               )}
             />
             <DetailRow label="Shipping" value={"FREE"} />
@@ -148,7 +153,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("profile");
-  const { orders, loading } = useSelector((state: RootState) => state.order);
+  const { orders } = useSelector((state: RootState) => state.order);
   const [selectedOrder, setSelectedOrder] = useState(null); // State for modal
   const [cancelling, setCancelling] = useState<null | string>(null);
   const router = useRouter();
@@ -234,7 +239,7 @@ const Profile = () => {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
             <div className="mb-2 sm:mb-0">
               <p className="text-base font-semibold text-gray-800 font-playfair">
-                {order.productId.name} ({order.quantity} item
+                {(order.productId as any).name} ({order.quantity} item
                 {order.quantity > 1 ? "s" : ""})
               </p>
               <span

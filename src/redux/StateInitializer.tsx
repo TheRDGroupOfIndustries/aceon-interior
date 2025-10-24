@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { fetchFeatureProducts, fetchProducts } from "./features/productSlice";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { fetchFeatureProducts } from "./features/productSlice";
+import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { fetchUserOrders } from "./features/orderSlice";
 

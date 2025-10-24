@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 import { signIn } from "next-auth/react";
-import React, { useState } from "react";
+import React from "react";
 
 // --- Inline SVG Icons ---
 
@@ -34,25 +34,7 @@ const GoogleIcon = (props) => (
   </svg>
 );
 
-// Checkmark Icon for Success State
-const CheckCircleIcon = (props) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-  >
-    <path
-      fillRule="evenodd"
-      d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.323 4.128-1.681-1.68a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.144-.094l4.25-5.378z"
-      clipRule="evenodd"
-    />
-  </svg>
-);
-
 const Login = () => {
-
-
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-sm bg-white rounded-xl shadow-2xl p-8 space-y-8">
@@ -74,8 +56,7 @@ const Login = () => {
             disabled:opacity-80
           `}
         >
-          
-            <GoogleIcon />
+          <GoogleIcon />
           Sign in with Google
         </button>
 

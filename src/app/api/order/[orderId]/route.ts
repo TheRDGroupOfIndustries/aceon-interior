@@ -11,6 +11,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { orderId: string } }
 ) {
+  const { orderId } = await params;
   try {
     const session = await getServerSession(authOptions);
 
@@ -34,7 +35,7 @@ export async function GET(
 
     // Get the specific order, ensuring it belongs to the user
     const orders = await Order.aggregate([
-      { $match: { _id: new Types.ObjectId(params.orderId), userId: user._id } },
+      { $match: { _id: new Types.ObjectId(orderId), userId: user._id } },
       {
         $lookup: {
           from: "products", // The collection name for products
@@ -74,6 +75,7 @@ export async function PUT(
   { params }: { params: { orderId: string } }
 ) {
   try {
+    const { orderId } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
@@ -99,7 +101,7 @@ export async function PUT(
 
     // Find the order
     const order = await Order.findOne({
-      _id: params.orderId,
+      _id: orderId,
       userId: user._id,
     });
 

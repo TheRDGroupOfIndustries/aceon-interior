@@ -7,18 +7,7 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { createOrder } from "@/redux/features/orderSlice";
 import { RootState } from "@/redux/store";
-
-// --- Inline SVG Icons ---
-const StarFillIcon = (props) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-  >
-    <path d="M12 17.27l6.18 3.73-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-  </svg>
-);
+import Image from "next/image";
 
 const CashIcon = (props) => (
   <svg
@@ -79,7 +68,11 @@ const CheckoutPage = () => {
   const [isAddressValid, setIsAddressValid] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const [showModal, setShowModal] = useState<{ title: string; message: string; type: string } | null>(null);
+  const [showModal, setShowModal] = useState<{
+    title: string;
+    message: string;
+    type: string;
+  } | null>(null);
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -255,7 +248,9 @@ const CheckoutPage = () => {
                   Product Details
                 </h2>
                 <div className="flex space-x-4">
-                  <img
+                  <Image
+                    height={80}
+                    width={80}
                     src={checkoutProduct?.main_image}
                     alt={checkoutProduct?.name}
                     className="w-20 h-20 object-cover rounded-lg"

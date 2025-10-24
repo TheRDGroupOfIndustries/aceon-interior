@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, SlidersHorizontal, ChevronDown, X, ChevronLeftIcon } from "lucide-react";
+import {
+  Search,
+  SlidersHorizontal,
+  ChevronDown,
+  X,
+  ChevronLeftIcon,
+} from "lucide-react";
 // import { fetchProducts } from "@/services/productServices";
 import { useRouter } from "next/navigation";
 import ProductCard from "./ProductCard";
@@ -9,34 +15,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "@/redux/features/productSlice";
 import { RootState } from "@/redux/store";
 
-interface Product {
-  _id: string;
-  name: string;
-  sku: string;
-  price: number;
-  category: string;
-  subcategory: string;
-  images: string[];
-  description: {
-    short_description: string;
-    long_description: string;
-  };
-  stock: number;
-}
-
-interface PaginationData {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
-}
-
 export default function ProductListingPage() {
-//   const [products, setProducts] = useState<Product[]>([]);
-//   const [loading, setLoading] = useState(true);
-//   const [pagination, setPagination] = useState<PaginationData | null>(null);
+  //   const [products, setProducts] = useState<Product[]>([]);
+  //   const [loading, setLoading] = useState(true);
+  //   const [pagination, setPagination] = useState<PaginationData | null>(null);
 
   // Filters state
   const [searchQuery, setSearchQuery] = useState("");
@@ -47,10 +29,12 @@ export default function ProductListingPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
 
-  const { products, loading, error, pagination } = useSelector((state: RootState) => state.product);
+  const { products, loading, pagination } = useSelector(
+    (state: RootState) => state.product
+  );
 
   const router = useRouter();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   // Categories and subcategories (you can fetch these from your API)
   const categories = [
@@ -86,7 +70,6 @@ export default function ProductListingPage() {
   ];
 
   useEffect(() => {
-
     dispatch(
       fetchProducts({
         page: currentPage,
@@ -95,7 +78,7 @@ export default function ProductListingPage() {
         sortBy,
         sortOrder,
       }) as any
-    )
+    );
 
     // fetchProducts({
     //   currentPage,

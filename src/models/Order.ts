@@ -1,6 +1,7 @@
 // --- Sub-Schemas ---
 
-import { model, models, Schema } from "mongoose";
+import { Model, model, models, Schema } from "mongoose";
+import { IProduct } from "./Product";
 
 // Schema for shipping address
 const AddressSchema = new Schema(
@@ -39,12 +40,13 @@ const OrderSchema = new Schema(
   { timestamps: true }
 );
 
-const Order = models.Order || model("Order", OrderSchema);
+const Order =
+  (models.Order as Model<IOrder>) || model<IOrder>("Order", OrderSchema);
 export default Order;
 
 export interface IOrder {
   _id: string;
-  productId: string; // ObjectId as string
+  productId: IProduct | string; // ObjectId as string
   userId: string; // ObjectId as string
   quantity: number;
   variant: string;

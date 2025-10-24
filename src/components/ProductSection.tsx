@@ -1,12 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { useState, useRef } from "react";
-import { IoEyeOutline } from "react-icons/io5";
+import { useRef } from "react";
 import { motion, useInView, Variants } from "framer-motion";
-import { servicesData } from "@/lib/data"; // Make sure to import from your data file
-import { BsStarFill } from "react-icons/bs";
 import ProductCard from "./ProductCard";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";

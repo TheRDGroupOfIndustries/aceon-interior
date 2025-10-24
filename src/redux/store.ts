@@ -1,26 +1,15 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import authSlice from "./features/authSlice";
 import productSlice from "./features/productSlice";
 import orderSlice from "./features/orderSlice";
 
 // 1. Explicitly combine all your individual slices into the main reducer
 const appReducer = combineReducers({
-  auth: authSlice,
   product: productSlice,
   order: orderSlice,
 });
 
 // 2. Create a root reducer that handles the state reset logic
 const rootReducer: typeof appReducer = (state, action) => {
-  // We are assuming the logout action type is 'auth/logout'
-  // based on Redux Toolkit naming conventions for a slice named 'auth'
-  // with a reducer function named 'logout'.
-  if (action.type === "auth/logout") {
-    // When the logout action is dispatched, call appReducer with 'undefined'
-    // state to force all slices to return their initial state.
-    return appReducer(undefined, action);
-  }
-
   // For all other actions, proceed normally
   return appReducer(state, action);
 };
