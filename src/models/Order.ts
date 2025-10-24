@@ -19,13 +19,22 @@ const AddressSchema = new Schema(
 
 const OrderSchema = new Schema(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    productId: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     quantity: { type: Number, required: true, min: 1 },
-    variant: { type: String, required: true },
+    variant: { type: Object, required: true },
     address: { type: AddressSchema, required: true },
     paymentMethod: { type: String, required: true },
     grandTotal: { type: Number, required: true, min: 0 },
+    status: {
+      type: String,
+      enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
+      default: "pending",
+    },
+    shippedAt: { type: Date },
+    deliveredAt: { type: Date },
+    cancelledAt: { type: Date },
+    cancelReason: { type: String },
   },
   { timestamps: true }
 );
@@ -35,7 +44,8 @@ export default Order;
 
 export interface IOrder {
   _id: string;
-  product: string; 
+  productId: string; // ObjectId as string
+  userId: string; // ObjectId as string
   quantity: number;
   variant: string;
   address: {
@@ -48,6 +58,11 @@ export interface IOrder {
   };
   paymentMethod: string;
   grandTotal: number;
+  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  shippedAt?: Date;
+  deliveredAt?: Date;
+  cancelledAt?: Date;
+  cancelReason?: string;
   createdAt: Date;
   updatedAt: Date;
 }

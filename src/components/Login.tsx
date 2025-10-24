@@ -1,5 +1,6 @@
 "use client"
 
+import { signIn } from "next-auth/react";
 import React, { useState } from "react";
 
 // --- Inline SVG Icons ---
@@ -50,27 +51,7 @@ const CheckCircleIcon = (props) => (
 );
 
 const Login = () => {
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Simulates the OAuth process
-  const handleGoogleLogin = () => {
-    if (isLoggedIn) return; // Prevent double click
-
-    setIsLoggingIn(true);
-
-    // Simulate API call delay for 2 seconds
-    setTimeout(() => {
-      setIsLoggingIn(false);
-      setIsLoggedIn(true);
-    }, 2000);
-  };
-
-  const getButtonText = () => {
-    if (isLoggingIn) return "Authenticating...";
-    if (isLoggedIn) return "Logged In Successfully";
-    return "Sign in with Google";
-  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
@@ -86,22 +67,16 @@ const Login = () => {
 
         {/* --- Google Login Button --- */}
         <button
-          onClick={handleGoogleLogin}
-          disabled={isLoggingIn || isLoggedIn}
+          onClick={() => signIn("google")}
           className={`
             w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-md font-semibold text-gray-700 
             transition-all duration-300
-            ${isLoggingIn ? "bg-gray-100 cursor-wait" : "hover:bg-gray-50"}
-            ${isLoggedIn ? "bg-green-100 border-green-500 text-green-700" : ""}
             disabled:opacity-80
           `}
         >
-          {isLoggedIn ? (
-            <CheckCircleIcon className="w-6 h-6 mr-3 text-green-600" />
-          ) : (
+          
             <GoogleIcon />
-          )}
-          {getButtonText()}
+          Sign in with Google
         </button>
 
         {/* --- Simple Footer/Branding --- */}

@@ -1,11 +1,13 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import authSlice from "./features/authSlice";
 import productSlice from "./features/productSlice";
+import orderSlice from "./features/orderSlice";
 
 // 1. Explicitly combine all your individual slices into the main reducer
 const appReducer = combineReducers({
   auth: authSlice,
   product: productSlice,
+  order: orderSlice,
 });
 
 // 2. Create a root reducer that handles the state reset logic

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import React, { useState, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ProductDetailsLoader from "./loaders/ProductDetails";
+import { useSession } from "next-auth/react";
 
 // --- Inline SVG Icon Components (Replaced react-icons) ---
 
@@ -242,6 +243,7 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
 
   const router = useRouter();
   const dispatch = useDispatch();
+  const { data: session } = useSession();
 
   // --- Review Form State ---
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -290,7 +292,7 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
       return;
     }
 
-    console.log("New Review: ", newReviewData)
+    console.log("New Review: ", newReviewData);
     setProduct((prev: any) => {
       if (!prev) return;
       return {
@@ -317,7 +319,6 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
       title: "",
       comment: "",
     });
-
   };
 
   // --- Derived State (Current Price Calculation) ---
@@ -355,6 +356,10 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
   };
 
   const redirectToCheckout = () => {
+    if (!session) {
+      router.push("/login");
+      return;
+    }
     sessionStorage.setItem(
       "checkoutProduct",
       JSON.stringify({
@@ -368,7 +373,6 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
     );
     router.push(`/checkout/${productId}`);
   };
-
 
   if (loading || !product) {
     return <ProductDetailsLoader />;
@@ -528,7 +532,7 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
             <div className="flex space-x-4 mb-8">
               <button
                 onClick={redirectToCheckout}
-                className="flex-1 flex items-center justify-center bg-primary text-white text-lg font-semibold py-4 rounded-xl shadow-lg hover:bg-amber-900 cursor-pointer transition-all duration-300"
+                className="flex-1 flex items-center justify-center bg-primary text-white text-lg font-semibold py-4 rounded-xl shadow-lg hover:bg-primary-hover cursor-pointer transition-all duration-300"
               >
                 <CartPlusIcon className="w-5 h-5 mr-2" /> Buy Now
               </button>

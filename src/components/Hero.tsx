@@ -12,9 +12,11 @@ import {
 } from "react-icons/fa6";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 function Elements() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const {data: session } = useSession();
 
   useEffect(() => {
     const original = document.body.style.overflow;
@@ -27,14 +29,25 @@ function Elements() {
       document.body.style.overflow = original || "";
     };
   }, [isMenuOpen]);
-
-  const links = [
+  const [links, setLinks] = useState([
     { name: "Home", link: "#home" },
     { name: "About", link: "#about" },
     { name: "Services", link: "#services" },
     { name: "Contact", link: "#contact" },
     { name: "Profile", link: "/profile" },
-  ];
+  ]);
+
+  
+  // useEffect(()=> {
+  //   if(session?.user.role === "user") {
+  //     setLinks(prev => [
+  //       ...prev,
+  //       { name: "Profile", link: "/profile" },
+  //     ])
+  //   }
+  // }, [session])
+
+
 
   return (
     <div className="w-full h-full absolute inset-0 z-50">

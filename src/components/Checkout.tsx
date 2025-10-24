@@ -4,6 +4,9 @@ import React, { useState, useMemo, useEffect } from "react";
 import CheckoutPageLoader from "./loaders/CheckoutPageLoader";
 import { ChevronLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { createOrder } from "@/redux/features/orderSlice";
+import { RootState } from "@/redux/store";
 
 // --- Inline SVG Icons ---
 const StarFillIcon = (props) => (
@@ -61,6 +64,7 @@ const MOCK_PRODUCT = {
 };
 
 const CheckoutPage = () => {
+  const { loading } = useSelector((state: RootState) => state.order);
   const [loader, setLoader] = useState(true);
   const [checkoutProduct, setCheckoutProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -75,9 +79,10 @@ const CheckoutPage = () => {
   const [isAddressValid, setIsAddressValid] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState<{ title: string; message: string; type: string } | null>(null);
 
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchCheckoutProduct = sessionStorage.getItem("checkoutProduct");
@@ -172,12 +177,18 @@ const CheckoutPage = () => {
       grandTotal,
     };
     console.log("Order Placed:", orderData);
-    setOrderPlaced(true);
-    setShowModal({
-      title: "Order Placed Successfully!",
-      message: `Your order for ${quantity} x ${checkoutProduct?.name} has been confirmed and will be shipped to ${address.city}. Total amount: ${formatPrice(grandTotal)}.`,
-      type: "success",
-    });
+
+    dispatch(createOrder(orderData) as any)
+      .unwrap()
+      .then(() => {
+        setOrderPlaced(true);
+        setShowModal({
+          title: "Order Placed Successfully!",
+          message: `Your order for ${quantity} x ${checkoutProduct?.name} has been confirmed and will be shipped to ${address.city}. Total amount: ${formatPrice(grandTotal)}.`,
+          type: "success",
+        });
+        router.push("/profile");
+      });
   };
 
   // --- Modal for Confirmation/Error ---
@@ -193,7 +204,7 @@ const CheckoutPage = () => {
         <p className="text-gray-600">{showModal.message}</p>
         <button
           type="button"
-          onClick={() => setShowModal(false)}
+          onClick={() => setShowModal(null)}
           className={`w-full py-2 rounded-lg font-semibold text-white cursor-pointer ${showModal.type === "success" ? "bg-primary hover:bg-primary" : "bg-primary hover:bg-amber-900"}`}
         >
           Close
@@ -207,7 +218,7 @@ const CheckoutPage = () => {
     <div className="min-h-screen">
       <div className="max-w-7xl p-4 sm:p-8 mx-auto">
         <button
-          type="botton"
+          type="button"
           onClick={() => router.back()}
           className="flex items-center text-sm font-medium text-gray-600 hover:text-primary mb-6 transition-colors cursor-pointer"
         >
@@ -438,14 +449,14 @@ const CheckoutPage = () => {
                 <button
                   type="submit"
                   onClick={handlePlaceOrder}
-                  disabled={orderPlaced || !isAddressValid}
+                  disabled={loading || !isAddressValid}
                   className={`w-full mt-6 py-4 rounded-lg font-bold text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer ${
                     orderPlaced
                       ? "bg-green-600"
                       : "bg-primary hover:bg-primary-hover"
                   }`}
                 >
-                  {orderPlaced ? "Order Confirmed!" : "Place Order"}
+                  {loading ? "Placing Order..." : "Place Order"}
                 </button>
 
                 {!isAddressValid && (

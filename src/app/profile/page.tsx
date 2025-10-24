@@ -1,7 +1,14 @@
 import Profile from "@/components/Profile";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 
-export default function Page () {
-  return (
-    <Profile/>
-  );
-};
+export default async function Page() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  return <Profile />;
+}

@@ -7,9 +7,8 @@ const UserSchema = new Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     image: { type: String }, // Profile picture URL from Google
-    emailVerified: { type: Date }, // When email was verified
     provider: { type: String, default: "google" }, // OAuth provider
-    providerId: { type: String, required: true }, // Google user ID
+    providerId: { type: String, required: false }, // Google user ID
     // Additional fields for app-specific data
     role: { type: String, enum: ["user", "admin"], default: "user" },
     orders: [{ type: Schema.Types.ObjectId, ref: "Order" }], // Reference to user's orders
@@ -25,7 +24,6 @@ export interface IUser {
   name: string;
   email: string;
   image?: string;
-  emailVerified?: Date;
   provider: string;
   providerId: string;
   role: "user" | "admin";

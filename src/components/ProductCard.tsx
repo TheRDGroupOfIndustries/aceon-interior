@@ -1,26 +1,33 @@
 "use client";
 
 import { IProduct } from "@/models/Product";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BsStarFill } from "react-icons/bs";
 
 export default function ProductCard({ product }: { product: IProduct }) {
-    const router = useRouter();
+  const router = useRouter();
+  const { date: session } = useSession();
 
- const redirectToCheckout = () => {
-   sessionStorage.setItem(
-     "checkoutProduct",
-     JSON.stringify({
-       id: product._id,
-       name: product?.name,
-       current_price: product.pricing.current_price,
-       original_price: product.pricing.original_price,
-       main_image: product?.media.images[0]?.url,
-     })
-   );
-   router.push(`/checkout/${product._id }`);
- };
+  const redirectToCheckout = () => {
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+
+    sessionStorage.setItem(
+      "checkoutProduct",
+      JSON.stringify({
+        id: product._id,
+        name: product?.name,
+        current_price: product.pricing.current_price,
+        original_price: product.pricing.original_price,
+        main_image: product?.media.images[0]?.url,
+      })
+    );
+    router.push(`/checkout/${product._id}`);
+  };
 
   return (
     // Outer Card Container: Rounded corners, shadow, max-width
