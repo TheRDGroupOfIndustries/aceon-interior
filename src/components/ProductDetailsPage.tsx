@@ -1,10 +1,13 @@
 "use client";
 
+import { IProduct } from "@/models/Product";
+import { fetchProductById } from "@/redux/features/productSlice";
 import { RootState } from "@/redux/store";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState, useMemo } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useMemo, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import ProductDetailsLoader from "./loaders/ProductDetails";
 
 // --- Inline SVG Icon Components (Replaced react-icons) ---
 
@@ -231,20 +234,14 @@ const PRODUCT_DATA = {
 
 // --- Component ---
 const ProductDetailsPage = ({ productId }: { productId: string }) => {
-  const { products } = useSelector((state: RootState) => state.product);
+  const [product, setProduct] = useState<IProduct | null>();
+  const [loading, setLoading] = useState(true);
 
-  const [product, setProduct] = useState(
-    products.find((p) => p._id === productId) || PRODUCT_DATA
-  );
-
-  const [selectedSize, setSelectedSize] = useState(
-    product.variants.find((v) => v.type === "Size")?.options[1].value || ""
-  );
-  const [selectedColor, setSelectedColor] = useState(
-    product.variants.find((v) => v.type === "Color")?.options[0].value || ""
-  );
+  const [selectedVariants, setSelectedVariants] = useState({});
   const [mainImageIndex, setMainImageIndex] = useState(0);
+
   const router = useRouter();
+  const dispatch = useDispatch();
 
   // --- Review Form State ---
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -254,6 +251,25 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
     title: "",
     comment: "",
   });
+
+  const getProductData = async (id) => {
+    await dispatch<any>(fetchProductById(id)).then((res) => {
+      if (res.payload && res.payload.success) {
+        console.log("getProductData:", res.payload);
+        setProduct(res.payload.data);
+        const initialVariants = {};
+        res.payload.data.variants.forEach((variantGroup) => {
+          initialVariants[variantGroup.type] = variantGroup.options[0].value;
+        });
+        setSelectedVariants(initialVariants);
+        setLoading(false);
+      }
+    });
+  };
+
+  useEffect(() => {
+    getProductData(productId);
+  }, [productId]);
 
   // --- Review Form Handlers ---
   const handleFormChange = (e) => {
@@ -266,7 +282,7 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
 
   const handleReviewSubmit = (e) => {
     e.preventDefault();
-    const { user, rating, comment } = newReviewData;
+    const { user, rating, comment, title } = newReviewData;
 
     if (!user || rating === 0 || !comment.trim()) {
       // In a real app, display an error message to the user instead of logging.
@@ -274,56 +290,51 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
       return;
     }
 
-    const newReview = {
-      ...newReviewData,
-      date: new Date().toISOString().split("T")[0], // Simple YYYY-MM-DD date format
-      rating: newReviewData.rating,
-    };
+    console.log("New Review: ", newReviewData)
+    setProduct((prev: any) => {
+      if (!prev) return;
+      return {
+        ...prev,
+        reviews: {
+          ...prev.reviews,
+          review_list: [
+            {
+              user,
+              rating,
+              date: new Date().toISOString(),
+              title,
+              comment,
+            },
+            ...prev.reviews.review_list,
+          ],
+        },
+      };
+    });
 
-    // --- Simulation of API Update ---
-    const updatedReviews = [...product.reviews.review_list, newReview];
-    const newRatingCount = updatedReviews.length;
-    const totalRatingSum = updatedReviews.reduce((sum, r) => sum + r.rating, 0);
-    const newAverageRating = (totalRatingSum / newRatingCount).toFixed(1);
+    setNewReviewData({
+      user: "",
+      rating: 0,
+      title: "",
+      comment: "",
+    });
 
-    // setProduct((prevProduct) => ({
-    //   ...prevProduct,
-    //   reviews: {
-    //     ...prevProduct.reviews,
-    //     review_list: updatedReviews,
-    //     rating_count: newRatingCount,
-    //     average_rating: parseFloat(newAverageRating),
-    //   },
-    // }));
-
-    // Reset form and close it
-    setNewReviewData({ user: "", rating: 0, title: "", comment: "" });
-    setShowReviewForm(false);
   };
 
   // --- Derived State (Current Price Calculation) ---
   const calculatedPrice = useMemo(() => {
-    const sizeVariant = product.variants
-      .find((v) => v.type === "Size")
-      ?.options.find((o) => o.value === selectedSize);
-    const colorVariant = product.variants
-      .find((v) => v.type === "Color")
-      ?.options.find((o) => o.value === selectedColor);
-
-    let price = product.pricing.current_price;
-    price += sizeVariant?.price_adjust || 0;
-    // You could also add color price adjustments here if defined
-
+    let price = product?.pricing.current_price;
+    product?.variants.forEach((variantGroup) => {
+      const selectedValue = selectedVariants[variantGroup.type];
+      const selectedOption = variantGroup.options.find(
+        (o) => o.value === selectedValue
+      );
+      price += selectedOption?.price_adjust || 0;
+    });
     return price;
-  }, [
-    selectedSize,
-    selectedColor,
-    product.pricing.current_price,
-    product.variants,
-  ]);
+  }, [selectedVariants, product?.pricing.current_price, product?.variants]);
 
   // --- Image Slider Functions ---
-  const totalImages = product.media.images.length;
+  const totalImages = product?.media.images.length;
   const nextImage = () => setMainImageIndex((prev) => (prev + 1) % totalImages);
   const prevImage = () =>
     setMainImageIndex((prev) => (prev - 1 + totalImages) % totalImages);
@@ -343,15 +354,35 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
     return stars;
   };
 
+  const redirectToCheckout = () => {
+    sessionStorage.setItem(
+      "checkoutProduct",
+      JSON.stringify({
+        id: productId,
+        name: product?.name,
+        current_price: product.pricing.current_price,
+        original_price: product.pricing.original_price,
+        main_image: product?.media.images[0]?.url,
+        variant: selectedVariants,
+      })
+    );
+    router.push(`/checkout/${productId}`);
+  };
+
+
+  if (loading || !product) {
+    return <ProductDetailsLoader />;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 font-sans p-4 sm:p-8">
+    <div className="min-h-screen max-w-7xl p-4 sm:p-8 mx-auto font-sans">
       <button
         onClick={() => router.back()}
         className="flex items-center text-sm font-medium text-gray-600 hover:text-primary mb-6 transition-colors cursor-pointer"
       >
         <ChevronLeftIcon className="w-4 h-4 mr-1" /> Go Back
       </button>
-      <div className="max-w-6xl mx-auto">
+      <div className=" ">
         {/* Breadcrumb / Back Link */}
 
         {/* --- Product Hero Section (Image & Details) --- */}
@@ -381,11 +412,11 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
               </button>
 
               {/* Sale Badge */}
-              {product.pricing.is_on_sale && (
+              {/* {product.pricing.is_on_sale && (
                 <div className="absolute top-4 left-4 bg-primary text-white text-sm font-semibold px-4 py-1.5 rounded-full shadow-lg">
                   SALE {product.pricing.discount_percent}% OFF
                 </div>
-              )}
+              )} */}
             </div>
 
             {/* Thumbnail Navigation */}
@@ -412,7 +443,7 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
               {product.category}
             </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold font-playfair text-gray-900 mt-2 mb-4 leading-tight">
-              {product.name} ({selectedColor})
+              {product.name} ({selectedVariants["Color"]})
             </h1>
 
             {/* Rating */}
@@ -448,29 +479,22 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
               {product.variants.map((variantGroup, groupIndex) => (
                 <div key={groupIndex}>
                   <h3 className="text-lg font-semibold text-gray-700 mb-3">
-                    {variantGroup.type}:{" "}
-                    {variantGroup.type === "Color"
-                      ? selectedColor
-                      : selectedSize}
+                    {variantGroup.type}: {selectedVariants[variantGroup.type]}
                   </h3>
                   <div className="flex flex-wrap gap-3">
                     {variantGroup.options.map((option, optionIndex) => (
                       <button
                         key={optionIndex}
                         onClick={() => {
-                          if (variantGroup.type === "Size") {
-                            setSelectedSize(option.value);
-                          } else {
-                            setSelectedColor(option.value);
-                          }
+                          setSelectedVariants((prev) => ({
+                            ...prev,
+                            [variantGroup.type]: option.value,
+                          }));
                         }}
                         className={`
                           p-3 border-2 rounded-lg text-sm font-medium transition-all duration-200
                           ${
-                            (variantGroup.type === "Size" &&
-                              option.value === selectedSize) ||
-                            (variantGroup.type === "Color" &&
-                              option.value === selectedColor)
+                            option.value === selectedVariants[variantGroup.type]
                               ? "border-primary text-primary ring-2 ring-primary shadow-md"
                               : "border-gray-300 text-gray-700 hover:border-gray-500"
                           }
@@ -502,12 +526,12 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
 
             {/* Call to Action Buttons */}
             <div className="flex space-x-4 mb-8">
-              <Link
-                href={`/checkout/${productId}`}
+              <button
+                onClick={redirectToCheckout}
                 className="flex-1 flex items-center justify-center bg-primary text-white text-lg font-semibold py-4 rounded-xl shadow-lg hover:bg-amber-900 cursor-pointer transition-all duration-300"
               >
                 <CartPlusIcon className="w-5 h-5 mr-2" /> Buy Now
-              </Link>
+              </button>
               {/* <button className="flex-1 flex items-center justify-center bg-white text-primary border-2 border-primary text-lg font-semibold py-4 rounded-xl shadow-lg hover:bg-amber-50 transition-all duration-300">
                 Buy Now
               </button> */}

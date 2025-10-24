@@ -1,32 +1,40 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { FaInstagram, FaXTwitter, FaFacebook, FaBars, FaX } from "react-icons/fa6"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  FaInstagram,
+  FaXTwitter,
+  FaFacebook,
+  FaBars,
+  FaX,
+} from "react-icons/fa6";
+import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 function Elements() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-    const original = document.body.style.overflow
+    const original = document.body.style.overflow;
     if (isMenuOpen) {
-      document.body.style.overflow = "hidden"
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = original || ""
+      document.body.style.overflow = original || "";
     }
     return () => {
-      document.body.style.overflow = original || ""
-    }
-  }, [isMenuOpen])
+      document.body.style.overflow = original || "";
+    };
+  }, [isMenuOpen]);
 
   const links = [
     { name: "Home", link: "#home" },
     { name: "About", link: "#about" },
     { name: "Services", link: "#services" },
     { name: "Contact", link: "#contact" },
-  ]
+    { name: "Profile", link: "/profile" },
+  ];
 
   return (
     <div className="w-full h-full absolute inset-0 z-50">
@@ -103,7 +111,6 @@ function Elements() {
 
       {/* Main Content */}
       <div className="h-full flex justify-center items-start flex-col px-4 sm:px-6 md:px-8 mt-[-1rem] sm:mt-0">
-       
         <motion.h1
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
@@ -132,37 +139,47 @@ function Elements() {
           transition={{ duration: 0.6, delay: 0.7 }}
           className="flex flex-col sm:flex-row gap-3 md:gap-4 items-center mt-6 md:mt-8 w-full sm:w-auto"
         >
-         <Link href="#cta" className="block w-full sm:w-auto">
-  <motion.button
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-    className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-[#b98663] text-white text-lg md:text-xl font-medium hover:bg-white hover:text-[#b98663] transition-all whitespace-nowrap text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
-  >
-    Get Started
-  </motion.button>
-</Link>
+          <Link href="/login" className="block w-full sm:w-auto">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-[#b98663] text-white text-lg md:text-xl font-medium hover:bg-white hover:text-[#b98663] transition-all whitespace-nowrap text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            >
+              Get Started
+            </motion.button>
+          </Link>
 
-<Link href="#contact" className="block w-full sm:w-auto">
-  <motion.button
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-    className="w-full sm:w-auto px-6 py-3 sm:py-2 rounded-xl border hover:bg-white hover:text-[#b98663] transition-all border-white text-white text-lg md:text-xl font-medium whitespace-nowrap text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
-  >
-    Contact Us
-  </motion.button>
-</Link>
-
+          <Link href="#contact" className="block w-full sm:w-auto">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-full sm:w-auto px-6 py-3 sm:py-2 rounded-xl border hover:bg-white hover:text-[#b98663] transition-all border-white text-white text-lg md:text-xl font-medium whitespace-nowrap text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            >
+              Contact Us
+            </motion.button>
+          </Link>
         </motion.div>
 
- 
         <div className="flex md:hidden justify-center items-center gap-4 mt-6">
-          <Link href="#" aria-label="Instagram" className="p-2 rounded-full bg-white/20 hover:bg-[#a87147]">
+          <Link
+            href="#"
+            aria-label="Instagram"
+            className="p-2 rounded-full bg-white/20 hover:bg-[#a87147]"
+          >
             <FaInstagram className="w-6 h-6 text-white" />
           </Link>
-          <Link href="#" aria-label="Facebook" className="p-2 rounded-full bg-white/20 hover:bg-[#a87147]">
+          <Link
+            href="#"
+            aria-label="Facebook"
+            className="p-2 rounded-full bg-white/20 hover:bg-[#a87147]"
+          >
             <FaFacebook className="w-6 h-6 text-white" />
           </Link>
-          <Link href="#" aria-label="X (Twitter)" className="p-2 rounded-full bg-white/20 hover:bg-[#a87147]">
+          <Link
+            href="#"
+            aria-label="X (Twitter)"
+            className="p-2 rounded-full bg-white/20 hover:bg-[#a87147]"
+          >
             <FaXTwitter className="w-6 h-6 text-white" />
           </Link>
         </div>
@@ -175,13 +192,25 @@ function Elements() {
         transition={{ duration: 0.6, delay: 0.8 }}
         className="hidden md:flex py-2 px-1 bg-white/20 rounded-xl absolute right-2 md:right-4 top-1/6 flex-col justify-center items-center gap-2 backdrop-blur-sm"
       >
-        <Link href="#" aria-label="Instagram" className="rounded-full hover:bg-[#a87147] transition-colors p-2">
+        <Link
+          href="#"
+          aria-label="Instagram"
+          className="rounded-full hover:bg-[#a87147] transition-colors p-2"
+        >
           <FaInstagram className="w-5 h-5 md:w-6 md:h-6 text-current" />
         </Link>
-        <Link href="#" aria-label="Facebook" className="rounded-full hover:bg-[#a87147] transition-colors p-2">
+        <Link
+          href="#"
+          aria-label="Facebook"
+          className="rounded-full hover:bg-[#a87147] transition-colors p-2"
+        >
           <FaFacebook className="w-5 h-5 md:w-6 md:h-6 text-current" />
         </Link>
-        <Link href="#" aria-label="X (Twitter)" className="rounded-full hover:bg-[#a87147] transition-colors p-2">
+        <Link
+          href="#"
+          aria-label="X (Twitter)"
+          className="rounded-full hover:bg-[#a87147] transition-colors p-2"
+        >
           <FaXTwitter className="w-5 h-5 md:w-6 md:h-6 text-current" />
         </Link>
       </motion.div>
@@ -204,10 +233,12 @@ function Elements() {
           />
         </div>
         <div className="flex-1 min-w-0 mt-3 sm:mt-0 sm:ml-3 flex flex-col justify-center overflow-hidden">
-          <h3 className="text-sm sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2 line-clamp-1">Furniture Design</h3>
+          <h3 className="text-sm sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2 line-clamp-1">
+            Furniture Design
+          </h3>
           <p className="text-xs sm:text-sm text-gray-600 overflow-hidden line-clamp-3 pr-1">
-            &quot;Custom furniture solutions for your home or office - stylish, functional, and within your budget.
-            Serving Varanasi on time.&quot;
+            &quot;Custom furniture solutions for your home or office - stylish,
+            functional, and within your budget. Serving Varanasi on time.&quot;
           </p>
           <span className="block mt-1 sm:mt-2 text-[10px] sm:text-sm font-semibold text-gray-900 truncate line-clamp-1">
             Style Within Your ₹ Budget
@@ -215,7 +246,7 @@ function Elements() {
         </div>
       </motion.div>
     </div>
-  )
+  );
 }
 
 function Hero() {
@@ -270,14 +301,19 @@ function Hero() {
           whileHover={{ scale: 1.02 }}
           className="w-full max-w-[15.5rem] sm:max-w-[20rem] md:max-w-[21.5rem] h-14 absolute right-4 md:right-[-23] top-5.5 z-[90] hidden sm:flex justify-center items-center cursor-pointer"
         >
-          <Image src="/buildrectangle.svg" alt="Rect" fill className="scale-x-105 object-cover md:object-contain" />
+          <Image
+            src="/buildrectangle.svg"
+            alt="Rect"
+            fill
+            className="scale-x-105 object-cover md:object-contain"
+          />
           <span className="text-white text-lg sm:text-xl md:text-2xl relative text-center z-50 font-playfair px-2">
             Build a modern Interior
           </span>
         </motion.div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Hero
+export default Hero;

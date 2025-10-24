@@ -139,9 +139,9 @@ export default function ProductListingPage() {
   };
 
   return (
-    <div className="min-h-screen  bg-gray-50">
+    <div className="min-h-screen  ">
       {/* Top Bar */}
-      <div className=" sticky bg-gray-50 top-0 z-10">
+      <div className=" sticky bg-background top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row gap-4 items-center text-center justify-between">
             <button
@@ -178,7 +178,7 @@ export default function ProductListingPage() {
                 <select
                   value={`${sortBy}-${sortOrder}`}
                   onChange={(e) => handleSortChange(e.target.value)}
-                  className="w-full appearance-none px-4 py-2 pr-10 border rounded-lg bg-gray-50 outline-primary border-primary cursor-pointer text-primary"
+                  className="w-full appearance-none px-4 py-2 pr-10 border rounded-lg  outline-primary border-primary cursor-pointer text-primary"
                 >
                   {sortOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -201,7 +201,7 @@ export default function ProductListingPage() {
               showFilters ? "block" : "hidden"
             } lg:block w-full lg:w-64 flex-shrink-0`}
           >
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
+            <div className="bg-card rounded-lg shadow-sm p-6 sticky top-24">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
                 {(selectedCategory || selectedSubcategory || searchQuery) && (
@@ -386,7 +386,7 @@ export default function ProductListingPage() {
                     <button
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={!pagination.hasPrev}
-                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:"
                     >
                       Previous
                     </button>
@@ -405,7 +405,7 @@ export default function ProductListingPage() {
                               className={`w-10 h-10 rounded-lg ${
                                 page === currentPage
                                   ? "bg-amber-600 text-white"
-                                  : "border border-gray-300 hover:bg-gray-50"
+                                  : "border border-gray-300 hover:"
                               }`}
                             >
                               {page}
@@ -430,7 +430,7 @@ export default function ProductListingPage() {
                     <button
                       onClick={() => setCurrentPage((p) => p + 1)}
                       disabled={!pagination.hasNext}
-                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:"
                     >
                       Next
                     </button>

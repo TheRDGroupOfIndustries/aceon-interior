@@ -2,9 +2,26 @@
 
 import { IProduct } from "@/models/Product";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { BsStarFill } from "react-icons/bs";
 
 export default function ProductCard({ product }: { product: IProduct }) {
+    const router = useRouter();
+
+ const redirectToCheckout = () => {
+   sessionStorage.setItem(
+     "checkoutProduct",
+     JSON.stringify({
+       id: product._id,
+       name: product?.name,
+       current_price: product.pricing.current_price,
+       original_price: product.pricing.original_price,
+       main_image: product?.media.images[0]?.url,
+     })
+   );
+   router.push(`/checkout/${product._id }`);
+ };
+
   return (
     // Outer Card Container: Rounded corners, shadow, max-width
     <div className="bg-card rounded-xl overflow-hidden transition-transform duration-300 hover:scale-[1.01]">
@@ -76,12 +93,12 @@ export default function ProductCard({ product }: { product: IProduct }) {
             </Link>
 
             {/* Buy Now Link */}
-            <Link
-              href={`/checkout/${product._id}`}
+            <button
+              onClick={redirectToCheckout}
               className="flex-1 bg-[#A97C51] border-2 border-[#A97C51] text-white font-semibold py-3 rounded-lg shadow-md hover:bg-[#9c724a] transition-colors duration-200 cursor-pointer text-center"
             >
               Buy Now
-            </Link>
+            </button>
           </div>
         </div>
       </div>

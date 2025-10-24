@@ -6,7 +6,7 @@ export const fetchFeatureProducts = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const params = new URLSearchParams();
-      params.append("limit", '3');
+      params.append("limit", "3");
 
       const response = await fetch(`/api/product?${params.toString()}`);
       if (!response.ok) {
@@ -19,6 +19,7 @@ export const fetchFeatureProducts = createAsyncThunk(
     }
   }
 );
+
 export const fetchProducts = createAsyncThunk(
   "product/fetchProducts",
   async (
@@ -51,6 +52,22 @@ export const fetchProducts = createAsyncThunk(
       const response = await fetch(`/api/product?${params.toString()}`);
       if (!response.ok) {
         rejectWithValue("Failed to fetch products");
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const fetchProductById = createAsyncThunk(
+  "product/fetchProductById",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`/api/product/${id}`);
+      if (!response.ok) {
+        rejectWithValue("Failed to fetch product");
       }
       const data = await response.json();
       return data;
