@@ -70,7 +70,7 @@ const DEFAULT_VARIANT_GROUP = {
   options: [{ ...DEFAULT_VARIANT_OPTION }],
 };
 
-const getDefaultValues = (product) => {
+const getDefaultValues = (product?: any) => {
   if (!product) {
     // Default values for a new product
     return {
@@ -391,7 +391,7 @@ const GeneralInfoTab = ({
       label="Tagline (Short Description)"
       name="description.tagline"
       register={register}
-      error={errors.description?.tagline}
+      error={(errors.description as any)?.tagline}
       rows={2}
       placeholder="Brief, catchy description of the product"
     />
@@ -399,7 +399,7 @@ const GeneralInfoTab = ({
       label="Long Description (Required)"
       name="description.long_description"
       register={register}
-      error={errors.description?.long_description}
+      error={(errors.description as any)?.long_description}
       placeholder="Detailed description including features, benefits, and specifications"
     />
 
@@ -876,7 +876,7 @@ const ProductForm = ({
     formState: { errors, isSubmitting },
     watch,
     setValue,
-  } = useForm({
+  } = useForm<any>({
     defaultValues,
   });
 
