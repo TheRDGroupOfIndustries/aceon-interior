@@ -5,6 +5,7 @@ import { IOrder } from "@/models/Order";
 interface OrderState {
   orders: IOrder[];
   currentOrder: IOrder | null;
+  total: number;
   loading: boolean;
   error: string | null;
 }
@@ -13,6 +14,7 @@ interface OrderState {
 const initialState: OrderState = {
   orders: [],
   currentOrder: null,
+  total: 0,
   loading: false,
   error: null,
 };
@@ -63,17 +65,26 @@ export const createOrder = createAsyncThunk(
 // Async thunk for fetching user orders
 export const fetchUserOrders = createAsyncThunk(
   "order/fetchUserOrders",
-  async (_, { rejectWithValue }) => {
+  async (
+    {
+      page = 1,
+      limit = 10,
+      status = "all",
+    }: { page?: number; limit?: number; status?: string },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await fetch("/api/order");
+      const response = await fetch(
+        `/api/order?page=${page}&limit=${limit}&status=${status}`
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
         return rejectWithValue(data.message || "Failed to fetch orders");
       }
-
-      return data.data;
+      console.log("fetchUserOrders", data);
+      return { orders: data.data, total: data.total || 0 };
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to fetch orders");
     }
@@ -119,11 +130,13 @@ export const updateOrderStatus = createAsyncThunk(
       const data = await response.json();
 
       if (!response.ok) {
+        console.log(data);
         return rejectWithValue(data.message || "Failed to update order status");
       }
 
       return data.data;
     } catch (error: any) {
+      console.log(error);
       return rejectWithValue(error.message || "Failed to update order status");
     }
   }
@@ -198,9 +211,10 @@ const orderSlice = createSlice({
       })
       .addCase(
         fetchUserOrders.fulfilled,
-        (state, action: PayloadAction<IOrder[]>) => {
+        (state, action: PayloadAction<{ orders: IOrder[]; total: number }>) => {
           state.loading = false;
-          state.orders = action.payload;
+          state.orders = action.payload.orders;
+          state.total = action.payload.total;
         }
       )
       .addCase(fetchUserOrders.rejected, (state, action) => {
@@ -241,7 +255,7 @@ const orderSlice = createSlice({
             (order) => order._id === action.payload._id
           );
           if (index !== -1) {
-            state.orders[index] = action.payload;
+            state.orders[index].status = action.payload.status;
           }
           // Update current order if it's the same
           if (state.currentOrder?._id === action.payload._id) {
@@ -251,6 +265,7 @@ const orderSlice = createSlice({
       )
       .addCase(updateOrderStatus.rejected, (state, action) => {
         state.loading = false;
+        console.log(action.payload);
         state.error = action.payload as string;
       });
 

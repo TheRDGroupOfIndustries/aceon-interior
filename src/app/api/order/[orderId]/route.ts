@@ -102,7 +102,6 @@ export async function PUT(
     // Find the order
     const order = await Order.findOne({
       _id: orderId,
-      userId: user._id,
     });
 
     if (!order) {
@@ -193,6 +192,15 @@ export async function PUT(
           as: "productId",
         },
       },
+      {
+        $lookup: {
+          from: "users", // The collection name for users
+          localField: "userId",
+          foreignField: "_id",
+          as: "userId",
+        },
+      },
+      { $unwind: "$userId" },
       { $unwind: "$productId" },
     ]);
 

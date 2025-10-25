@@ -5,7 +5,12 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ["cdn.sanity.io"],
+    domains: [
+      "cdn.sanity.io",
+      "aceon-interior.vercel.app",
+      "clipground.com",
+      "placehold.co",
+    ],
   },
   eslint: {
     ignoreDuringBuilds: true, // ✅ disables ESLint during production build

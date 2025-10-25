@@ -1,5 +1,12 @@
-# TODO: Create CRUD Routes for Product Model
+# TODO: Add Placeholders to ProductForm Inputs
 
-- [x] Implement GET and POST in /api/product/route.ts for listing and creating products
-- [x] Create /api/product/[id]/route.ts with GET, PUT, and DELETE for individual product operations
-- [ ] Test the routes to ensure they work correctly
+## Steps to Complete:
+
+- [x] Update InputField component to accept placeholder prop
+- [x] Update TextAreaField component to accept placeholder prop
+- [x] Add placeholders to General Info tab inputs
+- [x] Add placeholders to Pricing & Stock tab inputs
+- [ ] Add placeholders to Gallery & Media tab inputs
+- [ ] Add placeholders to Specifications tab inputs
+- [ ] Add placeholders to Variants tab inputs
+- [ ] Test form to ensure placeholders display correctly

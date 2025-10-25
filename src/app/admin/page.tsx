@@ -1,9 +1,15 @@
 "use client";
 
-import { signOut } from "next-auth/react";
+import CategoryListing from "@/components/admin/CategoryListing";
+import OrderListing from "@/components/admin/OrderListing";
+import ProductListing from "@/components/admin/ProductListing";
+import { fetchUserOrders } from "@/redux/features/orderSlice";
+import { fetchProducts } from "@/redux/features/productSlice";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { BsArrowLeft } from "react-icons/bs";
+import { useDispatch } from "react-redux";
 
 interface EMIApplication {
   _id: string;
@@ -34,7 +40,9 @@ interface ContactMessage {
 }
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<"emi" | "contact">("emi");
+  const [activeTab, setActiveTab] = useState<
+    "emi" | "contact" | "products" | "order" | "category"
+  >("emi");
   const [emiApplications, setEmiApplications] = useState<EMIApplication[]>([]);
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
   const [emiPage, setEmiPage] = useState(1);
@@ -43,13 +51,22 @@ export default function AdminDashboard() {
   const [contactTotal, setContactTotal] = useState(0);
   const [emiFilter, setEmiFilter] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [statusStats, setStatusStats] = useState({
+  const [stats, setStats] = useState({
+    totalEmiApp: 0,
+    totalMessages: 0,
+    totalOrders: 0,
+    totalProducts: 0,
+    totalCategory: 0,
+  });
+  const [statusStats, setStfirsttats] = useState({
     pending: 0,
     approved: 0,
     rejected: 0,
     under_review: 0,
     total: 0,
   });
+
+  const { data: session } = useSession();
 
   const [selectedApp, setSelectedApp] = useState<EMIApplication | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -80,8 +97,8 @@ export default function AdminDashboard() {
       const data = await response.json();
       if (data.success) {
         setEmiApplications(data.data.applications);
-        setEmiTotal(data.data.pagination.total);
-        setStatusStats(data.data.filters.status);
+        // setEmiTotal(data.data.pagination.total);
+        // setStatusStats(data.data.filters.status);
       }
     } catch (error) {
       console.error("Error fetching EMI applications:", error);
@@ -89,6 +106,7 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   }, [emiPage, emiFilter, limit]);
+
   useEffect(() => {
     if (activeTab === "emi") fetchEMIApplications();
   }, [fetchEMIApplications, activeTab]);
@@ -108,9 +126,11 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   }, [contactPage, limit]);
+
   useEffect(() => {
     if (activeTab === "contact") fetchContactMessages();
   }, [fetchContactMessages, activeTab]);
+
   const handleStatusUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedApp) return;
@@ -175,27 +195,42 @@ export default function AdminDashboard() {
     { key: "rejected", label: "Rejected", count: statusStats.rejected },
   ];
 
+  const dispatch = useDispatch();
+
+  const getLengths = async () => {
+    try {
+      const res = await fetch("/api/stats", {
+        method: "GET",
+      });
+      const data = await res.json();
+      console.log("getLengths", data.data);
+      setStats(data.data);
+    } catch (error) {
+      console.error("Error fetching lengths:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (session) {
+      getLengths();
+      dispatch(fetchProducts({}) as any);
+      dispatch(fetchUserOrders({}) as any);
+    }
+  }, [session]);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto border-b flex items-center justify-between p-4">
-        <div className="px-4 sm:px-6 py-8 flex items-center gap-3">
-          <Link
-            href="/"
-            className="text-gray-600 hover:text-[#A97C51] transition-colors"
+        <div className="px-4 sm:px-6 py-8 gap-3">
+          <h1
+            className="text-2xl sm:text-4xl font-serif mb-1 sm:mb-2"
+            style={{ color: "#A97C51" }}
           >
-            <BsArrowLeft className="w-6 h-6 sm:w-7 sm:h-7" />
-          </Link>
-          <div className="pl-6 sm:pl-10">
-            <h1
-              className="text-2xl sm:text-4xl font-serif mb-1 sm:mb-2"
-              style={{ color: "#A97C51" }}
-            >
-              Admin Dashboard
-            </h1>
-            <p className="text-sm sm:text-base text-gray-600">
-              Manage inquiries and applications
-            </p>
-          </div>
+            Admin Dashboard
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600">
+            Manage inquiries and applications
+          </p>
         </div>
         <button
           onClick={() => signOut()}
@@ -205,13 +240,13 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 pb-8">
         <div className="flex gap-1 border-b mb-8">
           <button
             onClick={() => setActiveTab("emi")}
             className={`px-6 py-3 font-medium transition-colors relative ${activeTab === "emi" ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
           >
-            EMI Applications ({statusStats.total})
+            EMI Applications ({stats.totalEmiApp})
             {activeTab === "emi" && (
               <div
                 className="absolute bottom-0 left-0 right-0 h-0.5"
@@ -223,8 +258,44 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab("contact")}
             className={`px-6 py-3 font-medium transition-colors relative ${activeTab === "contact" ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
           >
-            Contact Messages ({contactTotal})
+            Contact Messages ({stats.totalMessages})
             {activeTab === "contact" && (
+              <div
+                className="absolute bottom-0 left-0 right-0 h-0.5"
+                style={{ backgroundColor: "#A97C51" }}
+              />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab("products")}
+            className={`px-6 py-3 font-medium transition-colors relative ${activeTab === "contact" ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
+          >
+            Products ({stats.totalProducts})
+            {activeTab === "products" && (
+              <div
+                className="absolute bottom-0 left-0 right-0 h-0.5"
+                style={{ backgroundColor: "#A97C51" }}
+              />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab("order")}
+            className={`px-6 py-3 font-medium transition-colors relative ${activeTab === "contact" ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
+          >
+            Orders ({stats.totalOrders})
+            {activeTab === "order" && (
+              <div
+                className="absolute bottom-0 left-0 right-0 h-0.5"
+                style={{ backgroundColor: "#A97C51" }}
+              />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab("category")}
+            className={`px-6 py-3 font-medium transition-colors relative ${activeTab === "contact" ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
+          >
+            Category ({stats.totalCategory})
+            {activeTab === "category" && (
               <div
                 className="absolute bottom-0 left-0 right-0 h-0.5"
                 style={{ backgroundColor: "#A97C51" }}
@@ -511,6 +582,12 @@ export default function AdminDashboard() {
             )}
           </div>
         )}
+
+        {activeTab === "products" && (
+          <ProductListing totalProducts={stats.totalProducts} />
+        )}
+        {activeTab === "order" && <OrderListing />}
+        {activeTab === "category" && <CategoryListing />}
       </div>
 
       {selectedApp && (

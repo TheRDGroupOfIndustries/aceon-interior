@@ -77,6 +77,23 @@ export const fetchProductById = createAsyncThunk(
   }
 );
 
+export const deleteProduct = createAsyncThunk(
+  "product/deleteProduct",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`/api/product/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        rejectWithValue("Failed to delete product");
+      }
+      return id;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 interface ProductState {
   fearureProducts: IProduct[];
   products: IProduct[];
@@ -129,11 +146,6 @@ const productSlice = createSlice({
         state.products[index] = action.payload;
       }
     },
-    deleteProduct: (state, action) => {
-      state.products = state.products.filter(
-        (product) => product._id !== action.payload
-      );
-    },
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
@@ -174,6 +186,21 @@ const productSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       });
+
+    // Delete Product
+    builder
+      .addCase(deleteProduct.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.products = state.products.filter(
+          (product) => product._id !== action.payload
+        );
+        console.log("Deleted: ", action.payload);
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        state.error = action.payload as string;
+      });
   },
 });
 
@@ -183,7 +210,6 @@ export const {
   setPagination,
   addProduct,
   updateProduct,
-  deleteProduct,
   setLoading,
   setError,
 } = productSlice.actions;
