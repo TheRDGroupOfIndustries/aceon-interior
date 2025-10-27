@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
       "aceon-interior.vercel.app",
       "clipground.com",
       "placehold.co",
+      "res.cloudinary.com",
     ],
   },
   eslint: {

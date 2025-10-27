@@ -1,5 +1,5 @@
 import { updateProduct } from "@/redux/features/productSlice";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   useForm,
   useFieldArray,
@@ -369,61 +369,109 @@ const GeneralInfoTab = ({
   control,
   watch,
   setValue,
+  product,
 }: {
   register: UseFormRegister<any>;
   errors: FieldErrors<any>;
   control: Control<any>;
   watch: UseFormWatch<any>;
   setValue: UseFormSetValue<any>;
-}) => (
-  <div className="space-y-6">
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <InputField
-        label="Product Name"
-        name="name"
+  product?: any;
+}) => {
+  const [categories, setCategories] = useState<{ _id: string; name: string }[]>(
+    []
+  );
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("/api/category");
+        const data = await response.json();
+        setCategories(data.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <InputField
+          label="Product Name"
+          name="name"
+          register={register}
+          error={errors.name}
+          placeholder="e.g., Modern Wooden Bed Frame"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label
+            htmlFor="category"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Category
+          </label>
+          <select
+            id="category"
+            {...register("category")}
+            className={`block w-full rounded-lg border px-3 py-2 text-gray-900 shadow-sm transition duration-150 ${
+              errors.category
+                ? "border-red-500 focus:ring-red-500"
+                : "border-gray-300 focus:border-amber-500 focus:ring-amber-500"
+            }`}
+          >
+            <option value="">Select a category</option>
+            {product?.category && (
+              <option value={product.category}>{product.category}</option>
+            )}
+            {categories
+              .filter((cat) => cat.name !== product?.category)
+              .map((cat) => (
+                <option key={cat._id} value={cat.name}>
+                  {cat.name}
+                </option>
+              ))}
+          </select>
+          {errors.category && (
+            <p className="mt-1 text-xs text-red-500">
+              {errors.category.message as any}
+            </p>
+          )}
+        </div>
+        <InputField
+          label="Subcategory"
+          name="subcategory"
+          register={register}
+          error={errors.subcategory}
+          placeholder="e.g., Beds"
+        />
+      </div>
+
+      <TextAreaField
+        label="Tagline (Short Description)"
+        name="description.tagline"
         register={register}
-        error={errors.name}
-        placeholder="e.g., Modern Wooden Bed Frame"
+        error={(errors.description as any)?.tagline}
+        rows={2}
+        placeholder="Brief, catchy description of the product"
       />
+      <TextAreaField
+        label="Long Description (Required)"
+        name="description.long_description"
+        register={register}
+        error={(errors.description as any)?.long_description}
+        placeholder="Detailed description including features, benefits, and specifications"
+      />
+
+      <h4 className="text-md font-semibold pt-4">Product Features</h4>
+      <FeaturesArray register={register} control={control} errors={errors} />
     </div>
-
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <InputField
-        label="Category"
-        name="category"
-        register={register}
-        error={errors.category}
-        placeholder="e.g., Furniture"
-      />
-      <InputField
-        label="Subcategory"
-        name="subcategory"
-        register={register}
-        error={errors.subcategory}
-        placeholder="e.g., Beds"
-      />
-    </div>
-
-    <TextAreaField
-      label="Tagline (Short Description)"
-      name="description.tagline"
-      register={register}
-      error={(errors.description as any)?.tagline}
-      rows={2}
-      placeholder="Brief, catchy description of the product"
-    />
-    <TextAreaField
-      label="Long Description (Required)"
-      name="description.long_description"
-      register={register}
-      error={(errors.description as any)?.long_description}
-      placeholder="Detailed description including features, benefits, and specifications"
-    />
-
-    <h4 className="text-md font-semibold pt-4">Product Features</h4>
-    <FeaturesArray register={register} control={control} errors={errors} />
-  </div>
-);
+  );
+};
 
 const PricingAndStockTab = ({ register, errors, watch, setValue }) => {
   const is_on_sale = watch("pricing.is_on_sale");
@@ -435,7 +483,7 @@ const PricingAndStockTab = ({ register, errors, watch, setValue }) => {
           label="Current Price (₹)"
           name="pricing.current_price"
           register={register}
-          error={errors.pricing?.current_price}
+          error={(errors.pricing as any)?.current_price}
           type="number"
           placeholder="e.g., 25000"
         />
@@ -443,7 +491,7 @@ const PricingAndStockTab = ({ register, errors, watch, setValue }) => {
           label="Original Price (₹)"
           name="pricing.original_price"
           register={register}
-          error={errors.pricing?.original_price}
+          error={(errors.pricing as any)?.original_price}
           type="number"
           placeholder="e.g., 30000"
         />
@@ -451,7 +499,7 @@ const PricingAndStockTab = ({ register, errors, watch, setValue }) => {
           label="Currency"
           name="pricing.currency"
           register={register}
-          error={errors.pricing?.currency}
+          error={(errors.pricing as any)?.currency}
           placeholder="e.g., INR"
         />
       </div>
@@ -467,14 +515,14 @@ const PricingAndStockTab = ({ register, errors, watch, setValue }) => {
               label="Discount Amount (₹)"
               name="pricing.discount"
               register={register}
-              error={errors.pricing?.discount}
+              error={(errors.pricing as any)?.discount}
               type="number"
             />
             <InputField
               label="Discount Percent (%)"
               name="pricing.discount_percent"
               register={register}
-              error={errors.pricing?.discount_percent}
+              error={(errors.pricing as any)?.discount_percent}
               type="number"
             />
           </>
@@ -489,7 +537,7 @@ const PricingAndStockTab = ({ register, errors, watch, setValue }) => {
           label="Available Quantity"
           name="stock.available_quantity"
           register={register}
-          error={errors.stock?.available_quantity}
+          error={(errors.stock as any)?.available_quantity}
           type="number"
           placeholder="e.g., 50"
         />
@@ -497,7 +545,7 @@ const PricingAndStockTab = ({ register, errors, watch, setValue }) => {
           label="Estimated Delivery"
           name="stock.estimated_delivery"
           register={register}
-          error={errors.stock?.estimated_delivery}
+          error={(errors.stock as any)?.estimated_delivery}
           placeholder="e.g., 5-7 business days"
         />
       </div>
@@ -506,14 +554,14 @@ const PricingAndStockTab = ({ register, errors, watch, setValue }) => {
           label="Shipping Policy"
           name="shipping_returns.shipping_policy"
           register={register}
-          error={errors.shipping_returns?.shipping_policy}
+          error={(errors.shipping_returns as any)?.shipping_policy}
           rows={2}
         />
         <TextAreaField
           label="Return Policy"
           name="shipping_returns.return_policy"
           register={register}
-          error={errors.shipping_returns?.return_policy}
+          error={(errors.shipping_returns as any)?.return_policy}
           rows={2}
         />
         <CheckboxField
@@ -1001,6 +1049,7 @@ const ProductForm = ({
               control={control}
               watch={watch}
               setValue={setValue}
+              product={product}
             />
           </div>
 

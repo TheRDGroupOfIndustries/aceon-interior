@@ -14,6 +14,7 @@ import ProductCard from "./ProductCard";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "@/redux/features/productSlice";
 import { RootState } from "@/redux/store";
+import { ICategory } from "@/models/Category";
 
 export default function ProductListingPage() {
   //   const [products, setProducts] = useState<Product[]>([]);
@@ -36,15 +37,30 @@ export default function ProductListingPage() {
   const router = useRouter();
   const dispatch = useDispatch();
 
+  const [categories, setCategories] = useState<ICategory[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("/api/category");
+        const data = await response.json();
+        setCategories(data.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   // Categories and subcategories (you can fetch these from your API)
-  const categories = [
-    { value: "storage", label: "Storage" },
-    { value: "lighting", label: "Lighting" },
-    { value: "living-room", label: "Living Room" },
-    { value: "bedroom", label: "Bedroom" },
-    { value: "kitchen", label: "Kitchen" },
-    { value: "dining", label: "Dining" },
-  ];
+  // const categories = [
+  //   { value: "storage", label: "Storage" },
+  //   { value: "lighting", label: "Lighting" },
+  //   { value: "living-room", label: "Living Room" },
+  //   { value: "bedroom", label: "Bedroom" },
+  //   { value: "kitchen", label: "Kitchen" },
+  //   { value: "dining", label: "Dining" },
+  // ];
 
   const subcategories: { [key: string]: { value: string; label: string }[] } = {
     furniture: [
@@ -206,14 +222,14 @@ export default function ProductListingPage() {
                 <div className="space-y-2">
                   {categories.map((cat) => (
                     <label
-                      key={cat.value}
+                      key={cat.slug}
                       className="flex items-center cursor-pointer"
                     >
                       <input
                         type="radio"
                         name="category"
-                        value={cat.value}
-                        checked={selectedCategory === cat.value}
+                        value={cat.name}
+                        checked={selectedCategory === cat.name}
                         onChange={(e) => {
                           setSelectedCategory(e.target.value);
                           setSelectedSubcategory("");
@@ -222,7 +238,7 @@ export default function ProductListingPage() {
                         className="w-4 h-4 text-amber-600 focus:ring-amber-500"
                       />
                       <span className="ml-2 text-sm text-gray-700">
-                        {cat.label}
+                        {cat.name}
                       </span>
                     </label>
                   ))}
