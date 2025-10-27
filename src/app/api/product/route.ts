@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Product from "@/models/Product";
+import { uploadToCloudinary, generateSKU } from "@/lib/upload";
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,7 +21,8 @@ export async function GET(request: NextRequest) {
     // Build filter object
     const filter: any = {};
     if (category) filter.category = { $regex: category, $options: "i" };
-    if (subcategory) filter.subcategory = { $regex: subcategory, $options: "i" };
+    if (subcategory)
+      filter.subcategory = { $regex: subcategory, $options: "i" };
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
@@ -40,7 +42,7 @@ export async function GET(request: NextRequest) {
       .select("-__v")
       .lean();
 
-    const total = await Product.countDocuments(filter); 
+    const total = await Product.countDocuments(filter);
     const totalPages = Math.ceil(total / limit);
 
     return NextResponse.json(
@@ -71,31 +73,37 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const data = await request.json();
+
+    // Extract fields from JSON data
+    const {
+      name,
+      category,
+      pricing,
+      description,
+      specifications,
+      stock,
+      media,
+    } = data;
 
     // Validate required fields
-    const requiredFields = [
-      "sku",
-      "name",
-      "category",
-      "pricing",
-      "description",
-      "media",
-      "specifications",
-      "stock",
-    ];
-
-    for (const field of requiredFields) {
-      if (!body[field]) {
-        return NextResponse.json(
-          { error: `${field} is required` },
-          { status: 400 }
-        );
-      }
+    if (
+      !name ||
+      !category ||
+      !pricing ||
+      !description ||
+      !specifications ||
+      !stock ||
+      !media
+    ) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
     // Validate pricing structure
-    if (!body.pricing.current_price || body.pricing.current_price < 0) {
+    if (!pricing.current_price || pricing.current_price < 0) {
       return NextResponse.json(
         { error: "Valid current price is required" },
         { status: 400 }
@@ -103,7 +111,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate Stock Structure
-    if (!body.stock.available_quantity || typeof body.stock.available_quantity !== "number" || body.stock.available_quantity < 0) {
+    if (
+      !stock.available_quantity ||
+      typeof stock.available_quantity !== "number" ||
+      stock.available_quantity < 0
+    ) {
       return NextResponse.json(
         { error: "Valid stock quantity is required" },
         { status: 400 }
@@ -112,16 +124,25 @@ export async function POST(request: NextRequest) {
 
     await dbConnect();
 
-    // Check if SKU already exists
-    const existingProduct = await Product.findOne({ sku: body.sku });
+    // Generate unique SKU
+    const sku = generateSKU();
+
+    // Prepare product data
+    const productData = {
+      ...data,
+      sku,
+    };
+
+    // Check if SKU already exists (though unlikely with generated SKU)
+    const existingProduct = await Product.findOne({ sku });
     if (existingProduct) {
       return NextResponse.json(
-        { error: "Product with this SKU already exists" },
+        { error: "Generated SKU already exists, please try again" },
         { status: 400 }
       );
     }
 
-    const product = await Product.create(body);
+    const product = await Product.create(productData);
 
     return NextResponse.json(
       {

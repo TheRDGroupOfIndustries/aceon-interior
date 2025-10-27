@@ -1,3 +1,4 @@
+import { updateProduct } from "@/redux/features/productSlice";
 import React, { useState, useMemo } from "react";
 import {
   useForm,
@@ -10,6 +11,7 @@ import {
   UseFormWatch,
   UseFormSetValue,
 } from "react-hook-form";
+import { useDispatch } from "react-redux";
 
 // Inline Icons (replacing react-icons imports for guaranteed compilation)
 const XMarkIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -233,20 +235,37 @@ const CheckboxField = ({
   </div>
 );
 
-// --- Mock Image Uploader Component (Simulates Cloudinary interaction) ---
+// --- Image Uploader Component ---
 
-const MockImageUploader = ({ name, control, imageUrl, setValue }) => {
+const ImageUploader = ({ name, control, imageUrl, setValue }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
-  // Mock function to simulate an upload and return a URL
-  const handleMockUpload = (file) => {
-    console.log(`Simulating upload of file: ${file.name}`);
-    // In a real app, this would be an API call to Cloudinary
-    const mockUrl = `https://placehold.co/400x300/a0a0a0/ffffff?text=Uploaded+${file.name.substring(
-      0,
-      10
-    )}...`;
-    setValue(name, mockUrl, { shouldValidate: true });
+  const handleFileUpload = async (file: File) => {
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const data = await response.json();
+      setValue(name, data.url, { shouldValidate: true });
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleDragOver = (e) => {
@@ -263,15 +282,15 @@ const MockImageUploader = ({ name, control, imageUrl, setValue }) => {
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files[0];
-    if (file) {
-      handleMockUpload(file);
+    if (file && file.type.startsWith("image/")) {
+      handleFileUpload(file);
     }
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      handleMockUpload(file);
+      handleFileUpload(file);
     }
   };
 
@@ -286,12 +305,17 @@ const MockImageUploader = ({ name, control, imageUrl, setValue }) => {
               isDragging
                 ? "border-amber-500 bg-amber-50"
                 : "border-gray-300 bg-gray-50 hover:bg-gray-100"
-            }`}
+            } ${uploading ? "opacity-50 pointer-events-none" : ""}`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            {field.value ? (
+            {uploading ? (
+              <div className="flex flex-col items-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
+                <p className="mt-2 text-sm text-gray-600">Uploading...</p>
+              </div>
+            ) : field.value ? (
               <div className="relative w-full h-40">
                 <img
                   src={field.value}
@@ -360,13 +384,6 @@ const GeneralInfoTab = ({
         register={register}
         error={errors.name}
         placeholder="e.g., Modern Wooden Bed Frame"
-      />
-      <InputField
-        label="SKU"
-        name="sku"
-        register={register}
-        error={errors.sku}
-        placeholder="e.g., BED-001-QUEEN"
       />
     </div>
 
@@ -534,7 +551,7 @@ const GalleryMediaTab = ({
         Main Product Image
       </h3>
       <div className="w-full">
-        <MockImageUploader
+        <ImageUploader
           name="media.main_image"
           control={control}
           setValue={setValue}
@@ -557,13 +574,12 @@ const GalleryMediaTab = ({
             key={item.id}
             className="flex items-center space-x-4 p-3 border rounded-lg bg-gray-50"
           >
-            <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InputField
-                label="Image URL"
+            <div className="flex-grow">
+              <ImageUploader
                 name={`media.images.${index}.url`}
-                register={register}
-                error={errors.media?.images?.[index]?.url}
-                placeholder="e.g., https://example.com/image.jpg"
+                control={control}
+                setValue={setValue}
+                imageUrl={watch(`media.images.${index}.url`)}
               />
               <InputField
                 label="Alt Text"
@@ -876,11 +892,13 @@ const ProductForm = ({
     formState: { errors, isSubmitting },
     watch,
     setValue,
+    reset,
   } = useForm<any>({
     defaultValues,
   });
 
   const [activeTab, setActiveTab] = useState("general");
+  const dispatch = useDispatch();
 
   const tabs = [
     { id: "general", name: "General Info", component: GeneralInfoTab },
@@ -892,16 +910,52 @@ const ProductForm = ({
 
   const CurrentTabComponent = tabs.find((t) => t.id === activeTab).component;
 
-  const handleFormSubmit = (data) => {
+  const handleFormSubmit = async (data) => {
     console.log("Submitting Product Data:", data);
-    // Simulate API call delay
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        // onSubmit && onSubmit(data);
-        // onClose();
-        resolve();
-      }, 1500);
-    });
+
+    try {
+      if (product) {
+        const productId = product._id || product.id;
+        if (!productId || productId === "undefined") {
+          throw new Error("Product ID is missing or invalid");
+        }
+
+        const response = await fetch(`/api/product/${productId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        const responseData = await response.json();
+        console.log("API Response:", responseData);
+
+        if (!response.ok) {
+          throw new Error(responseData.error || "Failed to update product");
+        }
+        dispatch(updateProduct(responseData.data));
+      } else {
+        const response = await fetch("/api/product", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+        const responseData = await response.json();
+        console.log("API Response:", responseData);
+
+        if (!response.ok) {
+          throw new Error(responseData.error || "Failed to add product");
+        }
+      }
+      reset();
+      onClose();
+    } catch (error) {
+      console.log("Error submitting product", error);
+      alert(`Error: ${error.message}`);
+    }
   };
 
   const title = product
