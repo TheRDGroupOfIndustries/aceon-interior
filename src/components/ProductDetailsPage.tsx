@@ -336,7 +336,7 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
               {product.category}
             </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold font-playfair text-gray-900 mt-2 mb-4 leading-tight">
-              {product.name} ({selectedVariants["Color"]})
+              {product.name}
             </h1>
 
             {/* Rating */}

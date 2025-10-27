@@ -177,17 +177,17 @@ const Profile = () => {
   // --- Action Handler ---
   const handleCancelOrder = (orderId) => {
     if (cancelling === orderId) return;
-    const isConfirmed = window.confirm(
-      `Are you sure you want to cancel order ${orderId}? This action cannot be undone.`
-    );
+    // const isConfirmed = window.confirm(
+    //   `Are you sure you want to cancel order ${orderId}? This action cannot be undone.`
+    // );
     setCancelling(orderId);
 
-    if (isConfirmed) {
-      dispatch(cancelOrder({ orderId }) as any).unwrap();
-      setCancelling(null);
-    } else {
-      setCancelling(null);
-    }
+    // if (isConfirmed) {
+    dispatch(cancelOrder({ orderId }) as any).unwrap();
+    setCancelling(null);
+    // } else {
+    setCancelling(null);
+    // }
   };
 
   // --- Tab Content Components ---
@@ -202,12 +202,12 @@ const Profile = () => {
         <InfoCard title="User Id" value={data?.user.id} />
         <InfoCard title="Full Name" value={data?.user.name} />
         <InfoCard title="Email Address" value={data?.user.email} />
-        <InfoCard title="Phone Number" value={data?.user.phone || "N/A"} />
+        {/* <InfoCard title="Phone Number" value={data?.user.phone || "N/A"} /> */}
       </div>
 
-      <button className="px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover transition-colors">
+      {/* <button className="px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover transition-colors">
         Edit Profile
-      </button>
+      </button> */}
     </div>
   );
 
@@ -262,20 +262,22 @@ const Profile = () => {
               View Details
             </button>
 
-            {order.status !== "cancelled" && (
-              <button
-                onClick={() => handleCancelOrder(order._id)}
-                disabled={cancelling === order._id}
-                className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 font-semibold rounded-lg bg-red-50 hover:bg-red-100 transition-colors"
-              >
-                {cancelling === order._id ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <MinusCircleIcon className="w-4 h-4" />
-                )}
-                <span>Cancel Order</span>
-              </button>
-            )}
+            {order.status !== "cancelled" &&
+              order.status !== "shipped" &&
+              order.status !== "delivered" && (
+                <button
+                  onClick={() => handleCancelOrder(order._id)}
+                  disabled={cancelling === order._id}
+                  className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 font-semibold rounded-lg bg-red-50 hover:bg-red-100 transition-colors"
+                >
+                  {cancelling === order._id ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <MinusCircleIcon className="w-4 h-4" />
+                  )}
+                  <span>Cancel Order</span>
+                </button>
+              )}
           </div>
         </div>
       ))}

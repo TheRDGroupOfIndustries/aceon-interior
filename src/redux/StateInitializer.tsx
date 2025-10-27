@@ -16,7 +16,7 @@ export default function StateInitializer() {
 
   useEffect(() => {
     if (session?.user) {
-      dispatch(fetchUserOrders() as any);
+      dispatch(fetchUserOrders({}) as any);
     }
   }, [session?.user]);
 
