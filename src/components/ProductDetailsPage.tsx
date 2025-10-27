@@ -169,7 +169,7 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
     }));
   };
 
-  const handleReviewSubmit = (e) => {
+  const handleReviewSubmit = async (e) => {
     e.preventDefault();
     const { user, rating, comment, title } = newReviewData;
 
@@ -179,26 +179,34 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
       return;
     }
 
-    console.log("New Review: ", newReviewData);
-    setProduct((prev: any) => {
-      if (!prev) return;
-      return {
-        ...prev,
-        reviews: {
-          ...prev.reviews,
-          review_list: [
-            {
-              user,
-              rating,
-              date: new Date().toISOString(),
-              title,
-              comment,
-            },
-            ...prev.reviews.review_list,
-          ],
+    try {
+      const newReview = await fetch("/api/review", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      };
-    });
+        body: JSON.stringify({
+          productId,
+          user,
+          rating,
+          comment,
+          title,
+        }),
+      });
+
+      if (!newReview.ok) {
+        throw new Error("Failed to submit review");
+      }
+      const newReviewData = await newReview.json();
+      console.log("New Review Data:", newReviewData);
+
+      setProduct(() => newReviewData.product);
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      return;
+    }
+
+    console.log("New Review: ", newReviewData);
 
     setNewReviewData({
       user: "",
@@ -345,7 +353,7 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
                 {ratingStars(product.reviews.average_rating)}
               </div>
               <span className="text-lg font-semibold text-gray-800 mr-2">
-                {product.reviews.average_rating}
+                {product.reviews.average_rating.toFixed(1)}
               </span>
               <span className="text-sm text-gray-500">
                 ({product.reviews.rating_count} reviews)
@@ -540,7 +548,7 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
                 <div className="flex items-baseline">
                   <span className="text-5xl font-extrabold text-primary">
-                    {product.reviews.average_rating}
+                    {product.reviews.average_rating.toFixed(1)}
                   </span>
                   <span className="text-xl text-gray-600 ml-2">/ 5.0</span>
                 </div>
