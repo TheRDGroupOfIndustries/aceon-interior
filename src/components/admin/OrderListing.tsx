@@ -1,5 +1,5 @@
 import {
-  fetchUserOrders,
+  fetchAllOrdersByAdmin,
   updateOrderStatus,
 } from "@/redux/features/orderSlice";
 import { RootState } from "@/redux/store";
@@ -211,7 +211,7 @@ const OrderListing = () => {
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
       dispatch(
-        fetchUserOrders({ page: newPage, status: currentFilter }) as any
+        fetchAllOrdersByAdmin({ page: newPage, status: currentFilter }) as any
       );
     }
   };
@@ -220,7 +220,10 @@ const OrderListing = () => {
     setCurrentFilter(e.target.value);
     setCurrentPage(1);
     dispatch(
-      fetchUserOrders({ status: e.target.value, page: currentPage }) as any
+      fetchAllOrdersByAdmin({
+        status: e.target.value,
+        page: currentPage,
+      }) as any
     );
   };
 

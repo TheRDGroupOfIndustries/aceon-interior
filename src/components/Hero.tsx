@@ -10,10 +10,15 @@ import {
   FaBars,
   FaX,
 } from "react-icons/fa6";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
+import { useSession } from "next-auth/react";
+import EMIApplicationModal from "./EMIApplicationModal";
 
 function Elements() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isEMIModalOpen, setIsEMIModalOpen] = useState(false);
+
+  const { data: session } = useSession();
 
   useEffect(() => {
     const original = document.body.style.overflow;
@@ -26,37 +31,80 @@ function Elements() {
       document.body.style.overflow = original || "";
     };
   }, [isMenuOpen]);
+
   const [links, setLinks] = useState([
     { name: "Home", link: "#home" },
+    { name: "Products", link: "/products" },
     { name: "About", link: "#about" },
     { name: "Services", link: "#services" },
     { name: "Contact", link: "#contact" },
-    { name: "Profile", link: "/profile" },
   ]);
 
-  return (
-    <div className="w-full h-full absolute inset-0 z-50">
-      {/* Desktop Navigation */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="hidden md:flex w-3/4 h-10 mt-8 justify-end items-center gap-10 px-8"
-      >
-        {links.map((items, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 + i * 0.1 }}
-          >
-            <Link className="text-white text-xl" href={items.link}>
-              {items.name}
-            </Link>
-          </motion.div>
-        ))}
-      </motion.div>
+  const elementVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (index: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: "easeOut", delay: index * 0.3 },
+    }),
+  };
 
+  useEffect(() => {
+    // Create a base set of links
+    let newLinks = [
+      { name: "Home", link: "#home" },
+      { name: "Products", link: "/products" },
+      { name: "About", link: "#about" },
+      { name: "Services", link: "#services" },
+      { name: "Contact", link: "#contact" },
+    ];
+
+    if (session?.user) {
+      if (session?.user.role === "admin") {
+        newLinks.push({ name: "Profile", link: "/profile" });
+        newLinks.push({ name: "Dashboard", link: "/admin" });
+      } else if (session?.user.role === "user") {
+        newLinks.push({ name: "Profile", link: "/profile" });
+      }
+    }
+    setLinks(newLinks);
+  }, [session?.user]);
+
+  return (
+    <div className="w-full h-full absolute inset-0 z-30">
+      {/* Desktop Navigation */}
+      <div className="flex items-center w-3/4 justify-between  ">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="hidden md:flex w-full h-10 mt-8 pl-32  items-center gap-10 px-8"
+        >
+          {links.map((items, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 + i * 0.1 }}
+            >
+              <Link className="text-white text-xl" href={items.link}>
+                {items.name}
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+        {!session?.user && (
+          <Link href="/login" className="hidden md:block w-full sm:w-auto mt-8">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-[#A97C51] text-white text-lg md:text-xl font-medium hover:bg-white hover:text-[#b98663] transition-all whitespace-nowrap text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 "
+            >
+              Get Started
+            </motion.button>
+          </Link>
+        )}
+      </div>
       {/* Mobile Navigation */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -103,6 +151,17 @@ function Elements() {
                 </Link>
               </motion.div>
             ))}
+            {!session?.user && (
+              <Link href="/login" className="block w-full sm:w-auto mt-8">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-[#b98663] text-white text-lg md:text-xl font-medium hover:bg-white hover:text-[#b98663] transition-all whitespace-nowrap text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                >
+                  Get Started
+                </motion.button>
+              </Link>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -137,7 +196,7 @@ function Elements() {
           transition={{ duration: 0.6, delay: 0.7 }}
           className="flex flex-col sm:flex-row gap-3 md:gap-4 items-center mt-6 md:mt-8 w-full sm:w-auto"
         >
-          <Link href="/login" className="block w-full sm:w-auto">
+          {/* <Link href="/login" className="block w-full sm:w-auto">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -145,7 +204,7 @@ function Elements() {
             >
               Get Started
             </motion.button>
-          </Link>
+          </Link> */}
 
           <Link href="#contact" className="block w-full sm:w-auto">
             <motion.button
@@ -156,6 +215,15 @@ function Elements() {
               Contact Us
             </motion.button>
           </Link>
+
+          <motion.button
+            onClick={() => setIsEMIModalOpen(true)}
+            className="bg-[#A97C51] text-white font-semibold  h-[52px] rounded-[10px] flex items-center justify-center transition-colors duration-300 text-sm sm:text-base px-10 hover:bg-[#8b6e5b]"
+            variants={elementVariants}
+            custom={4}
+          >
+            Apply For EMI Options
+          </motion.button>
         </motion.div>
 
         <div className="flex md:hidden justify-center items-center gap-4 mt-6">
@@ -243,6 +311,11 @@ function Elements() {
           </span>
         </div>
       </motion.div>
+
+      <EMIApplicationModal
+        isOpen={isEMIModalOpen}
+        onClose={() => setIsEMIModalOpen(false)}
+      />
     </div>
   );
 }
@@ -274,12 +347,7 @@ function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           className="
-            absolute top-4 
-            left-1/2 -translate-x-1/2   
-            sm:left-3 sm:translate-x-0  
-            md:left-[-30] md:top-3
-            w-32 h-16 sm:w-32 sm:h-16    
-            z-[60]
+            absolute top-4 left-1/2 -translate-x-1/2 sm:left-3 sm:translate-x-0  md:left-[-30] md:top-3 w-32 h-16 sm:w-32 sm:h-16 
           "
         >
           <Image
@@ -297,7 +365,7 @@ function Hero() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           whileHover={{ scale: 1.02 }}
-          className="w-full max-w-[15.5rem] sm:max-w-[20rem] md:max-w-[21.5rem] h-14 absolute right-4 md:right-[-23] top-5.5 z-[90] hidden sm:flex justify-center items-center cursor-pointer"
+          className="w-full max-w-[15.5rem] sm:max-w-[20rem] md:max-w-[21.5rem] h-14 absolute right-4 md:right-[-23] top-5.5  hidden sm:flex justify-center items-center cursor-pointer"
         >
           <Image
             src="/buildrectangle.svg"
@@ -305,7 +373,7 @@ function Hero() {
             fill
             className="scale-x-105 object-cover md:object-contain"
           />
-          <span className="text-white text-lg sm:text-xl md:text-2xl relative text-center z-50 font-playfair px-2">
+          <span className="text-white text-lg sm:text-xl md:text-2xl relative text-center font-playfair px-2">
             Build a modern Interior
           </span>
         </motion.div>

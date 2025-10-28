@@ -22,20 +22,13 @@ export default function StateInitializer() {
 
   useEffect(() => {
     console.log("Session changed:", session);
-    if (session?.user) {
-      if (
-        session.user.role === "admin" &&
-        pathname.startsWith("/admin") === false
-      ) {
-        router.push("/admin");
-      } else if (
-        session.user.role !== "admin" &&
-        pathname.startsWith("/admin") === true
-      ) {
+    console.log("pathname:", pathname);
+    if (pathname === "/admin") {
+      if (!session?.user?.role || session?.user?.role !== "admin") {
         router.push("/");
       }
     }
-  }, [session?.user, router]);
+  }, [session?.user, router, pathname]);
 
   useEffect(() => {
     // Dispatch any actions needed to initialize state here

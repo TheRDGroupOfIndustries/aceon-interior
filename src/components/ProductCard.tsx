@@ -9,9 +9,10 @@ import { BsStarFill } from "react-icons/bs";
 
 export default function ProductCard({ product }: { product: IProduct }) {
   const router = useRouter();
-  const { date: session }: any = useSession();
+  const { data: session }: any = useSession();
 
   const redirectToCheckout = () => {
+    console.log("session", session);
     if (!session) {
       router.push("/login");
       return;
@@ -46,12 +47,12 @@ export default function ProductCard({ product }: { product: IProduct }) {
         </div>
 
         {/* Save Badge */}
-        {product.pricing.original_price > product.pricing.current_price && (
+        {/* {product.pricing.original_price > product.pricing.current_price && (
           <div className="absolute top-3 right-3 bg-green-500 text-white text-sm font-semibold px-3 py-1 rounded-full shadow-md">
             Save ₹
             {product.pricing.original_price - product.pricing.current_price}
           </div>
-        )}
+        )} */}
       </div>
 
       {/* 2. Product Details Section */}

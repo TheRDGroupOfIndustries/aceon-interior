@@ -35,7 +35,8 @@ const CtaBanner: React.FC = () => {
 
   return (
     <>
-      <section id="cta"
+      <section
+        id="cta"
         className="relative w-full h-[400px] overflow-hidden"
         ref={sectionRef}
       >
@@ -66,7 +67,10 @@ const CtaBanner: React.FC = () => {
         >
           <motion.div
             className="flex flex-col items-center"
-            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.3 } } }}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.3 } },
+            }}
           >
             <motion.h3
               className="font-playfair font-medium text-4xl md:text-[48px] leading-tight"
@@ -80,23 +84,27 @@ const CtaBanner: React.FC = () => {
               variants={elementVariants}
               custom={2}
             >
-              From concept to creation, we make interiors effortless and elegant.
+              From concept to creation, we make interiors effortless and
+              elegant.
             </motion.p>
 
             <motion.div
               className="mt-8 flex flex-col sm:flex-row items-center gap-4"
-              variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.3 } } }}
+              variants={{
+                hidden: { opacity: 0 },
+                visible: { opacity: 1, transition: { staggerChildren: 0.3 } },
+              }}
             >
-              <motion.button
-                className="bg-[#A97C51] font-poppins text-white font-medium w-full sm:w-[340px] h-[52px] rounded-[10px] flex items-center justify-center transition-colors duration-300 text-sm sm:text-base px-4 sm:px-6 hover:bg-[#8b6e5b]"
+              <motion.div
+                className="border-2 border-white bg-white font-poppins text-[#A97C51] font-medium w-full sm:w-[340px] h-[52px] rounded-[10px] flex items-center justify-center transition-colors duration-300 text-sm sm:text-base px-4 sm:px-6 cursor-default"
                 variants={elementVariants}
                 custom={3}
               >
                 Plan Your Paradise With Us
-              </motion.button>
+              </motion.div>
               <motion.button
                 onClick={() => setIsEMIModalOpen(true)}
-                className="border-2 border-white hover:bg-white/10 text-white font-medium w-full sm:w-[340px] h-[52px] rounded-[10px] flex items-center justify-center transition-colors duration-300 text-sm sm:text-base px-4 sm:px-6"
+                className="bg-[#A97C51] font-poppins text-white font-medium w-full sm:w-[340px] h-[52px] rounded-[10px] flex items-center justify-center transition-colors duration-300 text-sm sm:text-base px-4 sm:px-6 hover:bg-[#8b6e5b]"
                 variants={elementVariants}
                 custom={4}
               >

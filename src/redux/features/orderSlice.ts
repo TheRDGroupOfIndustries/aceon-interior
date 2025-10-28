@@ -91,6 +91,34 @@ export const fetchUserOrders = createAsyncThunk(
   }
 );
 
+export const fetchAllOrdersByAdmin = createAsyncThunk(
+  "order/fetchAllOrdersByAdmin",
+  async (
+    {
+      page = 1,
+      limit = 10,
+      status = "all",
+    }: { page?: number; limit?: number; status?: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await fetch(
+        `/api/order/admin?page=${page}&limit=${limit}&status=${status}`
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return rejectWithValue(data.message || "Failed to fetch orders");
+      }
+      console.log("fetchUserOrders", data);
+      return { orders: data.data, total: data.total || 0 };
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch orders");
+    }
+  }
+);
+
 // Async thunk for fetching a specific order
 export const fetchOrderById = createAsyncThunk(
   "order/fetchOrderById",
@@ -218,6 +246,25 @@ const orderSlice = createSlice({
         }
       )
       .addCase(fetchUserOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Fetch User Orders
+    builder
+      .addCase(fetchAllOrdersByAdmin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        fetchAllOrdersByAdmin.fulfilled,
+        (state, action: PayloadAction<{ orders: IOrder[]; total: number }>) => {
+          state.loading = false;
+          state.orders = action.payload.orders;
+          state.total = action.payload.total;
+        }
+      )
+      .addCase(fetchAllOrdersByAdmin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

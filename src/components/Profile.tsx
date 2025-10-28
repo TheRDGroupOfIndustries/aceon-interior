@@ -1,6 +1,6 @@
 "use client";
 
-import { cancelOrder } from "@/redux/features/orderSlice";
+import { cancelOrder, fetchUserOrders } from "@/redux/features/orderSlice";
 import Image from "next/image";
 import { RootState } from "@/redux/store";
 import {
@@ -163,6 +163,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (!session?.user) return router.push("/login");
+    dispatch(fetchUserOrders({}) as any);
   }, [session]);
 
   const formatPrice = (price) =>

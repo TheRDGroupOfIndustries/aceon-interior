@@ -34,53 +34,20 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all orders for this user, populated with product details
-    let orders;
-    if (user.role == "admin") {
-      const aggregationPipeline: any = [
-        { $match: status === "all" ? {} : { status } },
-        {
-          $lookup: {
-            from: "products", // The collection name for products
-            localField: "productId",
-            foreignField: "_id",
-            as: "productId",
-          },
-        },
-        {
-          $lookup: {
-            from: "users", // The collection name for users
-            localField: "userId",
-            foreignField: "_id",
-            as: "userId",
-          },
-        },
-        { $unwind: "$productId" },
-        { $unwind: "$userId" },
-        { $sort: { createdAt: -1 } }, // Sort by creation date, newest first
-      ];
 
-      // Apply pagination if page and limit are provided
-      if (page && limit && Number(page) > 0 && Number(limit) > 0) {
-        aggregationPipeline.push({ $skip: (Number(page) - 1) * Number(limit) });
-      }
-      orders = await Order.aggregate(aggregationPipeline as any).limit(
-        Number(limit)
-      );
-    } else {
-      orders = await Order.aggregate([
-        { $match: { userId: user._id } },
-        {
-          $lookup: {
-            from: "products", // The collection name for products
-            localField: "productId",
-            foreignField: "_id",
-            as: "productId",
-          },
+    const orders = await Order.aggregate([
+      { $match: { userId: user._id } },
+      {
+        $lookup: {
+          from: "products", // The collection name for products
+          localField: "productId",
+          foreignField: "_id",
+          as: "productId",
         },
-        { $unwind: "$productId" },
-        { $sort: { createdAt: -1 } },
-      ]);
-    }
+      },
+      { $unwind: "$productId" },
+      { $sort: { createdAt: -1 } },
+    ]);
 
     return NextResponse.json({
       success: true,

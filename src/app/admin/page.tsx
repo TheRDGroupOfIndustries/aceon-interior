@@ -3,7 +3,10 @@
 import CategoryListing from "@/components/admin/CategoryListing";
 import OrderListing from "@/components/admin/OrderListing";
 import ProductListing from "@/components/admin/ProductListing";
-import { fetchUserOrders } from "@/redux/features/orderSlice";
+import {
+  fetchAllOrdersByAdmin,
+  fetchUserOrders,
+} from "@/redux/features/orderSlice";
 import { fetchProducts } from "@/redux/features/productSlice";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -214,7 +217,7 @@ export default function AdminDashboard() {
     if (session) {
       getLengths();
       dispatch(fetchProducts({}) as any);
-      dispatch(fetchUserOrders({}) as any);
+      dispatch(fetchAllOrdersByAdmin({}) as any);
     }
   }, [session]);
 
@@ -232,12 +235,12 @@ export default function AdminDashboard() {
             Manage inquiries and applications
           </p>
         </div>
-        <button
+        {/* <button
           onClick={() => signOut()}
           className=" py-3 px-6 text-red-600 font-semibold hover:bg-red-100 rounded-lg transition-colors"
         >
           Logout
-        </button>
+        </button> */}
       </div>
 
       <div className="max-w-7xl mx-auto px-6 pb-8">
