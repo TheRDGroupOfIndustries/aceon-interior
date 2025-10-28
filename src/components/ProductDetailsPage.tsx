@@ -323,7 +323,8 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
             <div className="flex space-x-3 mt-4 overflow-x-auto justify-center">
               {product.media.images.map((img, index) => (
                 <Image
-                  fill={true}
+                  height={80}
+                  width={80}
                   key={index}
                   src={img.url}
                   alt={img.alt}

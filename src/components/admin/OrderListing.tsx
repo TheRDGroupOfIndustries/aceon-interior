@@ -120,7 +120,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
                 src={(order.productId as any).media.main_image}
                 alt={product.name}
                 className="w-16 h-16 rounded-lg object-cover shadow-sm bg-gray-100"
-                onError={(e) => {
+                onError={(e: any) => {
                   e.target.onerror = null;
                   e.target.src =
                     "https://placehold.co/64x64/e0e0e0/505050?text=P";
@@ -322,7 +322,7 @@ const OrderListing = () => {
                           className="h-10 w-10 rounded object-cover mr-3 bg-gray-100"
                           src={(order.productId as any).media.main_image}
                           alt={(order.productId as any).name}
-                          onError={(e) => {
+                          onError={(e: any) => {
                             e.target.onerror = null;
                             e.target.src =
                               "https://placehold.co/40x40/e0e0e0/505050?text=P";

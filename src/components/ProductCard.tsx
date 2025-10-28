@@ -2,6 +2,7 @@
 
 import { IProduct } from "@/models/Product";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BsStarFill } from "react-icons/bs";
@@ -36,10 +37,11 @@ export default function ProductCard({ product }: { product: IProduct }) {
       <div className="relative">
         {/* Replace with your actual image component or Next.js Image component */}
         <div className="h-[250px] w-full overflow-hidden">
-          <img
+          <Image
+            fill={true}
             className="w-full h-full object-cover"
             src={product.media.main_image} // Placeholder path
-            alt="Scandinavian Minimalist Bed Frame"
+            alt={product.name}
           />
         </div>
 
@@ -65,7 +67,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
           <div className="flex items-center text-primary">
             <BsStarFill className="w-4 h-4 mr-1" />
             <span className="text-sm font-semibold text-gray-700">
-              {product.reviews.average_rating}
+              {product.reviews.average_rating.toFixed(1)}
             </span>
           </div>
         </div>

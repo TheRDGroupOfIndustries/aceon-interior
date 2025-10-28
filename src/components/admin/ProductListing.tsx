@@ -94,7 +94,7 @@ const ProductDetailsModal = ({ product, onClose }) => {
               src={product.media.main_image}
               alt={product.name}
               className=" rounded-lg shadow-md object-cover bg-gray-100"
-              onError={(e) => {
+              onError={(e: any) => {
                 e.target.onerror = null;
                 e.target.src =
                   "https://placehold.co/400x300/e0e0e0/505050?text=No+Image";
@@ -110,7 +110,7 @@ const ProductDetailsModal = ({ product, onClose }) => {
                     width={200}
                     height={200}
                     className=""
-                    onError={(e) => {
+                    onError={(e: any) => {
                       e.target.onerror = null;
                       e.target.src =
                         "https://placehold.co/200x200/e0e0e0/505050?text=No+Image";
@@ -338,8 +338,24 @@ export default function ProductListing({
 
     return products.map((product) => (
       <tr key={product._id} className="hover:bg-gray-50 border-b">
+        <td className="p-4 text-sm">
+          <div className="h-[50px] w-[50px] bg-amber-400 rounded-sm overflow-hidden">
+            <Image
+              src={product.media.main_image}
+              alt={product.name}
+              width={50}
+              height={50}
+              className="rounded-sm object-cover h-full w-full "
+              onError={(e: any) => {
+                e.target.onerror = null;
+                e.target.src =
+                  "https://placehold.co/50x50/e0e0e0/505050?text=No+Image";
+              }}
+            />
+          </div>
+        </td>
         <td className="p-4 text-sm font-medium text-gray-900 truncate max-w-[150px]">
-          {product.name}
+          <span>{product.name}</span>
         </td>
         <td className="p-4 text-sm text-gray-600">{product.sku}</td>
         <td className="p-4 text-sm text-gray-600">{product.category}</td>
@@ -350,7 +366,7 @@ export default function ProductListing({
           {product.stock.available_quantity}
         </td>
         <td className="p-4 text-sm text-gray-600">
-          {product.reviews.average_rating || 0} (
+          {product.reviews.average_rating.toFixed(1) || 0} (
           {product.reviews.rating_count || 0})
         </td>
         <td className="p-4 text-sm">
@@ -466,6 +482,9 @@ export default function ProductListing({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Image
+              </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Product Name
               </th>
