@@ -52,16 +52,6 @@ export default function ProductListingPage() {
     fetchCategories();
   }, []);
 
-  // Categories and subcategories (you can fetch these from your API)
-  // const categories = [
-  //   { value: "storage", label: "Storage" },
-  //   { value: "lighting", label: "Lighting" },
-  //   { value: "living-room", label: "Living Room" },
-  //   { value: "bedroom", label: "Bedroom" },
-  //   { value: "kitchen", label: "Kitchen" },
-  //   { value: "dining", label: "Dining" },
-  // ];
-
   const subcategories: { [key: string]: { value: string; label: string }[] } = {
     furniture: [
       { value: "sofa", label: "Sofas" },
