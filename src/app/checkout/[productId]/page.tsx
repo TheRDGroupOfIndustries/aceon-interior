@@ -1,7 +1,13 @@
 import CheckoutPage from "@/components/Checkout";
+import Footer from "@/components/footer";
+import Header from "@/components/Header";
 
-export default function Page () {
+export default function Page() {
   return (
-    <CheckoutPage/>
+    <>
+      <Header />
+      <CheckoutPage />
+      <Footer />
+    </>
   );
-};
+}

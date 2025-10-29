@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createOrder } from "@/redux/features/orderSlice";
 import { RootState } from "@/redux/store";
 import Image from "next/image";
+import Header from "./Header";
 
 const CashIcon = (props) => (
   <svg
@@ -210,13 +211,13 @@ const CheckoutPage = () => {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl p-4 sm:p-8 mx-auto">
-        <button
+        {/* <button
           type="button"
           onClick={() => router.back()}
           className="flex items-center text-sm font-medium text-gray-600 hover:text-primary mb-6 transition-colors cursor-pointer"
         >
           <ChevronLeftIcon className="w-4 h-4 mr-1" /> Go Back
-        </button>
+        </button> */}
 
         {orderPlaced ? (
           <div className="min-h-[80vh] flex items-center justify-center">

@@ -1,7 +1,13 @@
+import Footer from "@/components/footer";
+import Header from "@/components/Header";
 import ProductListing from "@/components/ProductListing";
 
-export default function Page () {
+export default function Page() {
   return (
-    <ProductListing />
+    <>
+      <Header />
+      <ProductListing />
+      <Footer />
+    </>
   );
-};
+}

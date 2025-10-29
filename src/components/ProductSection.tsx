@@ -44,7 +44,7 @@ export default function ProductSection() {
             className="text-5xl font-serif text-[#b98663]"
             variants={textVariants}
           >
-            Featured Products
+            Explore Products
           </motion.h2>
           <motion.p
             className="text-sm md:text-base text-neutral-600 mt-2 font-serif"

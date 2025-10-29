@@ -10,17 +10,19 @@ import {
   ShoppingBag,
   UserIcon,
   X,
+  LogOut, // Added LogOut icon for the logout button
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Header from "./Header";
 
-// --- Modal Component for Order Details ---
+// --- Modal Component for Order Details (Updated Styling) ---
 
 const OrderDetailsModal = ({ order, onClose }) => {
   if (!order) return null;
-  console.log(order);
+  // console.log(order);
 
   const formatPrice = (price) =>
     `₹${(price ?? 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -31,117 +33,147 @@ const OrderDetailsModal = ({ order, onClose }) => {
     });
 
   const DetailRow = ({ label, value }) => (
-    <div className="flex justify-between border-b border-gray-100 py-2">
-      <span className="text-gray-500">{label}</span>
-      <span className="font-medium text-gray-800">{value}</span>
+    // Updated border color and text style for a softer look
+    <div className="flex justify-between border-b border-gray-200 py-3">
+      <span className="text-gray-600 font-medium">{label}</span>
+      <span className="font-semibold text-gray-900">{value}</span>
     </div>
   );
 
   const AddressBlock = ({ address }) => (
-    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 mt-2">
-      <p className="font-semibold text-gray-800">{address.fullName}</p>
-      <p className="text-gray-600">
+    // Updated background and border for a premium box
+    <div className="p-4 bg-amber-50 rounded-lg border border-amber-200 shadow-inner mt-2">
+      <p className="font-bold text-gray-800">{address.fullName}</p>
+      <p className="text-gray-700">
         {address.street}, {address.city}
       </p>
-      <p className="text-gray-600">
+      <p className="text-gray-700">
         {address.country} - {address.postalCode}
       </p>
-      <p className="text-gray-600">Phone: {address.phone}</p>
+      <p className="text-gray-700 font-medium">Phone: {address.phone}</p>
     </div>
   );
 
   return (
     <div
-      className="fixed inset-0 bg-gray-200/50 backdrop-blur-md z-50 flex justify-center items-center p-4"
+      // Softer backdrop
+      className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex justify-center items-center p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all"
+        // Rounded corners and stronger shadow for the modal
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[95vh] overflow-y-auto transform transition-all"
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
       >
-        <div className="sticky top-0 bg-white p-6 border-b flex justify-between items-center">
-          <h2 className="text-2xl font-bold  font-playfair text-gray-900">
-            Order #{order._id}
+        <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex justify-between items-center rounded-t-2xl">
+          {/* Accent font for heading */}
+          <h2 className="text-3xl font-bold font-serif text-gray-900">
+            Order Details
           </h2>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-700"
+            className="p-2 text-gray-500 hover:text-gray-900 transition-colors bg-gray-100 rounded-full"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-8 space-y-8">
+          {/* Order ID and Date */}
+          <div className="flex justify-between items-center pb-4 border-b">
+            <div>
+              <p className="text-sm font-medium text-gray-500">ORDER ID</p>
+              <p className="text-xl font-bold text-gray-800 break-all">
+                {order._id}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm font-medium text-gray-500">DATE PLACED</p>
+              <p className="text-lg font-semibold text-gray-800">
+                {formatDate(order.createdAt)}
+              </p>
+            </div>
+          </div>
+
           {/* Product Summary */}
-          <div className="border p-4 rounded-lg">
-            <h3 className="text-xl font-semibold font-playfair mb-3">
+          <div className="border border-gray-200 p-5 rounded-xl shadow-sm">
+            <h3 className="text-xl font-bold font-serif mb-4 text-gray-900">
               Product Ordered
             </h3>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-5">
               {/* Product Image */}
-              <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+              <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden relative">
                 {order.productId.media?.main_image && (
                   <Image
                     fill={true}
                     src={order.productId.media.main_image}
                     alt={order.productId.name}
-                    className="w-full h-full object-cover"
+                    className="object-cover"
                   />
                 )}
               </div>
               <div>
-                <p className="font-semibold text-gray-900">
+                <p className="font-bold text-xl text-gray-900">
                   {order.productId.name}
                 </p>
-                <p className="text-sm text-gray-500">
-                  Variant:{" "}
+                <p className="text-sm text-gray-600 mt-1">
                   {typeof order.variant === "object"
                     ? Object.entries(order.variant)
                         .map(([key, value]) => `${key}: ${value}`)
                         .join(", ")
                     : order.variant}
                 </p>
-                <p className="text-sm text-gray-500">
-                  Qty: {order.quantity} @
-                  {formatPrice(
-                    (order.productId as any).pricing?.current_price || 0
-                  )}{" "}
+                <p className="text-sm font-medium text-gray-600">
+                  Qty: <span className="font-semibold">{order.quantity}</span> @
+                  <span className="font-semibold">
+                    {formatPrice(
+                      (order.productId as any).pricing?.current_price || 0
+                    )}
+                  </span>{" "}
                   each
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Order Details */}
-          <div>
-            <h3 className="text-xl font-semibold font-playfair mb-3 border-b pb-1">
-              Order Summary
-            </h3>
-            <DetailRow label="Order Date" value={formatDate(order.createdAt)} />
-            <DetailRow label="Status" value={order.status} />
-            <DetailRow label="Payment Method" value={order.paymentMethod} />
-            <DetailRow
-              label="Subtotal"
-              value={formatPrice(
-                ((order.productId as any).pricing?.current_price || 0) *
-                  order.quantity
-              )}
-            />
-            <DetailRow label="Shipping" value={"FREE"} />
-            <div className="flex justify-between border-t-2 border-primary font-playfair pt-3 mt-3">
-              <span className="text-lg font-bold">Grand Total</span>
-              <span className="text-lg font-bold text-primary">
-                {formatPrice(order.grandTotal)}
-              </span>
+          {/* Order Details & Shipping Address Side-by-Side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Order Details */}
+            <div>
+              <h3 className="text-xl font-bold font-serif mb-3 pb-2 border-b">
+                Billing Summary
+              </h3>
+              <div className="space-y-1">
+                <DetailRow label="Status" value={order.status} />
+                <DetailRow label="Payment Method" value={order.paymentMethod} />
+                <DetailRow
+                  label="Subtotal"
+                  value={formatPrice(
+                    ((order.productId as any).pricing?.current_price || 0) *
+                      order.quantity
+                  )}
+                />
+                <DetailRow label="Shipping" value={"FREE"} />
+                {/* Grand Total Row - Highlighted */}
+                <div className="flex justify-between border-t border-gray-200 pt-3 mt-3">
+                  <span className="text-xl font-bold font-serif">
+                    Grand Total
+                  </span>
+                  {/* Applied the rich amber/gold color */}
+                  <span className="text-xl font-extrabold text-amber-700">
+                    {formatPrice(order.grandTotal)}
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* Shipping Address */}
-          <div>
-            <h3 className="text-xl font-semibold font-playfair mb-3 border-b pb-1">
-              Shipping Address
-            </h3>
-            <AddressBlock address={order.address} />
+            {/* Shipping Address */}
+            <div>
+              <h3 className="text-xl font-bold font-serif mb-3 pb-2 border-b">
+                Shipping Address
+              </h3>
+              <AddressBlock address={order.address} />
+            </div>
           </div>
         </div>
       </div>
@@ -149,7 +181,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
   );
 };
 
-// --- Main Profile Page Component ---
+// --- Main Profile Page Component (Updated Styling) ---
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -178,24 +210,17 @@ const Profile = () => {
   // --- Action Handler ---
   const handleCancelOrder = (orderId) => {
     if (cancelling === orderId) return;
-    // const isConfirmed = window.confirm(
-    //   `Are you sure you want to cancel order ${orderId}? This action cannot be undone.`
-    // );
     setCancelling(orderId);
 
-    // if (isConfirmed) {
     dispatch(cancelOrder({ orderId }) as any).unwrap();
     setCancelling(null);
-    // } else {
-    setCancelling(null);
-    // }
   };
 
   // --- Tab Content Components ---
 
   const ProfileDetailsTab = ({ data }) => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold font-playfair text-gray-900 mb-4 border-b pb-2">
+    <div className="space-y-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
+      <h2 className="text-3xl font-bold font-serif text-gray-900 mb-4 border-b pb-3">
         Account Information
       </h2>
 
@@ -203,7 +228,7 @@ const Profile = () => {
         <InfoCard title="User Id" value={data?.user.id} />
         <InfoCard title="Full Name" value={data?.user.name} />
         <InfoCard title="Email Address" value={data?.user.email} />
-        {/* <InfoCard title="Phone Number" value={data?.user.phone || "N/A"} /> */}
+        {/* Removed placeholder phone card */}
       </div>
 
       {/* <button className="px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover transition-colors">
@@ -214,51 +239,74 @@ const Profile = () => {
 
   const OrderHistoryTab = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold font-playfair text-gray-900 mb-4">
+      <h2 className="text-3xl font-bold font-serif text-gray-900 mb-6">
         Order History ({orders.length})
       </h2>
+
+      {orders.length === 0 && (
+        <div className="p-10 text-center bg-white rounded-xl shadow-lg border border-gray-200">
+          <ShoppingBag className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-xl font-semibold text-gray-600">
+            No orders found.
+          </p>
+          <p className="text-gray-500 mt-2">
+            Start shopping to see your purchase history here!
+          </p>
+        </div>
+      )}
 
       {orders.map((order) => (
         <div
           key={order._id}
-          className="bg-card p-5 rounded-xl  border border-gray-100 transition-shadow hover:shadow-md"
+          // Updated card styling for a cleaner look, using a soft shadow
+          className="bg-white p-6 rounded-xl border border-gray-200 transition-all duration-300 shadow-md hover:shadow-xl"
         >
-          <div className="flex justify-between items-start border-b pb-3 mb-3">
+          <div className="flex justify-between items-start border-b border-gray-100 pb-4 mb-4">
             <div className="">
-              <p className="text-xs font-medium text-gray-500">ORDER ID</p>
-              <p className="text-lg font-bold font-playfair text-gray-900">
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                ORDER ID
+              </p>
+              <p className="text-lg font-bold font-serif text-gray-900 break-all">
                 {order._id}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs font-medium text-gray-500">DATE PLACED</p>
-              <p className="text-gray-700">{formatDate(order.createdAt)}</p>
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                DATE PLACED
+              </p>
+              <p className="text-gray-700 font-semibold">
+                {formatDate(order.createdAt)}
+              </p>
             </div>
           </div>
 
           {/* Item and Total Summary */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-            <div className="mb-2 sm:mb-0">
-              <p className="text-base font-semibold text-gray-800 font-playfair">
-                {(order.productId as any).name} ({order.quantity} item
+            <div className="mb-3 sm:mb-0">
+              <p className="text-xl font-bold text-gray-800 font-serif">
+                {(order.productId as any).name}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                ({order.quantity} item
                 {order.quantity > 1 ? "s" : ""})
               </p>
               <span
-                className={`px-3 py-1 text-xs font-semibold rounded-full mt-1 ${getStatusClasses(order.status)}`}
+                className={`px-3 py-1 text-xs font-bold rounded-full mt-2 inline-block ${getStatusClasses(order.status)}`}
               >
-                {order.status}
+                {order.status.toUpperCase()}
               </span>
             </div>
-            <p className="text-2xl font-extrabold text-primary">
+            <p className="text-3xl font-extrabold text-amber-700">
               {formatPrice(order.grandTotal)}
             </p>
           </div>
 
           {/* --- Order Actions (Details and Cancel) --- */}
-          <div className="pt-3 border-t flex flex-wrap gap-3">
+          <div className="pt-4 border-t border-gray-100 flex flex-wrap gap-3">
+            {/* Styled "View Details" to match the image's "Contact Us" button (dark border, light fill) */}
             <button
               onClick={() => setSelectedOrder(order)}
-              className="px-4 py-2 text-sm font-semibold rounded-lg border border-primary text-primary hover:bg-amber-50 transition-colors"
+              className="px-6 py-2 text-sm font-semibold rounded-lg border border-gray-400 text-gray-800 hover:bg-gray-100 transition-colors"
             >
               View Details
             </button>
@@ -266,10 +314,11 @@ const Profile = () => {
             {order.status !== "cancelled" &&
               order.status !== "shipped" &&
               order.status !== "delivered" && (
+                // Styled "Cancel Order" to match the image's "Apply for EMI" button (rich color fill)
                 <button
                   onClick={() => handleCancelOrder(order._id)}
                   disabled={cancelling === order._id}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 font-semibold rounded-lg bg-red-50 hover:bg-red-100 transition-colors"
+                  className="flex items-center space-x-2 px-6 py-2 text-sm text-white font-semibold rounded-lg bg-red-600 hover:bg-red-700 transition-colors disabled:bg-red-300"
                 >
                   {cancelling === order._id ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -288,20 +337,26 @@ const Profile = () => {
   // --- Helper Components & Functions ---
 
   const InfoCard = ({ title, value }) => (
-    <div className="bg-card p-4 rounded-lg border border-gray-200">
-      <p className="text-sm font-medium text-gray-500">{title}</p>
-      <p className="text-lg font-semibold text-gray-800 mt-1">{value}</p>
+    <div className="bg-gray-50 p-5 rounded-xl border border-gray-200">
+      <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+        {title}
+      </p>
+      <p className="text-xl font-semibold text-gray-800 mt-1 font-serif">
+        {value}
+      </p>
     </div>
   );
 
   const getStatusClasses = (status) => {
     switch (status) {
       case "delivered":
-        return "bg-green-100 text-green-700";
+        return "bg-green-600 text-white"; // Stronger contrast for delivered
       case "processing":
-        return "bg-blue-100 text-blue-700";
+        return "bg-amber-100 text-amber-800"; // Using the new brand color
       case "cancelled":
         return "bg-red-100 text-red-700";
+      case "shipped":
+        return "bg-blue-100 text-blue-700";
       default:
         return "bg-gray-100 text-gray-700";
     }
@@ -313,13 +368,14 @@ const Profile = () => {
       <button
         onClick={() => setActiveTab(id)}
         className={`
-                    flex items-center space-x-2 py-3 px-6 rounded-lg font-semibold transition-all duration-200 w-full
-                    ${
-                      isActive
-                        ? "bg-primary text-white shadow-md"
-                        : "text-gray-700 hover:bg-gray-200"
-                    }
-                `}
+            flex items-center space-x-3 py-3 px-5 rounded-lg font-semibold transition-all duration-200 w-full text-left
+            ${
+              isActive
+                ? // Used a rich, dark primary color for the active state
+                  "bg-amber-700 text-white shadow-lg shadow-amber-200"
+                : "text-gray-700 hover:bg-amber-50 hover:text-amber-700"
+            }
+          `}
       >
         <span className="w-5 h-5">{icon}</span>
         <span>{label}</span>
@@ -328,28 +384,19 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto  p-4 sticky bg-background top-0 z-10 h-14 flex items-center justify-between">
-        <div className="flex flex-col sm:flex-row gap-4 items-center text-center justify-between">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center text-sm font-medium text-gray-600 hover:text-primary transition-colors cursor-pointer "
-          >
-            <ChevronLeftIcon className="w-4 h-4 mr-1" /> Go Back
-          </button>
-        </div>
-      </div>
-      <div className="max-w-7xl mx-auto p-4">
+    // Set a subtle background color for the page body
+    <div className="min-h-screen bg-gray-50 pb-16">
+      <div className="max-w-7xl mx-auto p-4 md:p-8 pt-10">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar / Navigation (1/4 width) */}
-          <div className="lg:w-1/4 sticky top-18 self-start bg-card p-6 rounded-xl">
-            <h1 className="text-4xl font-extrabold font-playfair text-gray-900 mb-2">
+          {/* Sidebar / Navigation (1/4 width) - Styled for a prominent look */}
+          <div className="lg:w-1/4 md:sticky md:top-20 self-start bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+            <h1 className="text-4xl font-extrabold font-serif text-gray-900 mb-2">
               My Account
             </h1>
-            <p className="text-gray-500 font-playfair mb-8">
-              Manage your profile and track your purchases.
+            <p className="text-gray-600 font-medium mb-10">
+              Manage your profile and track purchases.
             </p>
-            <div className=" space-y-2">
+            <div className="space-y-3">
               <TabButton
                 id="profile"
                 label="Profile Details"
@@ -360,12 +407,13 @@ const Profile = () => {
                 label="Order History"
                 icon={<ShoppingBag />}
               />
-              {/* Add a placeholder Logout button */}
+              {/* Logout button styled to stand out */}
               <button
                 onClick={() => signOut()}
-                className="w-full text-left py-3 px-6 text-red-600 font-semibold hover:bg-red-100 rounded-lg transition-colors"
+                className="w-full text-left flex items-center space-x-3 py-3 px-5 text-red-600 font-semibold hover:bg-red-50 rounded-lg transition-colors mt-4 border-t pt-4"
               >
-                Logout
+                <LogOut className="w-5 h-5" />
+                <span>Logout</span>
               </button>
             </div>
           </div>

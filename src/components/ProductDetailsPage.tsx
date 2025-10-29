@@ -275,12 +275,6 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
 
   return (
     <div className="min-h-screen max-w-7xl p-4 sm:p-8 mx-auto font-sans">
-      <button
-        onClick={() => router.back()}
-        className="flex items-center text-sm font-medium text-gray-600 hover:text-primary mb-6 transition-colors cursor-pointer"
-      >
-        <ChevronLeftIcon className="w-4 h-4 mr-1" /> Go Back
-      </button>
       <div className=" ">
         {/* Breadcrumb / Back Link */}
 

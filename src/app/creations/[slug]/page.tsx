@@ -1,7 +1,9 @@
-import Image from "next/image"
-import Link from "next/link"
-import { notFound } from "next/navigation"
-import { client } from "@/sanity/lib/sanity"
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { client } from "@/sanity/lib/sanity";
+import Footer from "@/components/footer";
+import Header from "@/components/Header";
 
 // GROQ query to fetch a single creation by slug
 const getCreationBySlugQuery = `*[_type == "creation" && slug.current == $slug][0] {
@@ -12,57 +14,71 @@ const getCreationBySlugQuery = `*[_type == "creation" && slug.current == $slug][
   content,
   publishedAt,
   category
-}`
+}`;
 
 // GROQ query to get all slugs for static generation
 const getAllCreationSlugsQuery = `*[_type == "creation"] {
   "slug": slug.current
-}`
+}`;
 
 interface Creation {
-  title: string
-  description: string
-  slug: string
-  imageSrc: string
-  content?: string
-  publishedAt?: string
-  category?: string
+  title: string;
+  description: string;
+  slug: string;
+  imageSrc: string;
+  content?: string;
+  publishedAt?: string;
+  category?: string;
 }
 
 export async function generateStaticParams() {
-  const creations = await client.fetch<{ slug: string }[]>(getAllCreationSlugsQuery)
+  const creations = await client.fetch<{ slug: string }[]>(
+    getAllCreationSlugsQuery
+  );
 
   return creations.map((creation) => ({
     slug: creation.slug,
-  }))
+  }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const creation = await client.fetch<Creation>(getCreationBySlugQuery, { slug: params.slug })
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const creation = await client.fetch<Creation>(getCreationBySlugQuery, {
+    slug: params.slug,
+  });
 
   if (!creation) {
     return {
       title: "Creation Not Found",
-    }
+    };
   }
 
   return {
     title: `${creation.title} | Creations`,
     description: creation.description,
-  }
+  };
 }
 
-export default async function CreationPage({ params }: { params: { slug: string } }) {
-  const creation = await client.fetch<Creation>(getCreationBySlugQuery, { slug: params.slug })
+export default async function CreationPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const creation = await client.fetch<Creation>(getCreationBySlugQuery, {
+    slug: params.slug,
+  });
 
   if (!creation) {
-    notFound()
+    notFound();
   }
 
   return (
     <main className="min-h-screen bg-white">
       {/* Header/Navigation */}
-      <nav className="border-b border-gray-200">
+      {/* <nav className="border-b border-gray-200">
         <div className="container mx-auto px-4 py-4">
           <Link
             href="/"
@@ -71,14 +87,19 @@ export default async function CreationPage({ params }: { params: { slug: string 
             ← Back to Creations
           </Link>
         </div>
-      </nav>
+      </nav> */}
+      <Header />
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12 md:py-20">
         <div className="max-w-4xl mx-auto">
           {/* Category & Date */}
           <div className="flex items-center gap-4 text-sm text-gray-500 mb-6">
-            {creation.category && <span className="uppercase tracking-wide">{creation.category}</span>}
+            {creation.category && (
+              <span className="uppercase tracking-wide">
+                {creation.category}
+              </span>
+            )}
             {creation.publishedAt && (
               <>
                 <span>•</span>
@@ -99,7 +120,9 @@ export default async function CreationPage({ params }: { params: { slug: string 
           </h1>
 
           {/* Description */}
-          <p className="text-xl text-gray-600 leading-relaxed mb-10">{creation.description}</p>
+          <p className="text-xl text-gray-600 leading-relaxed mb-10">
+            {creation.description}
+          </p>
 
           {/* Featured Image */}
           <div className="aspect-video w-full overflow-hidden rounded-lg mb-12">
@@ -116,7 +139,9 @@ export default async function CreationPage({ params }: { params: { slug: string 
           {/* Content */}
           {creation.content && (
             <div className="prose prose-lg max-w-none">
-              <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">{creation.content}</div>
+              <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                {creation.content}
+              </div>
             </div>
           )}
 
@@ -124,8 +149,12 @@ export default async function CreationPage({ params }: { params: { slug: string 
           <div className="mt-16 pt-8 border-t border-gray-200">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
               <div>
-                <h3 className="text-2xl font-semibold text-gray-800 mb-2">Interested in this creation?</h3>
-                <p className="text-gray-600">Get in touch to learn more about our work.</p>
+                <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                  Interested in this creation?
+                </h3>
+                <p className="text-gray-600">
+                  Get in touch to learn more about our work.
+                </p>
               </div>
               <Link
                 href="/contact"
@@ -137,6 +166,7 @@ export default async function CreationPage({ params }: { params: { slug: string 
           </div>
         </div>
       </section>
+      <Footer />
     </main>
-  )
+  );
 }
