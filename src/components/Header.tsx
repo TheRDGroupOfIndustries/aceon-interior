@@ -98,10 +98,13 @@ export default function Header() {
           <div className="">
             {!session?.user ? (
               <motion.button
-                onClick={() => router.push("/login")}
+                onClick={() => router.push("/auth/signin")}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-6 py-2.5 rounded-xl bg-[#A97C51] text-white text-lg font-medium hover:bg-white hover:text-[#A97C51] border border-[#A97C51] transition-all"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.3 + 2 * 0.1 }}
+                className="px-6 py-2.5 rounded-xl bg-[#A97C51] text-white text-lg font-playfair font-medium hover:bg-white hover:text-[#A97C51] border border-[#A97C51] transition-all"
               >
                 Get Started
               </motion.button>
@@ -110,6 +113,9 @@ export default function Header() {
                 onClick={() => router.push("/profile")}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.3 + 2 * 0.1 }}
                 className="px-6 py-2 rounded-xl bg-[#A97C51] text-white text-lg font-medium hover:bg-white hover:text-[#A97C51] border border-[#A97C51] transition-all"
               >
                 Profile
@@ -152,10 +158,10 @@ export default function Header() {
 
             {!session?.user && (
               <motion.button
-                onClick={() => navigateTo("/login")}
+                onClick={() => navigateTo("/auth/signin")}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-3 rounded-xl bg-[#A97C51] text-white text-lg font-medium hover:bg-white hover:text-[#A97C51] transition-all"
+                className="px-8 py-3 rounded-xl bg-[#A97C51] text-white text-lg font-playfair font-medium hover:bg-white hover:text-[#A97C51] transition-all"
               >
                 Get Started
               </motion.button>

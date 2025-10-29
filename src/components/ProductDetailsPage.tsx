@@ -252,7 +252,7 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
 
   const redirectToCheckout = () => {
     if (!session) {
-      router.push("/login");
+      router.push("/auth/signin");
       return;
     }
     sessionStorage.setItem(

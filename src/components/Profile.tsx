@@ -160,7 +160,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
                     Grand Total
                   </span>
                   {/* Applied the rich amber/gold color */}
-                  <span className="text-xl font-extrabold text-amber-700">
+                  <span className="text-xl font-extrabold text-[#A97C51]">
                     {formatPrice(order.grandTotal)}
                   </span>
                 </div>
@@ -194,7 +194,7 @@ const Profile = () => {
   const { data: session } = useSession();
 
   useEffect(() => {
-    if (!session?.user) return router.push("/login");
+    if (!session?.user) return router.push("/auth/signin");
     dispatch(fetchUserOrders({}) as any);
   }, [session]);
 
@@ -210,6 +210,7 @@ const Profile = () => {
   // --- Action Handler ---
   const handleCancelOrder = (orderId) => {
     if (cancelling === orderId) return;
+    console.log(orderId);
     setCancelling(orderId);
 
     dispatch(cancelOrder({ orderId }) as any).unwrap();
@@ -220,7 +221,7 @@ const Profile = () => {
 
   const ProfileDetailsTab = ({ data }) => (
     <div className="space-y-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
-      <h2 className="text-3xl font-bold font-serif text-gray-900 mb-4 border-b pb-3">
+      <h2 className="text-3xl font-bold font-serif text-[#A97C51] mb-4 border-b pb-3">
         Account Information
       </h2>
 
@@ -239,7 +240,7 @@ const Profile = () => {
 
   const OrderHistoryTab = () => (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold font-serif text-gray-900 mb-6">
+      <h2 className="text-3xl font-bold font-serif text-[#A97C51] mb-6">
         Order History ({orders.length})
       </h2>
 
@@ -283,8 +284,9 @@ const Profile = () => {
           {/* Item and Total Summary */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
             <div className="mb-3 sm:mb-0">
-              <p className="text-xl font-bold text-gray-800 font-serif">
-                {(order.productId as any).name}
+              <p className="text-xl font-bold text-[#A97C51] font-serif">
+                {(order.productId as any).name[0].toUpperCase() +
+                  (order.productId as any).name.slice(1)}
               </p>
               <p className="text-sm text-gray-600 mt-1">
                 ({order.quantity} item
@@ -296,7 +298,7 @@ const Profile = () => {
                 {order.status.toUpperCase()}
               </span>
             </div>
-            <p className="text-3xl font-extrabold text-amber-700">
+            <p className="text-3xl font-extrabold text-[#A97C51]">
               {formatPrice(order.grandTotal)}
             </p>
           </div>
@@ -372,8 +374,8 @@ const Profile = () => {
             ${
               isActive
                 ? // Used a rich, dark primary color for the active state
-                  "bg-amber-700 text-white shadow-lg shadow-amber-200"
-                : "text-gray-700 hover:bg-amber-50 hover:text-amber-700"
+                  "bg-[#A97C51] text-white shadow-lg "
+                : "text-gray-700 hover:bg-amber-50 hover:text-[#A97C51]"
             }
           `}
       >
@@ -390,7 +392,7 @@ const Profile = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar / Navigation (1/4 width) - Styled for a prominent look */}
           <div className="lg:w-1/4 md:sticky md:top-20 self-start bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
-            <h1 className="text-4xl font-extrabold font-serif text-gray-900 mb-2">
+            <h1 className="text-4xl font-extrabold font-serif text-[#A97C51] mb-2">
               My Account
             </h1>
             <p className="text-gray-600 font-medium mb-10">

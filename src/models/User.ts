@@ -6,6 +6,7 @@ const UserSchema = new Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
+    password: { type: String, required: false },
     image: { type: String }, // Profile picture URL from Google
     provider: { type: String, default: "google" }, // OAuth provider
     providerId: { type: String, required: false }, // Google user ID
@@ -23,6 +24,7 @@ export interface IUser {
   _id: string;
   name: string;
   email: string;
+  password?: string;
   image?: string;
   provider: string;
   providerId: string;

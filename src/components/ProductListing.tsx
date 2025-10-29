@@ -140,11 +140,11 @@ export default function ProductListingPage() {
           >
             <div className="bg-card rounded-lg shadow-sm p-6 sticky top-24">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+                <h2 className="text-xl font-semibold text-gray-900 font-playfair">Filters</h2>
                 {(selectedCategory || selectedSubcategory || searchQuery) && (
                   <button
                     onClick={clearFilters}
-                    className="text-sm text-amber-600 hover:text-amber-700 flex items-center gap-1"
+                    className="text-sm text-amber-600 font-playfair hover:text-amber-700 flex items-center gap-1"
                   >
                     <X className="w-4 h-4" />
                     Clear
@@ -154,7 +154,7 @@ export default function ProductListingPage() {
 
               {/* Category Filter */}
               <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-900 mb-3">
+                <h3 className="text-sm font-medium text-gray-900 mb-3 ">
                   Category
                 </h3>
                 <div className="space-y-2">

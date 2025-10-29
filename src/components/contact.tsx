@@ -47,7 +47,7 @@ const Contact: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session) {
-      router.push("/login");
+      router.push("/auth/signin");
       return;
     }
 

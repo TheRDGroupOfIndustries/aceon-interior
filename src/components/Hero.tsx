@@ -94,11 +94,17 @@ function Elements() {
           ))}
         </motion.div>
         {!session?.user && (
-          <Link href="/login" className="hidden md:block w-full sm:w-auto mt-8">
+          <Link
+            href="/auth/signin"
+            className="hidden md:block w-full sm:w-auto mt-8"
+          >
             <motion.button
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 + 2 * 0.1 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-[#A97C51] text-white text-lg md:text-xl font-medium hover:bg-white hover:text-[#b98663] transition-all whitespace-nowrap text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 "
+              className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-[#A97C51] text-white text-lg md:text-xl font-medium hover:bg-white hover:text-[#b98663] transition-all whitespace-nowrap text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 font-playfair"
             >
               Get Started
             </motion.button>
@@ -152,7 +158,7 @@ function Elements() {
               </motion.div>
             ))}
             {!session?.user && (
-              <Link href="/login" className="block w-full sm:w-auto mt-8">
+              <Link href="/auth/signin" className="block w-full sm:w-auto mt-8">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -196,7 +202,7 @@ function Elements() {
           transition={{ duration: 0.6, delay: 0.7 }}
           className="flex flex-col sm:flex-row gap-3 md:gap-4 items-center mt-6 md:mt-8 w-full sm:w-auto"
         >
-          {/* <Link href="/login" className="block w-full sm:w-auto">
+          {/* <Link href="/auth/signin" className="block w-full sm:w-auto">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

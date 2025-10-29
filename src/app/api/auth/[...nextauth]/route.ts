@@ -2,6 +2,8 @@ import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
 import NextAuth, { AuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
 // const handler = NextAuth({
 //   providers: [
@@ -19,7 +21,41 @@ export const authOptions: AuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
+    CredentialsProvider({
+      id: "credentials",
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text", placeholder: "you@example.com" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials, req) {
+        if (!credentials?.email || !credentials?.password) return null;
+
+        await dbConnect();
+        const user = await User.findOne({ email: credentials.email });
+
+        if (!user || !user.password) {
+          // No user or user signed up via social provider and hasn't set password
+          return null;
+        }
+
+        const isValid = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
+        if (!isValid) return null;
+
+        // return minimal user object that will be available as `user` in callbacks
+        return {
+          id: user._id.toString(),
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        };
+      },
+    }),
   ],
+
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async signIn({ user }) {
@@ -44,6 +80,17 @@ export const authOptions: AuthOptions = {
       return true;
     },
 
+    async jwt({ token, user }) {
+      // On first sign in (user present), copy DB role to token
+      if (user && user.email) {
+        await dbConnect();
+        const dbUser = await User.findOne({ email: user.email });
+        token.role = dbUser?.role || "user";
+        token.sub = dbUser?._id.toString() || token.sub;
+      }
+      return token;
+    },
+
     async session({ session }) {
       await dbConnect();
       const dbUser = await User.findOne({ email: session.user?.email });
@@ -60,11 +107,10 @@ export const authOptions: AuthOptions = {
       // So we’ll just let client-side redirect handle it
       return baseUrl;
     },
-    
   },
-    pages: {
-    signIn: "/login",
-  },
+  // pages: {
+  //   signIn: "/login",
+  // },
 };
 
 const handler = NextAuth(authOptions);

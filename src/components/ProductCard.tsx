@@ -14,7 +14,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
   const redirectToCheckout = () => {
     console.log("session", session);
     if (!session) {
-      router.push("/login");
+      router.push("/auth/signin");
       return;
     }
 
@@ -60,7 +60,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
         {/* Category and Rating */}
         <div className="flex justify-between items-center mb-1">
           {/* Category Tag */}
-          <span className="text-sm font-medium text-[#A97C51] bg-primary/20 px-3 py-1 rounded-md">
+          <span className="text-sm font-medium font-playfair text-[#A97C51] bg-primary/20 px-3 py-1 rounded-md">
             {product.category}
           </span>
 
@@ -74,14 +74,14 @@ export default function ProductCard({ product }: { product: IProduct }) {
         </div>
 
         {/* Product Title */}
-        <h2 className="text-lg font-bold text-gray-900 mb-3 leading-snug line-clamp-1">
-          {product.name}
+        <h2 className="text-xl font-bold font-playfair text-gray-900 mb-3 leading-snug line-clamp-1">
+          {product.name[0].toLocaleUpperCase() + product.name.slice(1)}
         </h2>
 
         {/* Price and Action Buttons */}
         <div className="flex flex-col gap-3">
           {/* Price */}
-          <div className="flex items-baseline mb-3">
+          <div className="flex items-baseline mb-3 font-playfair">
             <span className="text-2xl font-bold text-[#A97C51] mr-2">
               ₹{product.pricing.current_price}
             </span>
@@ -97,7 +97,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
             {/* View Details Button */}
             <Link
               href={`/products/${product._id}`}
-              className="flex-1 border-2 border-[#A97C51] text-[#A97C51] font-semibold py-3 rounded-lg hover:bg-[#9c724a] hover:text-white transition-colors duration-200 cursor-pointer text-center"
+              className="flex-1 border-2 border-[#A97C51] text-[#A97C51] font-semibold py-3 rounded-lg hover:bg-[#9c724a] hover:text-white transition-colors duration-200 cursor-pointer text-center font-playfair"
             >
               View Details
             </Link>
@@ -105,7 +105,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
             {/* Buy Now Link */}
             <button
               onClick={redirectToCheckout}
-              className="flex-1 bg-[#A97C51] border-2 border-[#A97C51] text-white font-semibold py-3 rounded-lg shadow-md hover:bg-[#9c724a] transition-colors duration-200 cursor-pointer text-center"
+              className="flex-1 bg-[#A97C51] border-2 border-[#A97C51] text-white font-semibold py-3 rounded-lg shadow-md hover:bg-[#9c724a] transition-colors duration-200 cursor-pointer text-center font-playfair"
             >
               Buy Now
             </button>
