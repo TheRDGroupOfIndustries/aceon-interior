@@ -422,6 +422,14 @@ export default function ProductListing({
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+            {/* Deactivate / Activate button - styled to match admin mock */}
+            <button
+              onClick={() => window.alert(`Toggled active state for ${product.name} (simulated)`)}
+              className="ml-2 btn-deactivate"
+              title="Deactivate"
+            >
+              Deactivate
+            </button>
           </div>
         </td>
       </tr>

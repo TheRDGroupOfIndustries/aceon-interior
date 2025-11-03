@@ -1,684 +1,339 @@
 "use client";
 
-import CategoryListing from "@/components/admin/CategoryListing";
-import OrderListing from "@/components/admin/OrderListing";
-import ProductListing from "@/components/admin/ProductListing";
-import {
-  fetchAllOrdersByAdmin,
-  fetchUserOrders,
-} from "@/redux/features/orderSlice";
-import { fetchProducts } from "@/redux/features/productSlice";
-import { signOut, useSession } from "next-auth/react";
-import Link from "next/link";
-import { useState, useEffect, useCallback } from "react";
-import { BsArrowLeft } from "react-icons/bs";
-import { useDispatch } from "react-redux";
+import { Mail, Phone, Clock, MessageSquare } from "lucide-react";
+import Footer from "@/components/footer";
+import { useState, useRef, useEffect } from "react";
 
-interface EMIApplication {
-  _id: string;
-  fullName: string;
-  email: string;
-  phoneNumber: string;
-  interiorPackage: string;
-  totalAmount: number;
-  downPayment: number;
-  emiTenure: number;
-  calculatedEMI: number;
-  monthlyIncome: number;
-  employmentType: string;
-  status: "pending" | "approved" | "rejected" | "under_review";
-  createdAt: string;
-  bankDetails?: string;
-  adminNotes?: string;
-}
+type Status = "PENDING" | "APPROVED" | "UNDER REVIEW" | "REJECTED";
 
-interface ContactMessage {
-  _id: string;
+interface AppItem {
+  id: string;
   name: string;
   email: string;
-  number?: string;
-  address?: string;
-  description: string;
-  createdAt: string;
+  phone: string;
+  date: string;
+  status: Status;
+  total: string;
+  down: string;
+  emi: string;
+  tenure: string;
+  income: string;
+  employment: string;
 }
 
+const sampleApps: AppItem[] = [
+  {
+    id: "A1",
+    name: "Kitwishiii Kitwishiii",
+    email: "kitwishiiikitwishiii@gmail.com",
+    phone: "8628875654",
+    date: "2025-10-30T22:38:00",
+    status: "PENDING",
+    total: "₹50,000",
+    down: "₹8,000",
+    emi: "₹3,732",
+    tenure: "12 months",
+    income: "₹120,000",
+    employment: "Salaried",
+  },
+  {
+    id: "A2",
+    name: "Rahul Sharma",
+    email: "rahul.sharma@gmail.com",
+    phone: "9876543210",
+    date: "2025-10-29T14:15:00",
+    status: "APPROVED",
+    total: "₹75,000",
+    down: "₹15,000",
+    emi: "₹5,500",
+    tenure: "12 months",
+    income: "₹150,000",
+    employment: "Salaried",
+  },
+  {
+    id: "A3",
+    name: "Priya Patel",
+    email: "priya.patel@gmail.com",
+    phone: "9123456789",
+    date: "2025-10-28T11:20:00",
+    status: "UNDER REVIEW",
+    total: "₹35,000",
+    down: "₹5,000",
+    emi: "₹2,800",
+    tenure: "12 months",
+    income: "₹80,000",
+    employment: "Salaried",
+  },
+];
+
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<
-    "emi" | "contact" | "products" | "order" | "category"
-  >("emi");
-  const [emiApplications, setEmiApplications] = useState<EMIApplication[]>([]);
-  const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
-  const [emiPage, setEmiPage] = useState(1);
-  const [contactPage, setContactPage] = useState(1);
-  const [emiTotal, setEmiTotal] = useState(0);
-  const [contactTotal, setContactTotal] = useState(0);
-  const [emiFilter, setEmiFilter] = useState("all");
-  const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalEmiApp: 0,
-    totalMessages: 0,
-    totalOrders: 0,
-    totalProducts: 0,
-    totalCategory: 0,
-  });
-  const [statusStats, setStfirsttats] = useState({
-    pending: 0,
-    approved: 0,
-    rejected: 0,
-    under_review: 0,
-    total: 0,
-  });
+  const [apps, setApps] = useState<AppItem[]>(sampleApps);
+  const [activeTab, setActiveTab] = useState<'EMI' | 'CONTACT' | 'PRODUCTS' | 'ORDERS' | 'CATEGORY'>('EMI');
 
-  const { data: session } = useSession();
+  // refs to measure tab positions so we can render a centered indicator exactly under the active tab
+  const tabsContainerRef = useRef<HTMLDivElement | null>(null);
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({} as Record<string, HTMLButtonElement | null>);
+  const [indicator, setIndicator] = useState<{ left: number; width: number } | null>(null);
 
-  const [selectedApp, setSelectedApp] = useState<EMIApplication | null>(null);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [updateStatus, setUpdateStatus] =
-    useState<EMIApplication["status"]>("pending");
-  const [updateAdminNotes, setUpdateAdminNotes] = useState("");
-  const [notification, setNotification] = useState<{
+  useEffect(() => {
+    const measure = () => {
+      const btn = tabRefs.current[activeTab];
+      const container = tabsContainerRef.current;
+      if (!btn || !container) {
+        setIndicator(null);
+        return;
+      }
+      const btnRect = btn.getBoundingClientRect();
+      const contRect = container.getBoundingClientRect();
+      // leave a small horizontal padding so the indicator is slightly narrower than the tab
+      const padding = 24;
+      const width = Math.max(48, btnRect.width - padding);
+      const left = btnRect.left - contRect.left + padding / 2;
+      setIndicator({ left, width });
+    };
+
+    // measure now and on resize
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [activeTab]);
+
+  interface ContactMsg {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    date: string;
     message: string;
-    type: "success" | "error";
-  } | null>(null);
+    status: 'NEW' | 'REPLIED' | 'RESOLVED';
+  }
 
-  const limit = 10;
+  const [messages, setMessages] = useState<ContactMsg[]>([
+    {
+      id: 'M1',
+      name: 'Amit Kumar',
+      email: 'amit.kumar@gmail.com',
+      phone: '9988776655',
+      date: '2025-10-30T15:45:00',
+      message: 'I am interested in your bedroom furniture collection. Can you provide more details about customization options?',
+      status: 'NEW',
+    },
+    {
+      id: 'M2',
+      name: 'Sneha Reddy',
+      email: 'sneha.reddy@gmail.com',
+      phone: '8877665544',
+      date: '2025-10-29T13:30:00',
+      message: 'Do you offer delivery to Hyderabad? Any lead times I should be aware of?',
+      status: 'REPLIED',
+    },
+  ]);
 
-  useEffect(() => {
-    if (notification) {
-      const timer = setTimeout(() => setNotification(null), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [notification]);
-
-  const fetchEMIApplications = useCallback(async () => {
-    setLoading(true);
-    try {
-      const statusParam = emiFilter !== "all" ? `&status=${emiFilter}` : "";
-      const response = await fetch(
-        `/api/emi?page=${emiPage}&limit=${limit}${statusParam}`
-      );
-      const data = await response.json();
-      if (data.success) {
-        setEmiApplications(data.data.applications);
-        // setEmiTotal(data.data.pagination.total);
-        // setStatusStats(data.data.filters.status);
-      }
-    } catch (error) {
-      console.error("Error fetching EMI applications:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [emiPage, emiFilter, limit]);
-
-  useEffect(() => {
-    if (activeTab === "emi") fetchEMIApplications();
-  }, [fetchEMIApplications, activeTab]);
-
-  const fetchContactMessages = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `/api/contact?page=${contactPage}&limit=${limit}`
-      );
-      const data = await response.json();
-      setContactMessages(data.messages);
-      setContactTotal(data.pagination.total);
-    } catch (error) {
-      console.error("Error fetching contact messages:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [contactPage, limit]);
-
-  useEffect(() => {
-    if (activeTab === "contact") fetchContactMessages();
-  }, [fetchContactMessages, activeTab]);
-
-  const handleStatusUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedApp) return;
-
-    setIsUpdating(true);
-    setNotification(null);
-    try {
-      const response = await fetch("/api/emi", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          applicationId: selectedApp._id,
-          status: updateStatus,
-          adminNotes: updateAdminNotes,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setNotification({
-          message: "Application updated successfully!",
-          type: "success",
-        });
-        setSelectedApp(null);
-        fetchEMIApplications();
-      } else {
-        throw new Error(data.error || "Failed to update application");
-      }
-    } catch (error) {
-      setNotification({ message: (error as Error).message, type: "error" });
-    } finally {
-      setIsUpdating(false);
-    }
+  const toggleStatus = (id: string) => {
+    setApps(prev => prev.map(a => {
+      if (a.id !== id) return a;
+      // simple demo toggle: PENDING -> APPROVED, otherwise -> PENDING
+      const newStatus: Status = a.status === 'PENDING' ? 'APPROVED' : 'PENDING';
+      return { ...a, status: newStatus };
+    }));
   };
 
-  const formatDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString("en-IN", {
-      day: "numeric",
+  const viewDetails = (id: string) => {
+    const app = apps.find(a => a.id === id);
+    if (app) alert(`${app.name}\n${app.email}\nStatus: ${app.status}`);
+  };
+
+  const replyToMessage = (id: string) => {
+    const msg = messages.find(m => m.id === id);
+    if (msg) alert(`Reply to ${msg.name} (${msg.email})`);
+  };
+
+  const markResolved = (id: string) => {
+    setMessages(prev => prev.map(m => m.id === id ? { ...m, status: 'RESOLVED' } : m));
+  };
+
+  const metrics = [
+    { label: "TOTAL REVENUE", value: "₹12.5L", trend: "+15% this month" },
+    { label: "ACTIVE ORDERS", value: "47", sub: "8 pending delivery" },
+    { label: "NEW INQUIRIES", value: "23", sub: "12 awaiting response" },
+    { label: "PRODUCTS", value: "156", sub: "12 categories" },
+  ];
+
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleString("en-IN", {
+      day: "2-digit",
       month: "short",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     });
 
-  const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(amount);
-
-  const filterButtons = [
-    { key: "all", label: "All", count: statusStats.total },
-    { key: "pending", label: "Pending", count: statusStats.pending },
-    {
-      key: "under_review",
-      label: "Under Review",
-      count: statusStats.under_review,
-    },
-    { key: "approved", label: "Approved", count: statusStats.approved },
-    { key: "rejected", label: "Rejected", count: statusStats.rejected },
-  ];
-
-  const dispatch = useDispatch();
-
-  const getLengths = async () => {
-    try {
-      const res = await fetch("/api/stats", {
-        method: "GET",
-      });
-      const data = await res.json();
-      console.log("getLengths", data.data);
-      setStats(data.data);
-    } catch (error) {
-      console.error("Error fetching lengths:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (session) {
-      getLengths();
-      dispatch(fetchProducts({}) as any);
-      dispatch(fetchAllOrdersByAdmin({}) as any);
-    }
-  }, [session]);
-
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto border-b flex items-center justify-between p-4">
-        <div className="px-4 sm:px-6 py-8 gap-3">
-          <h1
-            className="text-2xl sm:text-4xl font-serif mb-1 sm:mb-2"
-            style={{ color: "#A97C51" }}
-          >
-            Admin Dashboard
-          </h1>
-          <p className="text-sm sm:text-base text-gray-600">
-            Manage inquiries and applications
-          </p>
+    <div className="min-h-screen bg-[#FCFCF9] text-[#13343B]">
+      {/* Banner */}
+      <div className="w-full bg-cover bg-center relative" style={{ backgroundImage: "url('/images/back.jpg')", height: 200 }}>
+        {/* slightly reduced overlay opacity and banner height so page content doesn't get visually obscured */}
+        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(169,124,81,0.60)' }} />
+        <div className="max-w-[1280px] mx-auto px-6 py-16 relative text-center">
+          <h1 className="text-[56px] leading-tight font-serif text-white" style={{ textShadow: '0 6px 18px rgba(0,0,0,0.25)' }}>Executive Dashboard</h1>
+          <p className="text-sm text-white opacity-90 mt-3">Sophisticated management suite for premium furniture operations</p>
         </div>
-        {/* <button
-          onClick={() => signOut()}
-          className=" py-3 px-6 text-red-600 font-semibold hover:bg-red-100 rounded-lg transition-colors"
-        >
-          Logout
-        </button> */}
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 pb-8">
-        <div className="flex gap-1 border-b mb-8">
-          <button
-            onClick={() => setActiveTab("emi")}
-            className={`px-6 py-3 font-medium transition-colors relative ${activeTab === "emi" ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
-          >
-            EMI Applications ({stats.totalEmiApp})
-            {activeTab === "emi" && (
-              <div
-                className="absolute bottom-0 left-0 right-0 h-0.5"
-                style={{ backgroundColor: "#A97C51" }}
-              />
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("contact")}
-            className={`px-6 py-3 font-medium transition-colors relative ${activeTab === "contact" ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
-          >
-            Contact Messages ({stats.totalMessages})
-            {activeTab === "contact" && (
-              <div
-                className="absolute bottom-0 left-0 right-0 h-0.5"
-                style={{ backgroundColor: "#A97C51" }}
-              />
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("products")}
-            className={`px-6 py-3 font-medium transition-colors relative ${activeTab === "contact" ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
-          >
-            Products ({stats.totalProducts})
-            {activeTab === "products" && (
-              <div
-                className="absolute bottom-0 left-0 right-0 h-0.5"
-                style={{ backgroundColor: "#A97C51" }}
-              />
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("order")}
-            className={`px-6 py-3 font-medium transition-colors relative ${activeTab === "contact" ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
-          >
-            Orders ({stats.totalOrders})
-            {activeTab === "order" && (
-              <div
-                className="absolute bottom-0 left-0 right-0 h-0.5"
-                style={{ backgroundColor: "#A97C51" }}
-              />
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("category")}
-            className={`px-6 py-3 font-medium transition-colors relative ${activeTab === "contact" ? "text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
-          >
-            Category ({stats.totalCategory})
-            {activeTab === "category" && (
-              <div
-                className="absolute bottom-0 left-0 right-0 h-0.5"
-                style={{ backgroundColor: "#A97C51" }}
-              />
-            )}
-          </button>
+      {/* add a visible gap below the banner so metrics/cards sit lower (matches mock) */}
+      <div className="max-w-[1280px] mx-auto px-6 mt-8">
+        {/* Metrics cards */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+          {metrics.map((m, idx) => (
+            <div key={m.label} className="bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgba(19,52,59,0.04)] flex items-center justify-between border border-transparent hover:border-gray-100 transition">
+              {/* Left: label, big value, small sub/trend */}
+              <div className="flex-1">
+                <div className="text-xs uppercase text-gray-400">{m.label}</div>
+                <div className="text-[28px] font-semibold text-[#8b6e5b] mt-3">{m.value}</div>
+                {m.trend && <div className="mt-2 text-sm text-teal-700">{m.trend}</div>}
+                {m.sub && <div className="mt-1 text-sm text-gray-500">{m.sub}</div>}
+              </div>
+
+              {/* Right: colored icon box */}
+              <div className="ml-4">
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm ${idx === 0 ? 'bg-[#CFAE8D]' : idx === 1 ? 'bg-[#3B82F6]' : idx === 2 ? 'bg-[#F59E0B]' : 'bg-[#A78BFA]'}`}>
+                  <div className="text-white text-xl">{idx === 0 ? '₹' : idx === 1 ? '📦' : idx === 2 ? '✉️' : '📁'}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </section>
+
+        {/* Tabs and filters */}
+        <div className="mt-6">
+    <div className="bg-white rounded-2xl p-4 overflow-visible shadow-[0_8px_30px_rgba(19,52,59,0.04)] border border-transparent">
+              <div ref={tabsContainerRef} className="max-w-[980px] flex items-center gap-6 px-6 relative justify-start">
+                <button ref={(el: HTMLButtonElement | null) => { tabRefs.current['EMI'] = el }} onClick={() => setActiveTab('EMI')} className={`px-6 py-3 rounded-l-2xl inline-flex items-center gap-3 ${activeTab === 'EMI' ? 'bg-[#fff4ea] text-[#8b6e5b] font-medium' : 'text-gray-600'}`}>
+                  <span>EMI Applications</span>
+                  <span className="inline-flex items-center justify-center bg-[#eef2f7] text-[#6b7280] w-6 h-6 rounded-full text-xs">3</span>
+                </button>
+                <button ref={(el: HTMLButtonElement | null) => { tabRefs.current['CONTACT'] = el }} onClick={() => setActiveTab('CONTACT')} className={`px-5 py-3 rounded-none text-sm inline-flex items-center gap-3 ${activeTab === 'CONTACT' ? 'bg-[#fff4ea] text-[#8b6e5b] font-medium' : 'text-gray-600'}`}>
+                  <span>Contact Messages</span>
+                  <span className="ml-2 bg-[#CFAE8D] px-2 py-0.5 rounded-full text-xs">2</span>
+                </button>
+
+                <button ref={(el: HTMLButtonElement | null) => { tabRefs.current['PRODUCTS'] = el }} onClick={() => setActiveTab('PRODUCTS')} className={`px-5 py-3 rounded-none text-sm ${activeTab === 'PRODUCTS' ? 'bg-[#fff4ea] text-[#8b6e5b] font-medium' : 'text-gray-600'}`}>Products <span className="ml-2 bg-[#eef2f7] px-2 py-0.5 rounded-full text-xs">3</span></button>
+                <button ref={(el: HTMLButtonElement | null) => { tabRefs.current['ORDERS'] = el }} onClick={() => setActiveTab('ORDERS')} className={`px-5 py-3 rounded-none text-sm ${activeTab === 'ORDERS' ? 'bg-[#fff4ea] text-[#8b6e5b] font-medium' : 'text-gray-600'}`}>Orders <span className="ml-2 bg-[#eef2f7] px-2 py-0.5 rounded-full text-xs">2</span></button>
+                <button ref={(el: HTMLButtonElement | null) => { tabRefs.current['CATEGORY'] = el }} onClick={() => setActiveTab('CATEGORY')} className={`px-5 py-3 rounded-r-2xl text-sm ${activeTab === 'CATEGORY' ? 'bg-[#fff4ea] text-[#8b6e5b] font-medium' : 'text-gray-600'}`}>Category <span className="ml-2 bg-[#eef2f7] px-2 py-0.5 rounded-full text-xs">5</span></button>
+
+                {/* single measured indicator positioned under the active tab */}
+                {indicator && (
+                  <span style={{ left: indicator.left, width: indicator.width, bottom: -14 }} className="absolute h-2 bg-[#A97C51] rounded-md z-10 shadow-[0_8px_20px_rgba(169,124,81,0.12)]" />
+                )}
+              </div>
+          </div>
         </div>
 
-        {activeTab === "emi" && (
-          <div>
-            <div className="flex flex-wrap gap-2 mb-8">
-              {filterButtons.map((btn) => (
-                <button
-                  key={btn.key}
-                  onClick={() => {
-                    setEmiFilter(btn.key);
-                    setEmiPage(1);
-                  }}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${emiFilter === btn.key ? "text-white shadow-sm" : "bg-white border border-gray-200 text-gray-700 hover:border-gray-300"}`}
-                  style={
-                    emiFilter === btn.key ? { backgroundColor: "#A97C51" } : {}
-                  }
-                >
-                  {btn.label}
-                </button>
-              ))}
-            </div>
-            <div className="space-y-4">
-              {loading ? (
-                <div className="flex items-center justify-center py-20">
-                  <div
-                    className="w-10 h-10 border-3 border-t-transparent rounded-full animate-spin"
-                    style={{
-                      borderColor: "#A97C51",
-                      borderTopColor: "transparent",
-                      borderWidth: "3px",
-                    }}
-                  />
-                </div>
-              ) : emiApplications.length === 0 ? (
-                <div className="text-center py-20 border border-dashed border-gray-300 rounded-lg">
-                  <p className="text-gray-500">
-                    No applications found for this filter.
-                  </p>
-                </div>
-              ) : (
-                emiApplications.map((app) => (
-                  <div
-                    key={app._id}
-                    className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow"
-                  >
-                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6 pb-6 border-b">
+        <div className="mt-4 flex gap-3 px-1 items-center">
+          <button className="px-6 py-3 rounded-2xl bg-[#A97C51] text-white font-medium shadow-sm">All</button>
+          <button className="px-5 py-3 rounded-2xl bg-white text-[#2b2b2b] border border-gray-200 shadow-sm">Pending</button>
+          <button className="px-5 py-3 rounded-2xl bg-white text-[#2b2b2b] border border-gray-200 shadow-sm">Under review</button>
+          <button className="px-5 py-3 rounded-2xl bg-white text-[#2b2b2b] border border-gray-200 shadow-sm">Approved</button>
+          <button className="px-5 py-3 rounded-2xl bg-white text-[#2b2b2b] border border-gray-200 shadow-sm">Rejected</button>
+        </div>
+
+        {/* Content area: either Applications or Contact Messages depending on active tab */}
+        <section className="mt-6">
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+            <div className="space-y-5">
+              {activeTab === 'CONTACT' ? (
+                // Contact messages view
+                messages.map((m) => (
+                  <article key={m.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-50">
+                    <div className="relative">
+                      <div className="absolute right-6 top-6">
+                        <span className={`inline-flex items-center justify-center px-3 py-1.5 rounded-2xl text-sm font-semibold ${m.status === 'NEW' ? 'bg-[#FFF7E6] text-[#A97C51] border border-[#F5DEC9]' : m.status === 'REPLIED' ? 'bg-[#E8F9F2] text-[#0E9B7A] border border-[#DFF3EA]' : 'bg-slate-100 text-slate-700'}`}>
+                          {m.status}
+                        </span>
+                      </div>
+
                       <div>
-                        <h3 className="text-xl font-serif text-black mb-2">
-                          {app.fullName}
-                        </h3>
-                        <div className="space-y-1 text-sm text-gray-600">
-                          <p>{app.email}</p>
-                          <p>{app.phoneNumber}</p>
-                          <p className="text-xs text-gray-500">
-                            {formatDate(app.createdAt)}
-                          </p>
+                        <h3 className="text-[28px] font-playfair text-[#13343B]">{m.name}</h3>
+                        <div className="text-sm text-[#8b6e5b] mt-1">{m.email}</div>
+                        <div className="text-sm text-gray-700 mt-1">{m.phone}</div>
+                        <div className="text-xs text-gray-400 mt-2">{formatDate(m.date)}</div>
+
+                        <div className="mt-4">
+                          <div className="bg-[#fbfbfb] border border-gray-100 rounded-lg p-4 text-gray-700">{m.message}</div>
+                        </div>
+
+                        <div className="mt-6 flex items-center gap-4">
+                          <button onClick={() => replyToMessage(m.id)} className="bg-[#A97C51] text-white px-5 py-3 rounded-md shadow-sm">Reply</button>
+                          <button onClick={() => markResolved(m.id)} className="px-5 py-3 rounded-md border border-[#d6c2aa] text-[#8b6e5b]">Mark as Resolved</button>
                         </div>
                       </div>
-                      <span
-                        className="inline-block px-3 py-1 rounded-full text-xs font-medium text-white"
-                        style={{ backgroundColor: "#A97C51" }}
-                      >
-                        {app.status.replace("_", " ").toUpperCase()}
-                      </span>
                     </div>
+                  </article>
+                ))
+              ) : (
+                // EMI applications view (original)
+                apps.map((a) => (
+                  <article key={a.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-50">
+                    <div className="relative">
+                      <div className="absolute right-6 top-6">
+                        {/* Status badge styles tweaked to match mock: rounded-2xl, uppercase, subtle border and background per status */}
+                        <span className={`inline-flex items-center justify-center px-4 py-1.5 rounded-2xl text-[13px] font-semibold uppercase tracking-wide ${a.status === 'PENDING' ? 'bg-[#FFF7E6] text-[#A97C51] border border-[#F5DEC9]' : a.status === 'APPROVED' ? 'bg-[#E8F9F2] text-[#0E9B7A] border border-[#DFF3EA]' : 'bg-slate-100 text-slate-700'}`}>
+                          {a.status}
+                        </span>
+                      </div>
+                      <div className="w-full">
+                        <div className="flex gap-6">
+                          <div className="w-2/3">
+                            <h4 className="text-[20px] font-playfair text-[#13343B]">{a.name}</h4>
+                            <div className="text-sm text-[#8b6e5b] mt-2">
+                              <div className="flex items-center gap-3"><Mail size={14} /> <span>{a.email}</span></div>
+                              <div className="flex items-center gap-3 mt-1"><Phone size={14} /> <span>{a.phone}</span></div>
+                              <div className="flex items-center gap-3 mt-1"><Clock size={14} /> <span>{formatDate(a.date)}</span></div>
+                            </div>
+                          </div>
+                        </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">
-                          Total Amount
-                        </p>
-                        <p
-                          className="text-2xl font-semibold"
-                          style={{ color: "#A97C51" }}
-                        >
-                          {formatCurrency(app.totalAmount)}
-                        </p>
-                        <p className="text-sm text-gray-600 mt-1">
-                          Down Payment: {formatCurrency(app.downPayment)}
-                        </p>
+                        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="p-4 bg-white rounded-md border" style={{ borderColor: 'rgba(94,82,64,0.04)' }}>
+                            <div className="text-xs uppercase text-gray-400">Total Amount</div>
+                            <div className="text-lg font-bold mt-1 text-[#8b6e5b]">{a.total}</div>
+                            <div className="text-sm text-gray-500 mt-1">Down Payment: {a.down}</div>
+                          </div>
+                          <div className="p-4 bg-white rounded-md border" style={{ borderColor: 'rgba(94,82,64,0.04)' }}>
+                            <div className="text-xs uppercase text-gray-400">Monthly EMI</div>
+                            <div className="text-lg font-bold text-[#8b6e5b] mt-1">{a.emi}</div>
+                            <div className="text-sm text-gray-500 mt-1">Tenure: {a.tenure}</div>
+                          </div>
+                          <div className="p-4 bg-white rounded-md border" style={{ borderColor: 'rgba(94,82,64,0.04)' }}>
+                            <div className="text-xs uppercase text-gray-400">Monthly Income</div>
+                            <div className="text-lg font-bold mt-1 text-[#8b6e5b]">{a.income}</div>
+                            <div className="text-sm text-gray-500 mt-1">{a.employment}</div>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">
-                          Monthly EMI
-                        </p>
-                        <p
-                          className="text-2xl font-semibold"
-                          style={{ color: "#A97C51" }}
-                        >
-                          {formatCurrency(app.calculatedEMI)}
-                        </p>
-                        <p className="text-sm text-gray-600 mt-1">
-                          Tenure: {app.emiTenure} months
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">
-                          Monthly Income
-                        </p>
-                        <p
-                          className="text-2xl font-semibold"
-                          style={{ color: "#A97C51" }}
-                        >
-                          {formatCurrency(app.monthlyIncome)}
-                        </p>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {app.employmentType}
-                        </p>
+
+                      <div className="flex justify-end mt-6">
+                        <button onClick={() => toggleStatus(a.id)} className="bg-[#A97C51] text-white px-4 py-2 rounded-md shadow-sm">Update Status</button>
                       </div>
                     </div>
-                    <div className="mt-6 pt-6 border-t flex justify-end">
-                      <button
-                        onClick={() => {
-                          setSelectedApp(app);
-                          setUpdateStatus(app.status);
-                          setUpdateAdminNotes(app.adminNotes || "");
-                        }}
-                        className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
-                      >
-                        Update Status
-                      </button>
-                    </div>
-                  </div>
+                  </article>
                 ))
               )}
             </div>
-            {emiTotal > limit && (
-              <div className="flex items-center justify-between mt-8 pt-6 border-t">
-                <p className="text-sm text-gray-600">
-                  Showing {(emiPage - 1) * limit + 1} to{" "}
-                  {Math.min(emiPage * limit, emiTotal)} of {emiTotal}
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setEmiPage((p) => Math.max(1, p - 1))}
-                    disabled={emiPage === 1}
-                    className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium disabled:opacity-50 hover:border-gray-300"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => setEmiPage((p) => p + 1)}
-                    disabled={emiPage * limit >= emiTotal}
-                    className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium disabled:opacity-50 hover:border-gray-300"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
-        )}
-
-        {activeTab === "contact" && (
-          <div>
-            <div className="space-y-4">
-              {loading ? (
-                <div className="flex items-center justify-center py-20">
-                  <div className="text-center">
-                    <div
-                      className="w-10 h-10 border-3 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-                      style={{
-                        borderColor: "#A97C51",
-                        borderTopColor: "transparent",
-                        borderWidth: "3px",
-                      }}
-                    />
-                    <p className="text-gray-500">Loading...</p>
-                  </div>
-                </div>
-              ) : contactMessages.length === 0 ? (
-                <div className="text-center py-20 border border-dashed border-gray-300 rounded-lg">
-                  <div className="text-6xl mb-4">📭</div>
-                  <p className="text-gray-500 text-lg mb-2">No messages yet</p>
-                  <p className="text-gray-400 text-sm">
-                    Contact form submissions will appear here
-                  </p>
-                </div>
-              ) : (
-                contactMessages.map((message) => (
-                  <div
-                    key={message._id}
-                    className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer"
-                  >
-                    {/* Header */}
-                    <div className="flex justify-between items-start mb-4 pb-4 border-b">
-                      <div>
-                        <h3 className="text-xl font-serif text-black mb-2">
-                          {message.name}
-                        </h3>
-                        <div className="space-y-1 text-sm text-gray-600">
-                          <p className="flex items-center gap-2">
-                            <span>📧</span>
-                            {message.email}
-                          </p>
-                          {message.number && (
-                            <p className="flex items-center gap-2">
-                              <span>📞</span>
-                              {message.number}
-                            </p>
-                          )}
-                          {message.address && (
-                            <p className="flex items-center gap-2">
-                              <span>📍</span>
-                              {message.address}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                          {formatDate(message.createdAt)}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Message Preview */}
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-sm leading-relaxed text-gray-700 line-clamp-3">
-                        {message.description}
-                      </p>
-                    </div>
-
-                    {/* Quick Actions */}
-                    <div className="flex justify-between items-center mt-4 pt-4 border-t">
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <span>ID: {message._id}</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <a
-                          href={`mailto:${message.email}`}
-                          className="px-3 py-1 bg-[#A97C51] text-white text-xs rounded hover:bg-[#8b6e5b] transition-colors"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          Reply
-                        </a>
-                        {message.number && (
-                          <a
-                            href={`tel:${message.number}`}
-                            className="px-3 py-1 border border-gray-300 text-gray-700 text-xs rounded hover:bg-gray-50 transition-colors"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            Call
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {/* Pagination */}
-            {contactTotal > limit && (
-              <div className="flex items-center justify-between mt-8 pt-6 border-t">
-                <p className="text-sm text-gray-600">
-                  Showing {(contactPage - 1) * limit + 1} to{" "}
-                  {Math.min(contactPage * limit, contactTotal)} of{" "}
-                  {contactTotal}
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setContactPage((p) => Math.max(1, p - 1))}
-                    disabled={contactPage === 1}
-                    className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:border-gray-300 transition-colors"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => setContactPage((p) => p + 1)}
-                    disabled={contactPage * limit >= contactTotal}
-                    className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:border-gray-300 transition-colors"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "products" && (
-          <ProductListing totalProducts={stats.totalProducts} />
-        )}
-        {activeTab === "order" && <OrderListing />}
-        {activeTab === "category" && <CategoryListing />}
+        </section>
       </div>
 
-      {selectedApp && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-2xl w-full max-w-md">
-            <div className="p-6 border-b">
-              <h3 className="text-lg text-black font-serif">
-                Update Application Status
-              </h3>
-              <p className="text-sm text-gray-500">
-                {selectedApp.fullName} - {selectedApp._id}
-              </p>
-            </div>
-            <form onSubmit={handleStatusUpdate}>
-              <div className="p-6 space-y-4">
-                <div>
-                  <label
-                    htmlFor="status"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Status
-                  </label>
-                  <select
-                    id="status"
-                    value={updateStatus}
-                    onChange={(e) =>
-                      setUpdateStatus(
-                        e.target.value as EMIApplication["status"]
-                      )
-                    }
-                    className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-[#A97C51]"
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="under_review">Under Review</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                  </select>
-                </div>
-                <div>
-                  <label
-                    htmlFor="adminNotes"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Admin Notes
-                  </label>
-                  <textarea
-                    id="adminNotes"
-                    value={updateAdminNotes}
-                    onChange={(e) => setUpdateAdminNotes(e.target.value)}
-                    rows={4}
-                    className="w-full px-3 py-2 border placeholder:text-gray-700 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-[#A97C51]"
-                    placeholder="Add notes for the applicant..."
-                  />
-                </div>
-              </div>
-              <div className="p-6 bg-gray-50 rounded-b-lg flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedApp(null)}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-800 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isUpdating}
-                  className="px-4 py-2 border rounded-lg text-sm font-medium text-white shadow-sm disabled:opacity-70"
-                  style={{ backgroundColor: "#A97C51" }}
-                >
-                  {isUpdating ? "Updating..." : "Update & Notify"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {notification && (
-        <div
-          className="fixed bottom-5 right-5 z-50 px-6 py-4 rounded-lg shadow-lg text-white"
-          style={{
-            backgroundColor:
-              notification.type === "success" ? "#10B981" : "#EF4444",
-          }}
-        >
-          {notification.message}
-        </div>
-      )}
+      {/* Floating chat button */}
+      <button className="fixed bottom-6 right-6 bg-black text-white px-4 py-3 rounded-full shadow-lg transform hover:scale-105 flex items-center gap-3">
+        <span className="w-8 h-8 bg-[#08c9c9] rounded-full flex items-center justify-center">
+          <MessageSquare size={16} color="#002" />
+        </span>
+        <span className="hidden sm:inline">Talk with Us</span>
+      </button>
+      
+      {/* Footer (match site-wide footer) */}
+      <Footer />
     </div>
   );
 }
