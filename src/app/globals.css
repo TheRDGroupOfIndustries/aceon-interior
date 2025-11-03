@@ -1,24 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Prata&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700;800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
+  --card: #ffffff;
+  --primary: #B98663;
+  --primary-hover: #A97452;
+  --font-playfair: "Playfair Display", "serif";
+  --font-prata: "Prata", "serif";
+  --font-poppins: "Poppins", "sans-serif";
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-playfair: "Playfair Display", "serif";
-  --font-prata:"Prata", "serif";
-  --font-poppins: "Poppins", "sans-serif";
+  --font-sans: var(--font-poppins);
+  --font-mono: monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -35,10 +34,41 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-poppins);
   overflow-x: hidden;
+}
+
+/* Utility class to apply the Playfair Display serif where needed */
+.font-playfair, h1, h2, h3 {
+  font-family: var(--font-playfair);
 }
 
 button{
   cursor: pointer;
+}
+
+/* Deactivate button style used in admin product controls */
+.btn-deactivate {
+  --btn-brown: #A97C51;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.5rem;
+  border: 2px solid var(--btn-brown);
+  color: var(--btn-brown);
+  background: transparent;
+  font-weight: 600;
+  transition: background-color 150ms ease, color 150ms ease, transform 120ms ease;
+}
+.btn-deactivate:hover {
+  background: var(--btn-brown);
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Footer hover/active look as a utility in case needed elsewhere */
+.footer-hovered {
+  background-color: #A97C51 !important;
+  color: white !important;
 }

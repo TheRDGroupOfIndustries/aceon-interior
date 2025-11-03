@@ -185,7 +185,7 @@ const Footer: React.FC = () => {
 
   return (
     <motion.footer
-      className="bg-[#B09579] text-white py-12 px-4 sm:px-6 lg:px-8 font-sans text-base leading-relaxed"
+      className="bg-[#A97C51] text-white py-12 px-4 sm:px-6 lg:px-8 font-sans text-base leading-relaxed footer-hovered"
       ref={footerRef}
       initial="hidden"
       animate={isFooterInView ? "visible" : "hidden"}
