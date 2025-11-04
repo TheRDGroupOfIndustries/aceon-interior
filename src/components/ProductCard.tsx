@@ -40,7 +40,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
         <div className="h-[250px] w-full overflow-hidden">
           <Image
             fill={true}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover "
             src={product.media.main_image} // Placeholder path
             alt={product.name}
           />

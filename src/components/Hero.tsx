@@ -78,7 +78,7 @@ function Elements() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="hidden md:flex w-full h-10 mt-8 pl-32  items-center gap-10 px-8"
+          className="hidden md:flex w-full h-10 mt-8 pl-48  items-center gap-10 px-8"
         >
           {links.map((items, i) => (
             <motion.div
@@ -328,8 +328,8 @@ function Elements() {
 
 function Hero() {
   return (
-    <div className="w-screen min-h-screen overflow-visible md:overflow-hidden grid place-items-center px-0 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-      <div className="w-full h-full md:h-auto md:aspect-[16/9] relative md:max-w-screen-xl">
+    <div className="w-screen min-h-screen overflow-visible md:overflow-hidden grid place-items-center px-0 sm:px-4 md:px-8 lg:px-14">
+      <div className="w-full h-full relative ">
         <Elements />
 
         <motion.div
@@ -342,7 +342,7 @@ function Hero() {
             src="/Rectangle 263.svg"
             alt="bg"
             fill
-            className="lg:scale-x-105 md:scale-x-103 object-cover md:object-contain"
+            className="object-cover object-center md:object-contain"
             priority
           />
         </motion.div>
@@ -361,7 +361,7 @@ function Hero() {
             alt="Aceon Interio"
             width={10}
             height={10}
-            className="w-full h-full object-contain md:ml-4 md:mt-1.5"
+            className="w-full h-full object-contain md:ml-10 md:mt-1.5"
           />
         </motion.div>
 
@@ -371,7 +371,7 @@ function Hero() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           whileHover={{ scale: 1.02 }}
-          className="w-full max-w-[15.5rem] sm:max-w-[20rem] md:max-w-[21.5rem] h-14 absolute right-4 md:right-[-23] top-5.5  hidden sm:flex justify-center items-center cursor-pointer"
+          className="w-full max-w-[15.5rem] sm:max-w-[20rem] md:max-w-[23.5rem] h-14 absolute right-6 md:right-[-0] top-3 hidden sm:flex justify-center items-center cursor-pointer"
         >
           <Image
             src="/buildrectangle.svg"

@@ -36,6 +36,10 @@ const MessageSchema: Schema = new Schema(
       required: [true, 'Description is required'],
       trim: true,
     },
+    reply: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true, 

@@ -11,7 +11,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   AlertDialog,
@@ -24,7 +24,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
-import { deleteProduct } from "@/redux/features/productSlice";
+import { deleteProduct, fetchProducts } from "@/redux/features/productSlice";
 import ProductForm from "../ProductForm";
 
 // --- Utility Functions ---
@@ -72,7 +72,7 @@ const ProductDetailsModal = ({ product, onClose }) => {
       onClick={onClose}
     >
       <div
-        className="bg-white  shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto transform transition-all"
+        className="bg-white shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto transform transition-all"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 bg-white p-6 border-b flex justify-between items-center z-10">
@@ -239,73 +239,71 @@ const ProductDetailsModal = ({ product, onClose }) => {
   );
 };
 
-export default function ProductListing({
-  totalProducts,
-}: {
-  totalProducts: number;
-}) {
+export default function ProductListing() {
   const { products, loading, pagination } = useSelector(
     (state: RootState) => state.product
   );
+  const [categories, setCategories] = useState([])
   const [createForm, setCreateForm] = useState(false);
   const [editForm, setEditForm] = useState(null);
 
   const dispatch = useDispatch();
 
+  const fetchCategories = async ()=> {
+    try {
+      const res = await fetch("/api/category", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      const data = await res.json()
+      setCategories(data.data);
+      console.log(data)
+      
+    } catch (error) {
+      console.log("Error Fetching Categories...", error)
+      
+    }
+  }
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
   const allCategories = useMemo(() => {
     const cats = new Set(products.map((p) => p.category));
     return ["All Categories", ...Array.from(cats)];
   }, [products]);
-
+  
   const [query, setQuery] = useState({
     page: 1,
-    limit: 5, // Keep limit low for demonstration
+    limit: 12,
     search: "",
     category: "",
     sortBy: "createdAt",
     sortOrder: "desc",
   });
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [viewProduct, setViewProduct] = useState<IProduct | null>(null);
   const [deleting, setDeleting] = useState(null);
 
-  //  const { products, loading, pagination } = useProducts(query);
-
-  // Handlers for UI changes
+  useEffect(() => {
+    dispatch(fetchProducts(query) as any);
+  }, [query]);
+  
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setQuery((prev) => ({
       ...prev,
       [name]: value === "All Categories" ? "" : value,
-      page: 1, // Reset to page 1 on filter change
+      page: 1,
     }));
-  };
-
-  const handleSearchChange = (e) => {
-    // Debounce logic would go here in a real app
-    setQuery((prev) => ({ ...prev, search: e.target.value, page: 1 }));
   };
 
   const handlePaginationChange = (newPage) => {
     setQuery((prev) => ({ ...prev, page: newPage }));
   };
 
-  // Simulated CRUD Actions
-  const handleCreate = () => {
-    // In a real app, open a creation form modal/page
-    console.log("Action: Create new product triggered.");
-    window.alert("Simulated: Navigating to Product Creation Form.");
-  };
-
-  const handleEdit = (product) => {
-    // In a real app, open an editing form modal/page pre-filled with product data
-    console.log(`Action: Edit product ${product.name}`);
-    window.alert(`Simulated: Opening Edit Form for SKU: ${product.sku}`);
-  };
-
   const handleDelete = async (id) => {
-    // In a real app, this would be an API call (DELETE)
-    console.log(`Action: Deleting product ${id}`);
     setDeleting(id);
     await dispatch(deleteProduct(id) as any)
       .unwrap()
@@ -314,216 +312,197 @@ export default function ProductListing({
       });
   };
 
-  // --- Render Content ---
-  const renderTableContent = () => {
+  const renderProductCards = () => {
     if (loading) {
       return (
-        <tr>
-          <td colSpan={7} className="p-8 text-center text-gray-500">
-            Loading products...
-          </td>
-        </tr>
+        <div className="col-span-full flex justify-center items-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-amber-800" />
+          <span className="ml-3 text-gray-500">Loading products...</span>
+        </div>
       );
     }
 
     if (products.length === 0) {
       return (
-        <tr>
-          <td colSpan={7} className="p-8 text-center text-gray-500">
-            No products found matching your criteria.
-          </td>
-        </tr>
+        <div className="col-span-full text-center py-20 text-gray-500">
+          No products found matching your criteria.
+        </div>
       );
     }
 
     return products.map((product) => (
-      <tr key={product._id} className="hover:bg-gray-50 border-b">
-        <td className="p-4 text-sm">
-          <div className="h-[50px] w-[50px] bg-amber-400 rounded-sm overflow-hidden">
-            <Image
-              src={product.media.main_image}
-              alt={product.name}
-              width={50}
-              height={50}
-              className="rounded-sm object-cover h-full w-full "
-              onError={(e: any) => {
-                e.target.onerror = null;
-                e.target.src =
-                  "https://placehold.co/50x50/e0e0e0/505050?text=No+Image";
-              }}
-            />
+      <div
+        key={product._id}
+        className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 flex flex-col"
+      >
+        {/* Product Image Section */}
+        <div className="relative h-64 bg-gray-100">
+          <Image
+            src={product.media.main_image}
+            alt={product.name}
+            fill
+            className="object-cover hover:scale-105 transition-transform duration-300"
+            onError={(e: any) => {
+              e.target.onerror = null;
+              e.target.src =
+                "https://placehold.co/400x300/e0e0e0/505050?text=No+Image";
+            }}
+          />
+          {/* Category Badge */}
+          <span className="absolute top-3 left-3 bg-amber-800 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">
+            {product.category}
+          </span>
+          {/* Status Badge */}
+          <span
+            className={`absolute top-3 right-3 text-xs font-semibold px-3 py-1 rounded-full shadow ${
+              product.stock.available_quantity > 0
+                ? "bg-green-500 text-white"
+                : "bg-red-500 text-white"
+            }`}
+          >
+            {product.stock.available_quantity > 0 ? "In Stock" : "Out of Stock"}
+          </span>
+          {/* SKU Badge */}
+          <span className="absolute bottom-3 left-3 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
+            SKU: {product.sku}
+          </span>
+        </div>
+
+        {/* Product Details Section */}
+        <div className="p-5 flex-1 flex flex-col">
+          <h3 className="text-lg font-bold text-gray-900 line-clamp-2 min-h-[3.5rem] capitalize leading-tight">
+            {product.name}
+          </h3>
+
+          {/* Price and Stock Row */}
+          <div className="flex justify-between items-center mb-1">
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold text-amber-800">
+                {formatPrice(product.pricing.current_price)}
+              </span>
+              {product.pricing.is_on_sale && (
+                <span className="text-sm text-gray-500 line-through">
+                  {formatPrice(product.pricing.original_price)}
+                </span>
+              )}
+            </div>
+            <span
+              className={`text-sm font-semibold px-3 py-1 rounded-full ${
+                product.stock.available_quantity > 0
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+              }`}
+            >
+              Stock: {product.stock.available_quantity}
+            </span>
           </div>
-        </td>
-        <td className="p-4 text-sm font-medium text-gray-900 truncate max-w-[150px]">
-          <span>{product.name}</span>
-        </td>
-        <td className="p-4 text-sm text-gray-600">{product.sku}</td>
-        <td className="p-4 text-sm text-gray-600">{product.category}</td>
-        <td className="p-4 text-sm font-semibold">
-          {formatPrice(product.pricing.current_price)}
-        </td>
-        <td className="p-4 text-sm text-gray-600">
-          {product.stock.available_quantity}
-        </td>
-        <td className="p-4 text-sm text-gray-600">
-          {product.reviews.average_rating.toFixed(1) || 0} (
-          {product.reviews.rating_count || 0})
-        </td>
-        <td className="p-4 text-sm">
-          <div className="flex space-x-2">
+
+          {/* Rating */}
+          <div className="flex items-center mb-2 text-sm text-gray-600">
+            <span className="text-yellow-500 mr-1">★</span>
+            <span className="font-medium">
+              {product.reviews.average_rating.toFixed(1) || 0}
+            </span>
+            <span className="ml-1">
+              ({product.reviews.rating_count || 0} reviews)
+            </span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2 mt-auto">
             <button
               onClick={() => setViewProduct(product)}
-              className="text-amber-600 hover:text-amber-800 p-1 rounded-md transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-200 text-blue-700 text-sm font-semibold rounded-lg hover:bg-blue-300 transition-colors"
               title="View Details"
             >
-              <EyeIcon className="w-5 h-5" />
+              <EyeIcon className="w-4 h-4" />
+              {/* View */}
             </button>
             <button
               onClick={() => setEditForm(product)}
-              className="text-blue-600 hover:text-blue-800 p-1 rounded-md transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-amber-200 text-amber-700 text-sm font-semibold rounded-lg hover:bg-amber-300 transition-colors"
               title="Edit Product"
             >
-              <PencilIcon className="w-5 h-5" />
+              <PencilIcon className="w-4 h-4" />
+              {/* Edit */}
             </button>
-            {/* <button
-              onClick={() => handleDelete(product)}
-              className="text-red-600 hover:text-red-800 p-1 rounded-md transition-colors"
-              title="Delete Product"
-            >
-              <TrashIcon className="w-5 h-5" />
-            </button> */}
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                {/* <button
-                type=""
-                  className="text-red-600 hover:text-red-800 p-1 rounded-md transition-colors"
+                <button
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-200 text-red-700 text-sm font-semibold rounded-lg hover:bg-red-300 transition-colors disabled:opacity-50"
+                  disabled={deleting === product._id}
                   title="Delete Product"
                 >
-                </button> */}
-                {deleting === product._id ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <TrashIcon className="w-5 h-5" />
-                )}
+                  {deleting === product._id ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <TrashIcon className="w-4 h-4" />
+                      {/* Delete */}
+                    </>
+                  )}
+                </button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="bg-white">
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
                     This action cannot be undone. This will permanently delete
-                    this product from the database. Are you absolutely sure?
+                    this product from the database.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => handleDelete(product._id)}>
+                  <AlertDialogAction
+                    onClick={() => handleDelete(product._id)}
+                    className="bg-red-600 text-white hover:bg-red-700"
+                  >
                     Delete
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            {/* Deactivate / Activate button - styled to match admin mock */}
-            <button
-              onClick={() => window.alert(`Toggled active state for ${product.name} (simulated)`)}
-              className="ml-2 btn-deactivate"
-              title="Deactivate"
-            >
-              Deactivate
-            </button>
           </div>
-        </td>
-      </tr>
+        </div>
+      </div>
     ));
   };
 
   return (
     <div className="">
-      {/* Product Listing Title and Actions */}
-      <div className="flex justify-between items-center mb-6">
+      {/* Header with Filter and Add Button */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-6">
         <select
           name="category"
           value={query.category}
           onChange={handleFilterChange}
-          className="p-3 border border-gray-300 rounded-lg w-full sm:w-1/4 focus:ring-amber-500 focus:border-amber-500"
+          className="p-3 border bg-white border-gray-300 rounded-lg w-full sm:w-1/4 focus:ring-amber-500 focus:border-amber-500"
         >
-          {allCategories.map((cat) => (
-            <option key={cat} value={cat === "All Categories" ? "" : cat}>
-              {cat}
+          <option value={""}>
+            All 
+          </option>
+          {categories.map((cat) => (
+            <option key={cat.slug} value={cat.name}>
+              {cat.name}
             </option>
           ))}
         </select>
         <button
           onClick={() => setCreateForm(true)}
-          className="flex items-center space-x-2 px-4 py-2 bg-amber-800 text-white font-semibold rounded-lg shadow-md hover:bg-amber-900 transition-colors"
+          className="flex items-center justify-center space-x-2 px-4 py-2 bg-amber-800 text-white font-semibold rounded-lg shadow-md hover:bg-amber-900 transition-colors w-full sm:w-auto"
         >
           <PlusIcon className="w-5 h-5" />
           <span>Add New Product</span>
         </button>
       </div>
 
-      {/* Filters and Search */}
-      <div className="mb-6 flex flex-col sm:flex-row gap-4">
-        {/* <input
-          type="text"
-          name="search"
-          placeholder="Search by name or SKU..."
-          value={query.search}
-          onChange={handleSearchChange}
-          className="p-3 border border-gray-300 rounded-lg w-full sm:w-1/3 focus:ring-amber-500 focus:border-amber-500"
-        /> */}
-        {/* <select
-          name="category"
-          value={query.category}
-          onChange={handleFilterChange}
-          className="p-3 border border-gray-300 rounded-lg w-full sm:w-1/4 focus:ring-amber-500 focus:border-amber-500"
-        >
-          {allCategories.map((cat) => (
-            <option key={cat} value={cat === "All Categories" ? "" : cat}>
-              {cat}
-            </option>
-          ))}
-        </select> */}
-      </div>
-
-      {/* Products Table */}
-      <div className="bg-white rounded-xl shadow-lg overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Image
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Product Name
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                SKU
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Category
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Price
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Stock
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Rating
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {renderTableContent()}
-          </tbody>
-        </table>
+      {/* Products Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+        {renderProductCards()}
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-between items-center mt-6 p-4 bg-white rounded-xl shadow-md">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 bg-white rounded-xl shadow-md">
         <span className="text-sm text-gray-700">
           Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
           {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
@@ -533,7 +512,7 @@ export default function ProductListing({
           <button
             onClick={() => handlePaginationChange(pagination.page - 1)}
             disabled={!pagination.hasPrev || loading}
-            className="px-4 py-2 text-sm font-semibold rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-semibold rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
@@ -543,7 +522,7 @@ export default function ProductListing({
           <button
             onClick={() => handlePaginationChange(pagination.page + 1)}
             disabled={!pagination.hasNext || loading}
-            className="px-4 py-2 text-sm font-semibold rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-semibold rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>

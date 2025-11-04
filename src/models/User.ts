@@ -13,6 +13,7 @@ const UserSchema = new Schema(
     // Additional fields for app-specific data
     role: { type: String, enum: ["user", "admin"], default: "user" },
     orders: [{ type: Schema.Types.ObjectId, ref: "Order" }], // Reference to user's orders
+    messages: [{ type: Schema.Types.ObjectId, ref: "Message" }], // Reference to user's messages
   },
   { timestamps: true }
 );

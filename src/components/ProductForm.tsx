@@ -1011,8 +1011,8 @@ const ProductForm = ({
     : "Create New Product";
 
   return (
-    <div className="fixed inset-0 min-h-screen flex items-center justify-center bg-background">
-      <div className="bg-background h-[80vh] overflow-y-auto p-6 md:p-10 rounded-xl shadow-2xl w-5xl mx-auto">
+    <div className="fixed bg-gray-800/20 backdrop-blur-md inset-0 min-h-screen flex items-center justify-center bg-background z-20">
+      <div className="bg-white h-[80vh] overflow-y-auto p-6 md:p-10 rounded-xl shadow-2xl w-6xl mx-auto">
         <h1 className="text-3xl font-extrabold text-amber-800 border-b pb-3 mb-6">
           {title}
         </h1>
@@ -1081,12 +1081,12 @@ const ProductForm = ({
             </button>
           </div>
         </form>
-        <div className="mt-8 p-4 bg-red-50 rounded-lg">
+        {/* <div className="mt-8 p-4 bg-red-50 rounded-lg">
           <h3 className="font-semibold text-red-700">Validation Errors:</h3>
           <pre className="text-xs text-red-600 overflow-x-auto whitespace-pre-wrap">
             {JSON.stringify(errors, null, 2)}
           </pre>
-        </div>
+        </div> */}
       </div>
     </div>
   );
