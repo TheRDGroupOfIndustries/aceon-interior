@@ -229,13 +229,15 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="mt-4 flex gap-3 px-1 items-center">
-          <button className="px-6 py-3 rounded-2xl bg-[#A97C51] text-white font-medium shadow-sm">All</button>
-          <button className="px-5 py-3 rounded-2xl bg-white text-[#2b2b2b] border border-gray-200 shadow-sm">Pending</button>
-          <button className="px-5 py-3 rounded-2xl bg-white text-[#2b2b2b] border border-gray-200 shadow-sm">Under review</button>
-          <button className="px-5 py-3 rounded-2xl bg-white text-[#2b2b2b] border border-gray-200 shadow-sm">Approved</button>
-          <button className="px-5 py-3 rounded-2xl bg-white text-[#2b2b2b] border border-gray-200 shadow-sm">Rejected</button>
-        </div>
+        {activeTab === 'EMI' && (
+          <div className="mt-4 flex gap-3 px-1 items-center">
+            <button className="px-6 py-3 rounded-2xl bg-[#A97C51] text-white font-medium shadow-sm">All</button>
+            <button className="px-5 py-3 rounded-2xl bg-white text-[#2b2b2b] border border-gray-200 shadow-sm">Pending</button>
+            <button className="px-5 py-3 rounded-2xl bg-white text-[#2b2b2b] border border-gray-200 shadow-sm">Under review</button>
+            <button className="px-5 py-3 rounded-2xl bg-white text-[#2b2b2b] border border-gray-200 shadow-sm">Approved</button>
+            <button className="px-5 py-3 rounded-2xl bg-white text-[#2b2b2b] border border-gray-200 shadow-sm">Rejected</button>
+          </div>
+        )}
 
         {/* Content area: either Applications or Contact Messages depending on active tab */}
         <section className="mt-6">
