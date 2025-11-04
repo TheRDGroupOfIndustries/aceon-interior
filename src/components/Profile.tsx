@@ -9,6 +9,10 @@ import {
   MinusCircleIcon,
   ShoppingBag,
   UserIcon,
+  Lock,
+  Wrench,
+  Heart,
+  Users,
   X,
   LogOut, // Added LogOut icon for the logout button
 } from "lucide-react";
@@ -220,21 +224,107 @@ const Profile = () => {
   // --- Tab Content Components ---
 
   const ProfileDetailsTab = ({ data }) => (
-    <div className="space-y-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
-      <h2 className="text-3xl font-bold font-serif text-[#A97C51] mb-4 border-b pb-3">
-        Account Information
-      </h2>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Center column: Account Overview + Quick Actions */}
+      <div className="lg:col-span-2 space-y-6">
+        {/* Account Overview */}
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Account Overview</h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <InfoCard title="User Id" value={data?.user.id} />
-        <InfoCard title="Full Name" value={data?.user.name} />
-        <InfoCard title="Email Address" value={data?.user.email} />
-        {/* Removed placeholder phone card */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
+              <Lock className="w-6 h-6 text-[#A97C51] mb-2" />
+              <div className="text-3xl md:text-4xl font-extrabold font-serif text-[#010100]">{orders?.length ?? 0}</div>
+              <div className="text-sm text-gray-500 mt-1">Total Orders</div>
+            </div>
+
+            <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
+              <Wrench className="w-6 h-6 text-[#A97C51] mb-2" />
+              <div className="text-3xl md:text-4xl font-extrabold font-serif text-gray-800">2</div>
+              <div className="text-sm text-gray-500 mt-1">Active Projects</div>
+            </div>
+
+            <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
+              <Heart className="w-6 h-6 text-[#A97C51] mb-2" />
+              <div className="text-3xl md:text-4xl font-extrabold font-serif text-gray-800">8</div>
+              <div className="text-sm text-gray-500 mt-1">Saved Items</div>
+            </div>
+
+            <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
+              <Users className="w-6 h-6 text-[#A97C51] mb-2" />
+              <div className="text-3xl md:text-4xl font-extrabold font-serif text-gray-800">3</div>
+              <div className="text-sm text-gray-500 mt-1">Consultations</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm">
+              <div className="w-10 h-10 rounded-md bg-blue-50 flex items-center justify-center text-blue-600">🛒</div>
+              <div className="text-left">
+                <div className="font-semibold">Browse Products</div>
+                <div className="text-sm text-gray-500">Explore our latest furniture collection</div>
+              </div>
+            </button>
+
+            <button className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm">
+              <div className="w-10 h-10 rounded-md bg-green-50 flex items-center justify-center text-green-600">📅</div>
+              <div className="text-left">
+                <div className="font-semibold">Book Consultation</div>
+                <div className="text-sm text-gray-500">Schedule a free interior design consultation</div>
+              </div>
+            </button>
+
+            <button className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm">
+              <div className="w-10 h-10 rounded-md bg-orange-50 flex items-center justify-center text-orange-600">🚚</div>
+              <div className="text-left">
+                <div className="font-semibold">Track Orders</div>
+                <div className="text-sm text-gray-500">Check the status of your recent orders</div>
+              </div>
+            </button>
+
+            <button className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm">
+              <div className="w-10 h-10 rounded-md bg-purple-50 flex items-center justify-center text-purple-600">🖼️</div>
+              <div className="text-left">
+                <div className="font-semibold">Design Gallery</div>
+                <div className="text-sm text-gray-500">View our portfolio of completed projects</div>
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* <button className="px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover transition-colors">
-        Edit Profile
-      </button> */}
+      {/* Right column: Account Information */}
+      <aside className="space-y-6">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Account Information</h3>
+
+          <div className="space-y-3">
+            <label className="block text-xs text-gray-500">USER ID</label>
+            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700 break-all">{data?.user?.id ?? data?.user?.sub ?? "-"}</div>
+
+            <label className="block text-xs text-gray-500">FULL NAME</label>
+            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700">{data?.user?.name ?? "-"}</div>
+
+            <label className="block text-xs text-gray-500">EMAIL ADDRESS</label>
+            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700">{data?.user?.email ?? "-"}</div>
+
+            <label className="block text-xs text-gray-500">PHONE NUMBER</label>
+            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700">{data?.user?.phone ?? "-"}</div>
+
+            <label className="block text-xs text-gray-500">ADDRESS</label>
+            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700">{data?.user?.address ?? "-"}</div>
+          </div>
+
+          <div className="mt-6">
+            <button className="w-full py-2 rounded-md bg-[#A97C51] text-white font-semibold">Edit Profile</button>
+          </div>
+        </div>
+      </aside>
     </div>
   );
 
