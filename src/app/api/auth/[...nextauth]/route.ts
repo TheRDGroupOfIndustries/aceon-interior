@@ -87,6 +87,12 @@ export const authOptions: AuthOptions = {
         const dbUser = await User.findOne({ email: user.email });
         token.role = dbUser?.role || "user";
         token.sub = dbUser?._id.toString() || token.sub;
+        token.email = dbUser.email;
+        token.name = dbUser.name;
+        token.image = dbUser.image;
+        token.phone = dbUser.phone;
+        token.address = dbUser.address;
+
       }
       return token;
     },
@@ -97,14 +103,14 @@ export const authOptions: AuthOptions = {
       if (dbUser) {
         session.user.id = dbUser._id.toString();
         session.user.role = dbUser.role;
+        session.user.phone = dbUser.phone;
+        session.user.address = dbUser.address;
       }
       return session;
     },
 
     // Handle redirects after login
     async redirect({ url, baseUrl }) {
-      // The redirect callback doesn't get session data directly
-      // So we’ll just let client-side redirect handle it
       return baseUrl;
     },
   },

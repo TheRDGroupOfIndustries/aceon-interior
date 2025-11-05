@@ -1,7 +1,7 @@
-
 import React from "react";
 import { client } from "@/sanity/lib/sanity";
-import CreationCardClient from "./CreationCardClient"; 
+import CreationCardClient from "./CreationCardClient";
+import Link from "next/link";
 
 const getCreationsQuery = `*[_type == "creation"] | order(order asc) {
   title,
@@ -27,7 +27,7 @@ const Creations: React.FC = async () => {
           Best of our creations
         </h2>
         <div className="mt-10 sm:mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {creationsData.map((c: Creation) => (
+          {creationsData.slice(0, 3).map((c: Creation) => (
             <CreationCardClient
               key={c.slug}
               imageSrc={c.imageSrc}
@@ -36,6 +36,14 @@ const Creations: React.FC = async () => {
               slug={c.slug}
             />
           ))}
+        </div>
+        <div className="w-full flex justify-center mt-12">
+          <Link
+            href="/portfolio"
+            className="bg-[#A97C51] text-white font-semibold py-4 px-8 rounded-lg shadow-md hover:bg-[#9c724a] transition-colors duration-200 cursor-pointer"
+          >
+            View All Creations
+          </Link>
         </div>
       </div>
     </section>

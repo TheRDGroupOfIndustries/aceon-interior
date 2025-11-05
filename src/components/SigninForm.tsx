@@ -144,6 +144,7 @@ export default function SigninForm() {
             )}
           </button>
           <button
+            type="button"
             onClick={() => signIn("google")}
             className={`
                       w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-md font-semibold text-gray-700 

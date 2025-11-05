@@ -27,6 +27,7 @@ export default function Header() {
     { name: "Products", link: "/products" },
     { name: "About", link: "/#about" },
     { name: "Services", link: "/#services" },
+    { name: "Portfolio", link: "/portfolio" },
     { name: "Contact", link: "/#contact" },
   ]);
 
@@ -37,6 +38,7 @@ export default function Header() {
       { name: "Products", link: "/products" },
       { name: "About", link: "/#about" },
       { name: "Services", link: "/#services" },
+      { name: "Portfolio", link: "/portfolio" },
       { name: "Contact", link: "/#contact" },
     ];
 

@@ -11,64 +11,68 @@ import OrderListing from "@/components/admin/OrderListing";
 type Status = "PENDING" | "APPROVED" | "UNDER REVIEW" | "REJECTED";
 
 interface AppItem {
-  id: string;
-  name: string;
+  _id: string;
+  fullName: string;
   email: string;
-  phone: string;
-  date: string;
+  phoneNumber: string;
+  interiorPackage: string;
+  totalAmount: number;
+  emiTenure: number;
+  downPayment: number;
+  calculatedEMI: number;
+  monthlyIncome: number;
+  employmentType: string;
+  bankDetails: string;
+  agreeTerms: boolean;
+  agreeCreditCheck: boolean;
   status: Status;
-  total: string;
-  down: string;
-  emi: string;
-  tenure: string;
-  income: string;
-  employment: string;
+  createdAt: string;
 }
 
-const sampleApps: AppItem[] = [
-  {
-    id: "A1",
-    name: "Kitwishiii Kitwishiii",
-    email: "kitwishiiikitwishiii@gmail.com",
-    phone: "8628875654",
-    date: "2025-10-30T22:38:00",
-    status: "PENDING",
-    total: "₹50,000",
-    down: "₹8,000",
-    emi: "₹3,732",
-    tenure: "12 months",
-    income: "₹120,000",
-    employment: "Salaried",
-  },
-  {
-    id: "A2",
-    name: "Rahul Sharma",
-    email: "rahul.sharma@gmail.com",
-    phone: "9876543210",
-    date: "2025-10-29T14:15:00",
-    status: "APPROVED",
-    total: "₹75,000",
-    down: "₹15,000",
-    emi: "₹5,500",
-    tenure: "12 months",
-    income: "₹150,000",
-    employment: "Salaried",
-  },
-  {
-    id: "A3",
-    name: "Priya Patel",
-    email: "priya.patel@gmail.com",
-    phone: "9123456789",
-    date: "2025-10-28T11:20:00",
-    status: "UNDER REVIEW",
-    total: "₹35,000",
-    down: "₹5,000",
-    emi: "₹2,800",
-    tenure: "12 months",
-    income: "₹80,000",
-    employment: "Salaried",
-  },
-];
+// const sampleApps: AppItem[] = [
+//   {
+//     id: "A1",
+//     name: "Kitwishiii Kitwishiii",
+//     email: "kitwishiiikitwishiii@gmail.com",
+//     phone: "8628875654",
+//     date: "2025-10-30T22:38:00",
+//     status: "PENDING",
+//     total: "₹50,000",
+//     down: "₹8,000",
+//     emi: "₹3,732",
+//     tenure: "12 months",
+//     income: "₹120,000",
+//     employment: "Salaried",
+//   },
+//   {
+//     id: "A2",
+//     name: "Rahul Sharma",
+//     email: "rahul.sharma@gmail.com",
+//     phone: "9876543210",
+//     date: "2025-10-29T14:15:00",
+//     status: "APPROVED",
+//     total: "₹75,000",
+//     down: "₹15,000",
+//     emi: "₹5,500",
+//     tenure: "12 months",
+//     income: "₹150,000",
+//     employment: "Salaried",
+//   },
+//   {
+//     id: "A3",
+//     name: "Priya Patel",
+//     email: "priya.patel@gmail.com",
+//     phone: "9123456789",
+//     date: "2025-10-28T11:20:00",
+//     status: "UNDER REVIEW",
+//     total: "₹35,000",
+//     down: "₹5,000",
+//     emi: "₹2,800",
+//     tenure: "12 months",
+//     income: "₹80,000",
+//     employment: "Salaried",
+//   },
+// ];
 
 export default function AdminDashboard() {
   // Category state for demo interactivity
@@ -232,10 +236,21 @@ export default function AdminDashboard() {
   const [editProductId, setEditProductId] = useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [editStock, setEditStock] = useState<number>(0);
-  const [apps, setApps] = useState<AppItem[]>(sampleApps);
+  const [apps, setApps] = useState<AppItem[]>([]);
   const [curReplyMessage, setCurReplyMessage] = useState(null);
 
   const [messages, setMessages] = useState<ContactMsg[]>([]);
+
+  const fetchEmiApplications = async () => {
+    try {
+      const res = await fetch("/api/emi");
+      const resData = await res.json();
+      console.log("fetch emi success", resData);
+      setApps(resData.data.applications);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const fetchMessages = async () => {
     try {
@@ -249,6 +264,7 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
+    fetchEmiApplications();
     fetchMessages();
   }, []);
 
@@ -286,7 +302,8 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<
     "EMI" | "CONTACT" | "PRODUCTS" | "ORDERS" | "CATEGORY"
   >("EMI");
-  const [emiFilter, setEmiFilter] = useState<"ALL" | Status>("ALL");
+  const [emiFilter, setEmiFilter] = useState<"all" | Status>("all");
+  const [statusUpdating, setStatusUpdating] = useState(null);
 
   // refs to measure tab positions so we can render a centered indicator exactly under the active tab
   const tabsContainerRef = useRef<HTMLDivElement | null>(null);
@@ -358,9 +375,7 @@ export default function AdminDashboard() {
         const resData = await res.json();
         console.log("Reply to message: ", resData.data);
         setMessages((prev) =>
-          prev.map((m) =>
-            m._id === resData.data._id ? resData.data : m
-          )
+          prev.map((m) => (m._id === resData.data._id ? resData.data : m))
         );
         setCurReplyMessage(null);
       } catch (error) {
@@ -441,23 +456,38 @@ export default function AdminDashboard() {
     );
   };
 
-  const toggleStatus = (id: string) => {
+  const updateStatus = async (id: string, newStatus: Status) => {
+    console.log("updateStatus", id, newStatus.toLowerCase().replace(" ", "_"));
+    setStatusUpdating(id);
+    try {
+      const res = await fetch("/api/emi", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          applicationId: id,
+          status: newStatus.toLowerCase().replace(" ", "_"),
+        }),
+      });
+      const resData = await res.json();
+      console.log("update status success", resData);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setStatusUpdating(null);
+    }
+
     setApps((prev) =>
-      prev.map((a) => {
-        if (a.id !== id) return a;
-        // simple demo toggle: PENDING -> APPROVED, otherwise -> PENDING
-        const newStatus: Status =
-          a.status === "PENDING" ? "APPROVED" : "PENDING";
-        return { ...a, status: newStatus };
-      })
+      prev.map((a) => (a._id === id ? { ...a, status: newStatus } : a))
     );
   };
 
   // Utility function for viewing application details (currently unused but kept for future functionality)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const viewDetails = (id: string) => {
-    const app = apps.find((a) => a.id === id);
-    if (app) alert(`${app.name}\n${app.email}\nStatus: ${app.status}`);
+    const app = apps.find((a) => a._id === id);
+    if (app) alert(`${app.fullName}\n${app.email}\nStatus: ${app.status}`);
   };
 
   // const replyToMessage = (id: string) => {
@@ -521,7 +551,7 @@ export default function AdminDashboard() {
 
   // Filtered EMI applications
   const filteredApps =
-    emiFilter === "ALL" ? apps : apps.filter((a) => a.status === emiFilter);
+    emiFilter === "all" ? apps : apps.filter((a) => a.status === emiFilter);
 
   return (
     <div className={styles.pageRoot}>
@@ -599,7 +629,7 @@ export default function AdminDashboard() {
                 <span
                   className={`${styles.tabBadge} ${activeTab === "EMI" ? styles.tabBadgeActive : styles.tabBadgeInactive}`}
                 >
-                  3
+                  {filteredApps.length}
                 </span>
               </button>
               <button
@@ -678,53 +708,63 @@ export default function AdminDashboard() {
         {activeTab === "EMI" && (
           <>
             <div className={styles.filterRow}>
-              <button
-                onClick={() => setEmiFilter("ALL")}
-                className={`${styles.filterButton} ${emiFilter === "ALL" ? styles.filterButtonActive : styles.filterButtonInactive}`}
+              {/* <select
+                value={emiFilter}
+                onChange={(e) => setEmiFilter(e.target.value as Status | "ALL")}
+                className="px-6 py-3 rounded-2xl font-medium shadow-sm bg-white text-[#2b2b2b] border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#A97C51] focus:border-[#A97C51]"
               >
-                All
-              </button>
-              <button
-                onClick={() => setEmiFilter("PENDING")}
-                className={`px-5 py-3 rounded-2xl font-medium shadow-sm ${emiFilter === "PENDING" ? styles.filterButtonActive : styles.filterButtonInactive}`}
-              >
-                Pending
-              </button>
-              <button
-                onClick={() => setEmiFilter("UNDER REVIEW")}
-                className={`px-5 py-3 rounded-2xl font-medium shadow-sm ${emiFilter === "UNDER REVIEW" ? styles.filterButtonActive : styles.filterButtonInactive}`}
-              >
-                Under review
-              </button>
-              <button
-                onClick={() => setEmiFilter("APPROVED")}
-                className={`px-5 py-3 rounded-2xl font-medium shadow-sm ${emiFilter === "APPROVED" ? styles.filterButtonActive : styles.filterButtonInactive}`}
-              >
-                Approved
-              </button>
-              <button
-                onClick={() => setEmiFilter("REJECTED")}
-                className={`px-5 py-3 rounded-2xl font-medium shadow-sm ${emiFilter === "REJECTED" ? styles.filterButtonActive : styles.filterButtonInactive}`}
-              >
-                Rejected
-              </button>
+                <option value="ALL">All</option>
+                <option value="PENDING">Pending</option>
+                <option value="UNDER REVIEW">Under review</option>
+                <option value="APPROVED">Approved</option>
+                <option value="REJECTED">Rejected</option>
+              </select> */}
+              <div className="flex items-center gap-2 rounded-xl bg-white p-1.5 shadow-sm border border-gray-200">
+                {(
+                  [
+                    "ALL",
+                    "PENDING",
+                    "UNDER REVIEW",
+                    "APPROVED",
+                    "REJECTED",
+                  ] as const
+                ).map((status) => (
+                  <button
+                    key={status}
+                    onClick={() =>
+                      setEmiFilter(
+                        status.toLowerCase().replace(" ", "_") as Status
+                      )
+                    }
+                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 capitalize ${
+                      emiFilter === status
+                        ? "bg-[#A97C51] text-white shadow"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {status === "UNDER REVIEW"
+                      ? "Under Review"
+                      : status.toLowerCase()}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className={styles.emiCardContainer}>
               <div className="space-y-5">
                 {filteredApps.map((a) => (
-                  <article key={a.id} className={styles.emiCard}>
+                  <article key={a._id} className={styles.emiCard}>
                     <div className="relative">
                       <div className="absolute right-6 top-6">
                         <span
                           className={`${styles.emiStatus} ${a.status === "PENDING" ? styles.emiStatusPending : a.status === "APPROVED" ? styles.emiStatusApproved : styles.emiStatusOther}`}
                         >
-                          {a.status}
+                          {statusUpdating === a._id ? "Updating..." : a.status}
                         </span>
                       </div>
                       <div className="w-full">
                         <div className="flex gap-6">
                           <div className="w-2/3">
-                            <h4 className={styles.emiCardName}>{a.name}</h4>
+                            <h4 className={styles.emiCardName}>{a.fullName}</h4>
                             <div className={styles.emiCardInfo}>
                               <div className={styles.emiCardInfoRow}>
                                 <Mail size={14} /> <span>{a.email}</span>
@@ -732,13 +772,13 @@ export default function AdminDashboard() {
                               <div
                                 className={`${styles.emiCardInfoRow} ${styles.emiCardInfoRowMargin}`}
                               >
-                                <Phone size={14} /> <span>{a.phone}</span>
+                                <Phone size={14} /> <span>{a.phoneNumber}</span>
                               </div>
                               <div
                                 className={`${styles.emiCardInfoRow} ${styles.emiCardInfoRowMargin}`}
                               >
                                 <Clock size={14} />{" "}
-                                <span>{formatDate(a.date)}</span>
+                                <span>{formatDate(a.createdAt)}</span>
                               </div>
                             </div>
                           </div>
@@ -751,9 +791,11 @@ export default function AdminDashboard() {
                             <div className={styles.emiStatLabel}>
                               Total Amount
                             </div>
-                            <div className={styles.emiStatValue}>{a.total}</div>
+                            <div className={styles.emiStatValue}>
+                              {a.totalAmount}
+                            </div>
                             <div className={styles.emiStatSub}>
-                              Down Payment: {a.down}
+                              Down Payment: {a.downPayment}
                             </div>
                           </div>
                           <div
@@ -763,9 +805,11 @@ export default function AdminDashboard() {
                             <div className={styles.emiStatLabel}>
                               Monthly EMI
                             </div>
-                            <div className={styles.emiStatValue}>{a.emi}</div>
+                            <div className={styles.emiStatValue}>
+                              {a.calculatedEMI}
+                            </div>
                             <div className={styles.emiStatSub}>
-                              Tenure: {a.tenure}
+                              Tenure: {a.emiTenure}
                             </div>
                           </div>
                           <div
@@ -776,21 +820,27 @@ export default function AdminDashboard() {
                               Monthly Income
                             </div>
                             <div className={styles.emiStatValue}>
-                              {a.income}
+                              {a.monthlyIncome}
                             </div>
                             <div className={styles.emiStatSub}>
-                              {a.employment}
+                              {a.employmentType}
                             </div>
                           </div>
                         </div>
                       </div>
                       <div className={styles.updateStatusButton}>
-                        <button
-                          onClick={() => toggleStatus(a.id)}
+                        <select
+                          value={a.status}
+                          onChange={(e) =>
+                            updateStatus(a._id, e.target.value as Status)
+                          }
                           className={styles.updateStatusBtn}
                         >
-                          Update Status
-                        </button>
+                          <option value="PENDING">Pending</option>
+                          <option value="UNDER REVIEW">Under Review</option>
+                          <option value="APPROVED">Approved</option>
+                          <option value="REJECTED">Rejected</option>
+                        </select>
                       </div>
                     </div>
                   </article>
@@ -999,7 +1049,10 @@ export default function AdminDashboard() {
               ) : (
                 <div className="space-y-5">
                   {messages?.map((m, idx) => (
-                    <article key={m._id || m.id || idx} className={styles.contactCard}>
+                    <article
+                      key={m._id || m.id || idx}
+                      className={styles.contactCard}
+                    >
                       <div className="relative">
                         <div className={styles.contactStatus}>
                           <span
@@ -1017,7 +1070,7 @@ export default function AdminDashboard() {
                           </div>
                           <div className="mt-4">
                             <div className="mt-4 bg-[#fbfbfb] border border-gray-100 rounded-lg p-4 text-gray-700 flex items-center gap-4 ">
-                               {m.description}
+                              {m.description}
                             </div>
                             {m.reply && (
                               <div className="mt-4 bg-[#fbfbfb] border border-gray-100 rounded-lg p-4 text-gray-700 flex items-center gap-4 ">

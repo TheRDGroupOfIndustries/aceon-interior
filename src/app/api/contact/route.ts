@@ -242,11 +242,16 @@ export async function PUT(request: NextRequest) {
           <h2 style="color: #A97C51;">Thank You for Contacting Aceon Interio!</h2>
           <div style="background: #f9f9f9; padding: 20px; border-radius: 10px; border-left: 4px solid #A97C51;">
             <p>Dear <strong>${updatedMessage.name}</strong>,</p>
-            <p>Thank you for reaching out to us. We have received your message and will get back to you within 24-48 hours.</p>
+            <p>Thank you for reaching out to us.</p>
             
             <div style="margin: 20px 0; padding: 15px; background: white; border-radius: 5px;">
               <p style="margin: 0;"><strong>Your Message:</strong></p>
               <p style="margin: 10px 0 0 0; font-style: italic;">"${updatedMessage.description}"</p>
+            </div>
+
+            <div style="margin: 20px 0; padding: 15px; background: white; border-radius: 5px;">
+              <p style="margin: 0;"><strong>Reply for your message:</strong></p>              
+              <p style="margin: 10px 0 0 0;">"${reply}"</p>
             </div>
 
             <p><strong>Our Contact Information:</strong></p>
@@ -276,10 +281,7 @@ export async function PUT(request: NextRequest) {
     };
 
     // Send both emails
-    await Promise.all([
-      transporter.sendMail(adminMailOptions),
-      transporter.sendMail(senderMailOptions),
-    ]);
+    await transporter.sendMail(senderMailOptions);
 
     if (!updatedMessage) {
       return NextResponse.json(

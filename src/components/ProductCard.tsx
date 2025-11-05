@@ -34,7 +34,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
 
   return (
     // Outer Card Container: Rounded corners, shadow, max-width
-    <div className="bg-card rounded-xl overflow-hidden transition-transform duration-300 hover:scale-[1.01]">
+    <div className="bg-card rounded-xl shadow-md overflow-hidden transition-transform duration-300 hover:scale-[1.01]">
       {/* 1. Image and Save Badge */}
       <div className="relative">
         {/* Replace with your actual image component or Next.js Image component */}
@@ -61,7 +61,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
         {/* Category and Rating */}
         <div className="flex justify-between items-center mb-1">
           {/* Category Tag */}
-          <span className="text-sm font-medium font-playfair text-[#A97C51] bg-primary/20 px-3 py-1 rounded-md">
+          <span className="text-sm font-medium font-playfair bg-[#a97c5127] text-[#A97C51] bg-primary/20 px-3 py-1 rounded-md">
             {product.category}
           </span>
 

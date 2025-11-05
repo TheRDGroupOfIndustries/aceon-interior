@@ -14,13 +14,18 @@ import {
   Heart,
   Users,
   X,
-  LogOut, // Added LogOut icon for the logout button
+  LogOut,
+  MessageCircle, // Added LogOut icon for the logout button
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "./Header";
+import Link from "next/link";
+import EditProfileModal from "./EditProfileModal";
+import { FaBucket } from "react-icons/fa6";
+import { BsCash } from "react-icons/bs";
 
 // --- Modal Component for Order Details (Updated Styling) ---
 
@@ -192,14 +197,42 @@ const Profile = () => {
   const { orders } = useSelector((state: RootState) => state.order);
   const [selectedOrder, setSelectedOrder] = useState(null); // State for modal
   const [cancelling, setCancelling] = useState<null | string>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [updatingProfile, setUpdatingProfile] = useState(false);
+  const [userStats, setUserStats] = useState(null)
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
+
+  const fetchUserStats = async () => {
+    try {
+      const response = await fetch("/api/user/stats", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("User Stats:", data);
+        setUserStats(data);
+      } else {
+        const error = await response.json();
+        console.error("Error fetching user stats:", error);
+      }
+      
+    } catch (error) {
+      console.error("Error fetching user stats:", error);
+      
+    }
+  }
 
   useEffect(() => {
     if (!session?.user) return router.push("/auth/signin");
     dispatch(fetchUserOrders({}) as any);
+    fetchUserStats()
   }, [session]);
 
   const formatPrice = (price) =>
@@ -221,6 +254,44 @@ const Profile = () => {
     setCancelling(null);
   };
 
+  const handleEditProfile = async (formData) => {
+    setUpdatingProfile(true);
+    try {
+      const response = await fetch("/api/user", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Profile updated successfully:", data);
+        await update({
+          ...session,
+          user: {
+            ...session.user,
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            address: formData.address,
+          },
+        });
+        setIsEditModalOpen(false);
+        alert("Profile updated successfully!");
+      } else {
+        const error = await response.json();
+        alert(error.error || "Failed to update profile");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("An error occurred while updating your profile");
+    } finally {
+      setUpdatingProfile(false);
+    }
+  };
+
   // --- Tab Content Components ---
 
   const ProfileDetailsTab = ({ data }) => (
@@ -229,71 +300,111 @@ const Profile = () => {
       <div className="lg:col-span-2 space-y-6">
         {/* Account Overview */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Account Overview</h3>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">
+            Account Overview
+          </h3>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
-              <Lock className="w-6 h-6 text-[#A97C51] mb-2" />
-              <div className="text-3xl md:text-4xl font-extrabold font-serif text-[#010100]">{orders?.length ?? 0}</div>
+              <FaBucket className="w-6 h-6 text-[#A97C51] mb-2" />
+              <div className="text-3xl md:text-4xl font-extrabold font-serif text-[#010100]">
+                {userStats ? userStats.orders : 0}
+              </div>
               <div className="text-sm text-gray-500 mt-1">Total Orders</div>
             </div>
 
             <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
-              <Wrench className="w-6 h-6 text-[#A97C51] mb-2" />
-              <div className="text-3xl md:text-4xl font-extrabold font-serif text-gray-800">2</div>
-              <div className="text-sm text-gray-500 mt-1">Active Projects</div>
+              <MessageCircle className="w-6 h-6 text-[#A97C51] mb-2" />
+              <div className="text-3xl md:text-4xl font-extrabold font-serif text-gray-800">
+                {userStats ? userStats.messages : 0}
+              </div>
+              <div className="text-sm text-gray-500 mt-1">Your Messages</div>
             </div>
 
             <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
-              <Heart className="w-6 h-6 text-[#A97C51] mb-2" />
-              <div className="text-3xl md:text-4xl font-extrabold font-serif text-gray-800">8</div>
-              <div className="text-sm text-gray-500 mt-1">Saved Items</div>
+              <BsCash className="w-6 h-6 text-[#A97C51] mb-2" />
+              <div className="text-3xl md:text-4xl font-extrabold font-serif text-gray-800">
+                {userStats ? userStats.emiApplications : 0}
+              </div>
+              <div className="text-sm text-gray-500 mt-1">EMI Applications</div>
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
+            {/* <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
               <Users className="w-6 h-6 text-[#A97C51] mb-2" />
-              <div className="text-3xl md:text-4xl font-extrabold font-serif text-gray-800">3</div>
+              <div className="text-3xl md:text-4xl font-extrabold font-serif text-gray-800">
+                3
+              </div>
               <div className="text-sm text-gray-500 mt-1">Consultations</div>
-            </div>
+            </div> */}
           </div>
         </div>
 
         {/* Quick Actions */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h3>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">
+            Quick Actions
+          </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <button className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm">
-              <div className="w-10 h-10 rounded-md bg-blue-50 flex items-center justify-center text-blue-600">🛒</div>
+            <Link
+              href="/products"
+              className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm"
+            >
+              <div className="w-10 h-10 rounded-md bg-blue-50 flex items-center justify-center text-blue-600">
+                🛒
+              </div>
               <div className="text-left">
                 <div className="font-semibold">Browse Products</div>
-                <div className="text-sm text-gray-500">Explore our latest furniture collection</div>
+                <div className="text-sm text-gray-500">
+                  Explore our latest furniture collection
+                </div>
               </div>
-            </button>
+            </Link>
 
-            <button className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm">
-              <div className="w-10 h-10 rounded-md bg-green-50 flex items-center justify-center text-green-600">📅</div>
+            <Link
+              href="https://calendly.com/prashantgoel1806/30min"
+              className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm"
+            >
+              <div className="w-10 h-10 rounded-md bg-green-50 flex items-center justify-center text-green-600">
+                📅
+              </div>
               <div className="text-left">
                 <div className="font-semibold">Book Consultation</div>
-                <div className="text-sm text-gray-500">Schedule a free interior design consultation</div>
+                <div className="text-sm text-gray-500">
+                  Schedule a free interior design consultation
+                </div>
               </div>
-            </button>
+            </Link>
 
-            <button className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm">
-              <div className="w-10 h-10 rounded-md bg-orange-50 flex items-center justify-center text-orange-600">🚚</div>
+            <button
+              onClick={() => setActiveTab("orders")}
+              className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm"
+            >
+              <div className="w-10 h-10 rounded-md bg-orange-50 flex items-center justify-center text-orange-600">
+                🚚
+              </div>
               <div className="text-left">
                 <div className="font-semibold">Track Orders</div>
-                <div className="text-sm text-gray-500">Check the status of your recent orders</div>
+                <div className="text-sm text-gray-500">
+                  Check the status of your recent orders
+                </div>
               </div>
             </button>
 
-            <button className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm">
-              <div className="w-10 h-10 rounded-md bg-purple-50 flex items-center justify-center text-purple-600">🖼️</div>
+            <Link
+              href={"#"}
+              className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm"
+            >
+              <div className="w-10 h-10 rounded-md bg-purple-50 flex items-center justify-center text-purple-600">
+                🖼️
+              </div>
               <div className="text-left">
                 <div className="font-semibold">Design Gallery</div>
-                <div className="text-sm text-gray-500">View our portfolio of completed projects</div>
+                <div className="text-sm text-gray-500">
+                  View our portfolio of completed projects
+                </div>
               </div>
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -301,27 +412,44 @@ const Profile = () => {
       {/* Right column: Account Information */}
       <aside className="space-y-6">
         <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Account Information</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Account Information
+          </h3>
 
           <div className="space-y-3">
             <label className="block text-xs text-gray-500">USER ID</label>
-            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700 break-all">{data?.user?.id ?? data?.user?.sub ?? "-"}</div>
+            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700 break-all">
+              {session?.user?.id ?? session?.user?.sub ?? "-"}
+            </div>
 
             <label className="block text-xs text-gray-500">FULL NAME</label>
-            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700">{data?.user?.name ?? "-"}</div>
+            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700">
+              {session?.user?.name ?? "-"}
+            </div>
 
             <label className="block text-xs text-gray-500">EMAIL ADDRESS</label>
-            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700">{data?.user?.email ?? "-"}</div>
+            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700">
+              {session?.user?.email ?? "-"}
+            </div>
 
             <label className="block text-xs text-gray-500">PHONE NUMBER</label>
-            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700">{data?.user?.phone ?? "-"}</div>
+            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700">
+              {session?.user?.phone ?? "-"}
+            </div>
 
             <label className="block text-xs text-gray-500">ADDRESS</label>
-            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700">{data?.user?.address ?? "-"}</div>
+            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700">
+              {session?.user?.address ?? "-"}
+            </div>
           </div>
 
           <div className="mt-6">
-            <button className="w-full py-2 rounded-md bg-[#A97C51] text-white font-semibold">Edit Profile</button>
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="w-full py-2 rounded-md bg-[#A97C51] text-white font-semibold hover:bg-[#8B6238] transition-colors"
+            >
+              Edit Profile
+            </button>
           </div>
         </div>
       </aside>
@@ -523,6 +651,22 @@ const Profile = () => {
         order={selectedOrder}
         onClose={() => setSelectedOrder(null)}
       />
+
+      {/* Edit Profile Modal */}
+      {isEditModalOpen && (
+        <EditProfileModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleEditProfile}
+          initialData={{
+            name: session?.user?.name || "",
+            email: session?.user?.email || "",
+            phone: session?.user?.phone || "",
+            address: session?.user?.address || "",
+          }}
+          updating={updatingProfile}
+        />
+      )}
     </div>
   );
 };

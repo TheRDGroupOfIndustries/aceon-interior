@@ -56,6 +56,7 @@ function Elements() {
       { name: "Products", link: "/products" },
       { name: "About", link: "#about" },
       { name: "Services", link: "#services" },
+      { name: "Portfolio", link: "/portfolio" },
       { name: "Contact", link: "#contact" },
     ];
 
@@ -94,20 +95,7 @@ function Elements() {
               </motion.div>
             ))}
           </motion.div>
-          {!session?.user && (
-            <Link href="/auth/signin" className="hidden md:block mr-20 lg:mr-36">
-              <motion.button
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.6 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-3 py-1.5 lg:px-4 lg:py-2 xl:px-6 xl:py-3 rounded-xl bg-[#A97C51] text-white text-xs sm:text-sm lg:text-base xl:text-lg font-medium hover:bg-white hover:text-[#b98663] transition-all whitespace-nowrap text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 font-playfair"
-              >
-                Get Started
-              </motion.button>
-            </Link>
-          )}
+          
         </div>
       </div>
       {/* Mobile Navigation */}
@@ -334,6 +322,21 @@ function Hero() {
     <div className="w-full min-h-screen overflow-visible md:overflow-hidden flex items-center justify-center px-2 sm:top-5 sm:px-4 md:px-6 lg:px-8">
       <div className="relative w-full max-w-[1500px] aspect-auto sm:aspect-video min-h-[100dvh] sm:min-h-[90vh] md:top-5 md:min-h-[70vh]">
         <Elements />
+
+        {!session?.user && (
+          <Link href="/auth/signin" className="hidden md:block absolute top-24 right-5 z-30">
+            <motion.button
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.6 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-3 py-1.5 lg:px-4 lg:py-2 xl:px-6 xl:py-3 rounded-xl bg-[#A97C51] text-white text-xs sm:text-sm lg:text-base xl:text-lg font-medium hover:bg-white hover:text-[#b98663] transition-all whitespace-nowrap text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 font-playfair"
+            >
+              Get Started
+            </motion.button>
+          </Link>
+        )}
 
         <motion.div
           initial={{ opacity: 0, scale: 1.1 }}

@@ -12,6 +12,8 @@ const UserSchema = new Schema(
     providerId: { type: String, required: false }, // Google user ID
     // Additional fields for app-specific data
     role: { type: String, enum: ["user", "admin"], default: "user" },
+    phone: { type: String },
+    address: { type: String },
     orders: [{ type: Schema.Types.ObjectId, ref: "Order" }], // Reference to user's orders
     messages: [{ type: Schema.Types.ObjectId, ref: "Message" }], // Reference to user's messages
   },
@@ -30,6 +32,8 @@ export interface IUser {
   provider: string;
   providerId: string;
   role: "user" | "admin";
+  phone?: string;
+  address?: string;
   orders: string[]; // Array of Order ObjectIds as strings
   createdAt: Date;
   updatedAt: Date;
