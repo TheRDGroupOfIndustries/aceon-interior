@@ -124,7 +124,9 @@ const CheckoutPage = () => {
 
   const handleAddressChange = (e) => {
     const { name, value } = e.target;
-    setAddress((prev) => ({ ...prev, [name]: value }));
+    // compute next address state first so validation doesn't lag by one keystroke
+    const nextAddress = { ...address, [name]: value };
+    setAddress(nextAddress);
 
     // Simple validation check
     const requiredFields = [
@@ -134,8 +136,9 @@ const CheckoutPage = () => {
       "postalCode",
       "phone",
     ];
-    const valid = requiredFields.every((field) => address[field].trim() !== "");
-    console.log("valid:", valid);
+    const valid = requiredFields.every(
+      (field) => (nextAddress[field] || "").trim() !== ""
+    );
     setIsAddressValid(valid);
   };
 
@@ -175,13 +178,11 @@ const CheckoutPage = () => {
     dispatch(createOrder(orderData) as any)
       .unwrap()
       .then(() => {
+        // Show only the green in-page success card (no overlapping modal)
         setOrderPlaced(true);
-        setShowModal({
-          title: "Order Placed Successfully!",
-          message: `Your order for ${quantity} x ${checkoutProduct?.name} has been confirmed and will be shipped to ${address.city}. Total amount: ${formatPrice(grandTotal)}.`,
-          type: "success",
-        });
-        router.push("/profile");
+        setShowModal(null);
+        // After a short pause, redirect back to the products page
+        setTimeout(() => router.push("/products"), 2000);
       });
   };
 
@@ -249,12 +250,21 @@ const CheckoutPage = () => {
                   Product Details
                 </h2>
                 <div className="flex space-x-4">
-                  <Image
-                    height={80}
+                  <img
                     width={80}
-                    src={checkoutProduct?.main_image}
-                    alt={checkoutProduct?.name}
+                    height={80}
+                    src={
+                      checkoutProduct?.main_image ||
+                      checkoutProduct?.media?.main_image ||
+                      checkoutProduct?.media?.images?.[0]?.url ||
+                      "https://placehold.co/120x120?text=No+Image"
+                    }
+                    alt={checkoutProduct?.name || "Product Image"}
                     className="w-20 h-20 object-cover rounded-lg"
+                    onError={(e) => {
+                      e.currentTarget.src = "/images/bed.jpg";
+                      e.currentTarget.onerror = null;
+                    }}
                   />
                   <div className="flex-1">
                     <h3 className="font-semibold font-playfair text-gray-900 mb-1">
@@ -442,6 +452,7 @@ const CheckoutPage = () => {
                   </div>
                 </div>
 
+                {/* Sticky action button lives inside the sticky card so it scrolls with it */}
                 <button
                   type="submit"
                   onClick={handlePlaceOrder}
@@ -449,10 +460,14 @@ const CheckoutPage = () => {
                   className={`w-full mt-6 py-4 rounded-lg font-bold text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer ${
                     orderPlaced
                       ? "bg-green-600"
-                      : "bg-primary hover:bg-primary-hover"
+                      : "bg-red-600 hover:bg-red-700"
                   }`}
                 >
-                  {loading ? "Placing Order..." : "Place Order"}
+                  {orderPlaced
+                    ? "Order Placed"
+                    : loading
+                      ? "Placing Order..."
+                      : "Place Order"}
                 </button>
 
                 {!isAddressValid && (

@@ -25,7 +25,8 @@ export default function ProductCard({ product }: { product: IProduct }) {
         name: product?.name,
         current_price: product.pricing.current_price,
         original_price: product.pricing.original_price,
-        main_image: product?.media.images[0]?.url,
+        // Prefer main_image, then first gallery image
+        main_image: product?.media?.main_image || product?.media?.images?.[0]?.url,
       })
     );
     router.push(`/checkout/${product._id}`);

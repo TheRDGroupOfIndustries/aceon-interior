@@ -230,10 +230,14 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
   }, [selectedVariants, product?.pricing.current_price, product?.variants]);
 
   // --- Image Slider Functions ---
-  const totalImages = product?.media.images.length;
-  const nextImage = () => setMainImageIndex((prev) => (prev + 1) % totalImages);
+  // guard against missing/empty images array
+  const totalImages = product?.media?.images?.length || 0;
+  const safeTotal = totalImages > 0 ? totalImages : 1;
+
+  const nextImage = () =>
+    setMainImageIndex((prev) => (prev + 1) % safeTotal);
   const prevImage = () =>
-    setMainImageIndex((prev) => (prev - 1 + totalImages) % totalImages);
+    setMainImageIndex((prev) => (prev - 1 + safeTotal) % safeTotal);
 
   const formatPrice = (price) => `₹${price.toLocaleString("en-IN")}`;
 
@@ -262,7 +266,9 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
         name: product?.name,
         current_price: product.pricing.current_price,
         original_price: product.pricing.original_price,
-        main_image: product?.media.images[0]?.url,
+        // Prefer main_image, then first gallery image
+        main_image:
+          product?.media?.main_image || product?.media?.images?.[0]?.url,
         variant: selectedVariants,
       })
     );
@@ -286,9 +292,20 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
               {/* Main Image */}
               <Image
                 fill={true}
-                src={product.media.images[mainImageIndex]?.url}
-                alt={product.media.images[mainImageIndex]?.alt}
-                className="w-full h-full object-cover transition-opacity duration-300" // This line is correct, no changes needed based on the error description.
+                // use gallery image if present, otherwise fallback to main_image or a local placeholder
+                src={
+                  product?.media?.images?.[mainImageIndex]?.url ||
+                  product?.media?.main_image ||
+                  "/images/placeholder.png"
+                }
+                alt={
+                  product?.media?.images?.[mainImageIndex]?.alt ||
+                  product?.name ||
+                  "Product image"
+                }
+                className="w-full h-full object-cover transition-opacity duration-300"
+                // sometimes external hosts (legacy) need unoptimized rendering — fallback handled by next/image automatically when domain is configured,
+                // but keep unoptimized=false by default; if you still see issues, set unoptimized to true for debugging.
               />
 
               {/* Slider Controls */}
@@ -315,7 +332,15 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
 
             {/* Thumbnail Navigation */}
             <div className="flex space-x-3 mt-4 overflow-x-auto justify-center">
-              {product.media.images.map((img, index) => (
+              {(product?.media?.images?.length > 0
+                ? product.media.images
+                : [
+                    {
+                      url: product?.media?.main_image || "/images/placeholder.png",
+                      alt: product?.name || "Placeholder",
+                    },
+                  ]
+              ).map((img, index) => (
                 <Image
                   height={80}
                   width={80}
