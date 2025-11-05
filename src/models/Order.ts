@@ -23,7 +23,7 @@ const OrderSchema = new Schema(
     productId: { type: Schema.Types.ObjectId, ref: "Product", required: true },
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     quantity: { type: Number, required: true, min: 1 },
-    variant: { type: Object, required: true },
+    variant: { type: Object },
     address: { type: AddressSchema, required: true },
     paymentMethod: { type: String, required: true },
     grandTotal: { type: Number, required: true, min: 0 },

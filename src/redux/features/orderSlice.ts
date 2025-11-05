@@ -199,6 +199,28 @@ export const cancelOrder = createAsyncThunk(
   }
 );
 
+// Async thunk for deleting an order (admin only)
+export const deleteOrder = createAsyncThunk(
+  "order/deleteOrder",
+  async (orderId: string, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`/api/order/${orderId}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return rejectWithValue(data.message || "Failed to delete order");
+      }
+
+      return orderId; // Return the deleted order ID
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to delete order");
+    }
+  }
+);
+
 // Create the order slice
 const orderSlice = createSlice({
   name: "order",
@@ -341,6 +363,33 @@ const orderSlice = createSlice({
         }
       )
       .addCase(cancelOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Delete Order
+    builder
+      .addCase(deleteOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        deleteOrder.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.loading = false;
+          // Remove the deleted order from the orders array
+          state.orders = state.orders.filter(
+            (order) => order._id !== action.payload
+          );
+          // Decrement total count
+          state.total = Math.max(0, state.total - 1);
+          // Clear current order if it's the deleted one
+          if (state.currentOrder?._id === action.payload) {
+            state.currentOrder = null;
+          }
+        }
+      )
+      .addCase(deleteOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

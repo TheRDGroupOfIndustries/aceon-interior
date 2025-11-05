@@ -1,6 +1,7 @@
 import {
   fetchAllOrdersByAdmin,
   updateOrderStatus,
+  deleteOrder,
 } from "@/redux/features/orderSlice";
 import { RootState } from "@/redux/store";
 import {
@@ -9,6 +10,9 @@ import {
   Eye,
   X,
   Package,
+  Trash2,
+  Loader,
+  Loader2,
 } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
@@ -146,9 +150,13 @@ const OrderDetailsModal = ({ order, onClose }) => {
             <h4 className="text-lg font-semibold border-b pb-2 pt-4">
               Variants Ordered
             </h4>
-            {Object.entries(order.variant).map(([type, value]) => (
-              <DetailRow key={type} label={type} value={value} />
-            ))}
+            {order.variant
+              ? order.variant === "Standard"
+                ? "Standard"
+                : Object.entries(order.variant).map(([type, value]) => (
+                    <DetailRow key={type} label={type} value={value} />
+                  ))
+              : "N/A"}
 
             <h4 className="text-lg font-semibold border-b pb-2 pt-4">
               Shipping Address
@@ -177,6 +185,7 @@ const OrderListing = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [deletingOrder, setDeletingOrder] = useState<string | null>(null);
   const dispatch = useDispatch();
 
   const ordersPerPage = 12;
@@ -186,6 +195,12 @@ const OrderListing = () => {
     setUpdatingStatus(orderId);
     await dispatch(updateOrderStatus({ orderId, status: newStatus }) as any);
     setUpdatingStatus(null);
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    setDeletingOrder(orderId);
+    await dispatch(deleteOrder(orderId) as any);
+    setDeletingOrder(null);
   };
 
   const totalPages = Math.ceil(total / ordersPerPage);
@@ -210,9 +225,9 @@ const OrderListing = () => {
     );
   };
 
-  useEffect(()=> {
+  useEffect(() => {
     dispatch(fetchAllOrdersByAdmin({}) as any);
-  }, [])
+  }, []);
 
   return (
     <div className="">
@@ -383,10 +398,23 @@ const OrderListing = () => {
                   </select>
                   <button
                     onClick={() => setSelectedOrder(order)}
-                    className="px-6 py-3 bg-amber-800 text-white font-semibold rounded-full hover:bg-amber-900 transition-colors"
+                    className="px-4 py-3 bg-amber-800 text-white font-semibold rounded-full hover:bg-amber-900 transition-colors"
                   >
-                    View Details
+                    <Eye className="w-4 h-4" />
                   </button>
+                  {order.status === "delivered" && (
+                    <button
+                      onClick={() => handleDeleteOrder(order._id)}
+                      disabled={deletingOrder === order._id}
+                      className="px-4 py-3 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {deletingOrder === order._id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
             ))

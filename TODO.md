@@ -1,7 +1,5 @@
-# TODO: Implement Reply Messages Route
+# TODO: Add Delete Order Functionality for Admin Side
 
-- [x] Implement POST handler in src/app/api/reply/router.ts to handle reply updates
-- [x] Parse request body for messageId and reply text
-- [x] Connect to MongoDB using lib/mongodb.ts
-- [x] Find the message by ID and update the reply field
-- [x] Return appropriate success or error response
+- [x] Add deleteOrder async thunk in src/redux/features/orderSlice.ts
+- [x] Update src/components/admin/OrderListing.tsx to include delete button with confirmation dialog and loader during deletion
+- [ ] Test the delete functionality (ensure orders are removed and UI updates correctly)
