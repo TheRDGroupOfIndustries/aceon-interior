@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Phone, Clock, MessageSquare, X, CornerLeftUp, CornerDownRight } from "lucide-react";
+import { Mail, Phone, Clock, X, CornerLeftUp } from "lucide-react";
 import Footer from "@/components/footer";
 import { useState, useRef, useEffect } from "react";
 import * as styles from "./page.styles";
@@ -95,12 +95,16 @@ export default function AdminDashboard() {
     },
   ];
 
-  // State for filtered products view
+  // State for filtered products view (used in commented sections, kept for future functionality)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [viewingProducts, setViewingProducts] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [newCategoryName, setNewCategoryName] = useState<string>("");
 
-  // Demo handlers for category actions
+  // Demo handlers for category actions (used in commented sections, kept for future functionality)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleEditCategory = (name: string) => {
     const action = confirm(
       `What would you like to do with "${name}" category?\n\nClick OK to Rename\nClick Cancel to Delete`
@@ -121,14 +125,17 @@ export default function AdminDashboard() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDeleteCategory = (name: string) => {
     // Remove category from categories array
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const updatedCategories = categories.filter((cat) => cat.name !== name);
     // Note: In a real app, you'd update the state properly. For demo, we'll just show alert
     alert(`Category "${name}" has been deleted successfully!`);
     // You would typically do: setCategories(updatedCategories);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleRenameCategory = (oldName: string) => {
     if (newCategoryName.trim() && newCategoryName !== oldName) {
       // In a real app, you'd update the category name in state
@@ -139,11 +146,13 @@ export default function AdminDashboard() {
     setNewCategoryName("");
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleCancelEdit = () => {
     setEditingCategory(null);
     setNewCategoryName("");
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleViewProducts = (name: string) => {
     setViewingProducts(name);
     setActiveTab("PRODUCTS");
@@ -173,7 +182,8 @@ export default function AdminDashboard() {
   ];
   const [orders, setOrders] = useState(initialOrders);
 
-  // Toggle order status
+  // Toggle order status (used in commented sections, kept for future functionality)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleOrderStatus = (id: string) => {
     setOrders((prev) =>
       prev.map((order) =>
@@ -186,7 +196,7 @@ export default function AdminDashboard() {
       )
     );
   };
-  // Sample product data for demo
+  // Sample product data for demo (used in commented sections, kept for future functionality)
   const initialProducts = [
     {
       id: "P1",
@@ -216,8 +226,11 @@ export default function AdminDashboard() {
       image: "/images/chair.jpg",
     },
   ];
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [products, setProducts] = useState(initialProducts);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [editProductId, setEditProductId] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [editStock, setEditStock] = useState<number>(0);
   const [apps, setApps] = useState<AppItem[]>(sampleApps);
   const [curReplyMessage, setCurReplyMessage] = useState(null);
@@ -239,7 +252,8 @@ export default function AdminDashboard() {
     fetchMessages();
   }, []);
 
-  // Handle edit button click
+  // Handle edit button click (used in commented sections, kept for future functionality)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleEditProduct = (id: string) => {
     const prod = products.find((p) => p.id === id);
     if (prod) {
@@ -248,7 +262,8 @@ export default function AdminDashboard() {
     }
   };
 
-  // Handle save stock
+  // Handle save stock (used in commented sections, kept for future functionality)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSaveStock = (id: string) => {
     setProducts((prev) =>
       prev.map((p) => (p.id === id ? { ...p, stock: editStock } : p))
@@ -256,7 +271,8 @@ export default function AdminDashboard() {
     setEditProductId(null);
   };
 
-  // Handle activate/deactivate
+  // Handle activate/deactivate (used in commented sections, kept for future functionality)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleToggleStatus = (id: string) => {
     setProducts((prev) =>
       prev.map((p) =>
@@ -307,11 +323,15 @@ export default function AdminDashboard() {
 
   interface ContactMsg {
     id: string;
+    _id?: string;
     name: string;
     email: string;
     phone: string;
     date: string;
+    createdAt: string;
     message: string;
+    description: string;
+    reply?: string;
     status: "NEW" | "REPLIED" | "RESOLVED";
   }
 
@@ -433,6 +453,8 @@ export default function AdminDashboard() {
     );
   };
 
+  // Utility function for viewing application details (currently unused but kept for future functionality)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const viewDetails = (id: string) => {
     const app = apps.find((a) => a.id === id);
     if (app) alert(`${app.name}\n${app.email}\nStatus: ${app.status}`);
@@ -443,6 +465,8 @@ export default function AdminDashboard() {
   //   if (msg) alert(`Reply to ${msg.name} (${msg.email})`);
   // };
 
+  // Utility function for marking messages as resolved (currently unused but kept for future functionality)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const markResolved = (id: string) => {
     setMessages((prev) =>
       prev.map((m) => (m.id === id ? { ...m, status: "RESOLVED" } : m))
@@ -974,8 +998,8 @@ export default function AdminDashboard() {
                 <div className="">No Messages Yet.</div>
               ) : (
                 <div className="space-y-5">
-                  {messages?.map((m) => (
-                    <article key={m.id} className={styles.contactCard}>
+                  {messages?.map((m, idx) => (
+                    <article key={m._id || m.id || idx} className={styles.contactCard}>
                       <div className="relative">
                         <div className={styles.contactStatus}>
                           <span
@@ -1022,13 +1046,7 @@ export default function AdminDashboard() {
         </section>
       </div>
 
-      {/* Floating chat button */}
-      <button className={styles.chatButton}>
-        <span className={styles.chatButtonIcon}>
-          <MessageSquare size={16} color="#002" />
-        </span>
-        <span className={styles.chatButtonText}>Talk with Us</span>
-      </button>
+      {/* Floating chat button removed per request */}
 
       {curReplyMessage && (
         <ReplyModal
