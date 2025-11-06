@@ -1,4 +1,3 @@
-
 // import React from 'react';
 // import Image from 'next/image';
 // import { CiPlay1 } from 'react-icons/ci';
@@ -6,7 +5,7 @@
 // const TestimonialSection: React.FC = () => {
 //   return (
 //     <section className="relative w-full text-white">
-  
+
 //       <div className="absolute inset-0 z-0">
 //         <Image
 //           src="/images/back.jpg"
@@ -16,7 +15,7 @@
 //           quality={75}
 //           priority={false}
 //           placeholder="blur"
-//           blurDataURL="/images/back_blur.jpg" 
+//           blurDataURL="/images/back_blur.jpg"
 //         />
 //         <div className="absolute inset-0 bg-black/50"></div>
 //       </div>
@@ -50,12 +49,12 @@
 //         {/* Right Column: Image */}
 //         <div className="w-full lg:w-1/2 flex items-center justify-center lg:justify-end">
 //           <div className="relative w-full max-w-sm md:max-w-md pt-10 lg:w-[480px] lg:h-[711px]">
-//             <Image 
-//               src="/images/woman.jpg" 
-//               alt="A smiling Adarsh Pandit" 
-//               layout="fill" 
-//               objectFit="cover" 
-//               className="rounded-[30px] blur-[2.5px]" 
+//             <Image
+//               src="/images/woman.jpg"
+//               alt="A smiling Adarsh Pandit"
+//               layout="fill"
+//               objectFit="cover"
+//               className="rounded-[30px] blur-[2.5px]"
 //               priority={true}
 //             />
 //             <div className="absolute inset-0 flex items-center justify-center">
@@ -71,8 +70,6 @@
 // };
 
 // export default TestimonialSection;
-
-
 
 // "use client";
 // import React, { useRef } from "react";
@@ -166,12 +163,12 @@
 //         {/* Right Column: Image */}
 //         <div className="w-full lg:w-1/2 flex items-center justify-center lg:justify-end">
 //           <div className="relative w-full max-w-sm md:max-w-md lg:w-[480px] lg:h-[711px] h-[400px] sm:h-[500px] md:h-[600px]">
-//             <Image 
-//               src="/images/woman.jpg" 
-//               alt="A smiling Adarsh Pandit" 
-//               layout="fill" 
-//               objectFit="cover" 
-//               className="rounded-[30px] blur-[2.5px]" 
+//             <Image
+//               src="/images/woman.jpg"
+//               alt="A smiling Adarsh Pandit"
+//               layout="fill"
+//               objectFit="cover"
+//               className="rounded-[30px] blur-[2.5px]"
 //               priority={true}
 //             />
 //             <div className="absolute inset-0 flex items-center justify-center">
@@ -409,7 +406,6 @@
 
 // export default TestimonialSection;
 
-
 "use client";
 import React from "react";
 import Image from "next/image";
@@ -423,7 +419,7 @@ const TestimonialSection: React.FC = () => {
   const isSectionInView = useInView(sectionRef, { margin: "-100px" }); // No once: true
 
   // Animation variants for containers
-  const containerVariants:Variants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -434,7 +430,7 @@ const TestimonialSection: React.FC = () => {
   };
 
   // Animation variants for image container
-  const imageContainerVariants:Variants = {
+  const imageContainerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -445,7 +441,7 @@ const TestimonialSection: React.FC = () => {
   };
 
   // Animation variants for text elements
-  const textVariants:Variants = {
+  const textVariants: Variants = {
     hidden: (direction: string = "up") => ({
       opacity: 0,
       y: direction === "up" ? 30 : 0,
@@ -466,7 +462,7 @@ const TestimonialSection: React.FC = () => {
   };
 
   // Animation variants for background image
-  const backgroundVariants:Variants = {
+  const backgroundVariants: Variants = {
     hidden: { opacity: 0 },
     visible: (index: number) => ({
       opacity: 1,
@@ -479,7 +475,7 @@ const TestimonialSection: React.FC = () => {
   };
 
   // Animation variants for right-side image
-  const imageVariants:Variants = {
+  const imageVariants: Variants = {
     hidden: { opacity: 0, scale: 0.9, y: 40 },
     visible: (index: number) => ({
       opacity: 1,
@@ -494,7 +490,7 @@ const TestimonialSection: React.FC = () => {
   };
 
   // Animation variants for play button
-  const buttonVariants:Variants = {
+  const buttonVariants: Variants = {
     hidden: { opacity: 0, scale: 0.8, rotate: -10 },
     visible: (index: number) => ({
       opacity: 1,
@@ -553,14 +549,14 @@ const TestimonialSection: React.FC = () => {
               variants={textVariants}
               custom={3} // Fourth to appear
             >
-              What Home Owners Feels
+              What Our Customers Say
             </motion.h1>
             <motion.p
               className="font-poppins text-lg md:text-xl mt-4 opacity-90"
               variants={textVariants}
               custom={4} // Fifth to appear
             >
-              Every Home Tells Different Story
+              Every Crafted Space Has Its Own Story{" "}
             </motion.p>
           </motion.div>
 
@@ -571,7 +567,7 @@ const TestimonialSection: React.FC = () => {
               visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
             }}
           >
-            <motion.p
+            {/* <motion.p
               className="font-poppins text-base md:text-[18px] tracking-tight text-gray-300 uppercase font-light"
               variants={textVariants}
               custom={5} // Sixth to appear
@@ -584,15 +580,16 @@ const TestimonialSection: React.FC = () => {
               custom={6} // Seventh to appear
             >
               Adarsh Pandit
-            </motion.h2>
+            </motion.h2> */}
             <motion.p
-              className="font-poppins font-light text-sm md:text-[20px] tracking-tight text-gray-300 pt-5 leading-relaxed"
+              className="font-poppins font-light text-sm md:text-[20px] tracking-tight text-gray-300 pt-5 leading-relaxed text-shadow-md"
               variants={textVariants}
               custom={7} // Eighth to appear
             >
-              Figma ipsum component variant main layer. Scrolling thumbnail share
-              text team follower select flatten move. Align ipsum shadow line
-              share duplicate comment component. Undo device comment invite bold.
+              “Each home we touch reflects a story of craftsmanship and comfort.
+              From rustic wooden textures to modern minimalism, our designs
+              bring warmth and personality into every corner. Here’s how our
+              clients feel living in the spaces we’ve built together.”
             </motion.p>
           </motion.div>
         </div>
@@ -623,7 +620,11 @@ const TestimonialSection: React.FC = () => {
               className="absolute inset-0 flex items-center justify-center"
               variants={buttonVariants}
               custom={2} // Third to appear
-              whileHover={{ scale: 1.15, rotate: 5, transition: { duration: 0.3 } }}
+              whileHover={{
+                scale: 1.15,
+                rotate: 5,
+                transition: { duration: 0.3 },
+              }}
             >
               <button
                 aria-label="Play video"
