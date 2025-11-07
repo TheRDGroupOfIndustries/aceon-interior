@@ -392,7 +392,7 @@ const Profile = () => {
             </button>
 
             <Link
-              href={"#"}
+              href={"/portfolio"}
               className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm"
             >
               <div className="w-10 h-10 rounded-md bg-purple-50 flex items-center justify-center text-purple-600">

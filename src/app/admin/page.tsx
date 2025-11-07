@@ -457,7 +457,7 @@ export default function AdminDashboard() {
   };
 
   const updateStatus = async (id: string, newStatus: Status) => {
-    console.log("updateStatus", id, newStatus.toLowerCase().replace(" ", "_"));
+    console.log("updateStatus", id, newStatus);
     setStatusUpdating(id);
     try {
       const res = await fetch("/api/emi", {
@@ -467,7 +467,7 @@ export default function AdminDashboard() {
         },
         body: JSON.stringify({
           applicationId: id,
-          status: newStatus.toLowerCase().replace(" ", "_"),
+          status: newStatus,
         }),
       });
       const resData = await res.json();
@@ -552,6 +552,8 @@ export default function AdminDashboard() {
   // Filtered EMI applications
   const filteredApps =
     emiFilter === "all" ? apps : apps.filter((a) => a.status === emiFilter);
+
+    console.log("filteredApps", filteredApps);
 
   return (
     <div className={styles.pageRoot}>
@@ -836,10 +838,10 @@ export default function AdminDashboard() {
                           }
                           className={styles.updateStatusBtn}
                         >
-                          <option value="PENDING">Pending</option>
-                          <option value="UNDER REVIEW">Under Review</option>
-                          <option value="APPROVED">Approved</option>
-                          <option value="REJECTED">Rejected</option>
+                          <option value="pending">Pending</option>
+                          <option value="under_review">Under Review</option>
+                          <option value="approved">Approved</option>
+                          <option value="rejected">Rejected</option>
                         </select>
                       </div>
                     </div>
