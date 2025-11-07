@@ -305,6 +305,8 @@ export default function AdminDashboard() {
   const [emiFilter, setEmiFilter] = useState<"all" | Status>("all");
   const [statusUpdating, setStatusUpdating] = useState(null);
 
+  console.log("emiFilter", emiFilter)
+
   // refs to measure tab positions so we can render a centered indicator exactly under the active tab
   const tabsContainerRef = useRef<HTMLDivElement | null>(null);
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>(
@@ -553,7 +555,7 @@ export default function AdminDashboard() {
   const filteredApps =
     emiFilter === "all" ? apps : apps.filter((a) => a.status === emiFilter);
 
-    console.log("filteredApps", filteredApps);
+  console.log("filteredApps", filteredApps);
 
   return (
     <div className={styles.pageRoot}>
@@ -739,7 +741,7 @@ export default function AdminDashboard() {
                       )
                     }
                     className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 capitalize ${
-                      emiFilter === status
+                      emiFilter === status.toLowerCase().replace(" ", "_")
                         ? "bg-[#A97C51] text-white shadow"
                         : "text-gray-600 hover:bg-gray-100"
                     }`}
