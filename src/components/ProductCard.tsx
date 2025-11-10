@@ -23,8 +23,8 @@ export default function ProductCard({ product }: { product: IProduct }) {
       JSON.stringify({
         id: product._id,
         name: product?.name,
-        current_price: product.pricing.current_price,
-        original_price: product.pricing.original_price,
+        current_price: product?.pricing?.current_price || 0,
+        original_price: product?.pricing?.original_price || 0,
         // Prefer main_image, then first gallery image
         main_image: product?.media?.main_image || product?.media?.images?.[0]?.url,
       })
@@ -42,8 +42,8 @@ export default function ProductCard({ product }: { product: IProduct }) {
           <Image
             fill={true}
             className="w-full h-full object-cover "
-            src={product.media.main_image} // Placeholder path
-            alt={product.name}
+            src={product?.media?.main_image || "/images/logo.png"} // Placeholder path
+            alt={product?.name || "Product image"}
           />
         </div>
 
@@ -84,11 +84,11 @@ export default function ProductCard({ product }: { product: IProduct }) {
           {/* Price */}
           <div className="flex items-baseline mb-3 font-playfair">
             <span className="text-2xl font-bold text-[#A97C51] mr-2">
-              ₹{product.pricing.current_price}
+              ₹{product?.pricing?.current_price || 0}
             </span>
-            {product.pricing.original_price > product.pricing.current_price && (
+            {(product?.pricing?.original_price || 0) > (product?.pricing?.current_price || 0) && (
               <span className="text-lg text-gray-400 line-through font-medium">
-                ₹{product.pricing.original_price}
+                ₹{product?.pricing?.original_price || 0}
               </span>
             )}
           </div>

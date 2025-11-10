@@ -20,6 +20,7 @@ import {
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import EMIApplicationModal from "./EMIApplicationModal";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "./Header";
 import Link from "next/link";
@@ -112,11 +113,11 @@ const OrderDetailsModal = ({ order, onClose }) => {
             <div className="flex items-center space-x-5">
               {/* Product Image */}
               <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden relative">
-                {order.productId.media?.main_image && (
+                {order.productId?.media?.main_image && (
                   <Image
                     fill={true}
                     src={order.productId.media.main_image}
-                    alt={order.productId.name}
+                    alt={order.productId?.name || "Product image"}
                     className="object-cover"
                   />
                 )}
@@ -199,7 +200,10 @@ const Profile = () => {
   const [cancelling, setCancelling] = useState<null | string>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [updatingProfile, setUpdatingProfile] = useState(false);
-  const [userStats, setUserStats] = useState(null)
+  const [userStats, setUserStats] = useState(null);
+  const [emiApplications, setEmiApplications] = useState([]);
+  const [loadingEmi, setLoadingEmi] = useState(false);
+  const [showEmiModal, setShowEmiModal] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -229,10 +233,80 @@ const Profile = () => {
     }
   }
 
+  // Fetch admin-level stats (total EMI applications) when user is admin
+  const fetchAdminEmiCount = async () => {
+    try {
+      // Use the EMI listing endpoint to read the total count from pagination
+      const res = await fetch('/api/emi?limit=1&page=1', { method: 'GET' });
+      if (!res.ok) {
+        console.error('Failed to fetch EMI list for admin:', await res.text());
+        return 0;
+      }
+      const json = await res.json();
+      // Try to read total from response structure
+      const total = json?.data?.pagination?.total ?? json?.data?.filters?.status?.total ?? 0;
+      return total;
+    } catch (err) {
+      console.error('Error fetching admin EMI count:', err);
+      return 0;
+    }
+  }
+
+  // Fetch user EMI applications
+  const fetchUserEmiApplications = async () => {
+    if (session?.user?.role === "admin") return; // Admins don't need user EMI applications
+    
+    console.log("Fetching EMI applications for user:", session?.user?.email);
+    setLoadingEmi(true);
+    try {
+      const response = await fetch("/api/emi/user", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("EMI API response status:", response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log("EMI API response data:", data);
+        setEmiApplications(data.data?.applications || []);
+        // Update user stats with EMI count
+        setUserStats(prev => ({ 
+          ...prev, 
+          emiApplications: data.data?.applications?.length || 0 
+        }));
+      } else {
+        console.error("Failed to fetch EMI applications:", await response.text());
+      }
+    } catch (error) {
+      console.error("Error fetching EMI applications:", error);
+    } finally {
+      setLoadingEmi(false);
+    }
+  };
+
   useEffect(() => {
     if (!session?.user) return router.push("/auth/signin");
     dispatch(fetchUserOrders({}) as any);
-    fetchUserStats()
+    (async () => {
+      // fetch regular user stats first
+      await fetchUserStats();
+
+      // if admin, also fetch global EMI count and merge into state so UI shows total
+      try {
+        if (session?.user?.role === 'admin') {
+          const adminEmiTotal = await fetchAdminEmiCount();
+          setUserStats((prev) => ({ ...(prev ?? {}), emiApplications: adminEmiTotal }));
+        } else {
+          // For regular users, fetch their EMI applications
+          await fetchUserEmiApplications();
+        }
+      } catch (e) {
+        console.error('Error fetching admin stats:', e);
+      }
+    })();
   }, [session]);
 
   const formatPrice = (price) =>
@@ -305,29 +379,62 @@ const Profile = () => {
           </h3>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
-              <FaBucket className="w-6 h-6 text-[#A97C51] mb-2" />
-              <div className="text-3xl md:text-4xl font-extrabold font-serif text-[#010100]">
-                {userStats ? userStats.orders : 0}
+            {session?.user?.role === "admin" ? (
+              <Link
+                href="/admin?tab=ORDERS"
+                aria-label="Go to admin orders"
+              >
+                <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center hover:shadow-md transition-shadow">
+                  <FaBucket className="w-6 h-6 text-[#A97C51] mb-2" />
+                  <div className="text-3xl md:text-4xl font-extrabold font-serif text-gray-800">
+                    {userStats ? userStats.orders : 0}
+                  </div>
+                  <div className="text-sm text-gray-500 mt-1">Total Orders</div>
+                </div>
+              </Link>
+            ) : (
+              <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
+                <FaBucket className="w-6 h-6 text-[#A97C51] mb-2" />
+                <div className="text-3xl md:text-4xl font-extrabold font-serif text-[#010100]">
+                  {userStats ? userStats.orders : 0}
+                </div>
+                <div className="text-sm text-gray-500 mt-1">Total Orders</div>
               </div>
-              <div className="text-sm text-gray-500 mt-1">Total Orders</div>
-            </div>
+            )}
 
-            <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
-              <MessageCircle className="w-6 h-6 text-[#A97C51] mb-2" />
-              <div className="text-3xl md:text-4xl font-extrabold font-serif text-gray-800">
-                {userStats ? userStats.messages : 0}
+            {session?.user?.role === "admin" ? (
+              <Link
+                href="/admin?tab=CONTACT"
+                className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center hover:shadow-md transition-shadow"
+                aria-label="Go to admin contact messages"
+                title="Go to admin dashboard (Contact tab)"
+              >
+                <MessageCircle className="w-6 h-6 text-[#A97C51] mb-2" />
+                <div className="text-3xl md:text-4xl font-extrabold font-serif text-gray-800">
+                  {userStats ? userStats.messages : 0}
+                </div>
+                <div className="text-sm text-gray-500 mt-1">Your Messages</div>
+              </Link>
+            ) : (
+              <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
+                <MessageCircle className="w-6 h-6 text-[#A97C51] mb-2" />
+                <div className="text-3xl md:text-4xl font-extrabold font-serif text-gray-800">
+                  {userStats && typeof userStats.messages === 'number' && userStats.messages > 0 ? userStats.messages : 0}
+                </div>
+                <div className="text-sm text-gray-500 mt-1">Your Messages</div>
               </div>
-              <div className="text-sm text-gray-500 mt-1">Your Messages</div>
-            </div>
+            )}
 
-            <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
+            <button
+              onClick={() => setActiveTab("emi")}
+              className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center hover:shadow-md transition-shadow"
+            >
               <BsCash className="w-6 h-6 text-[#A97C51] mb-2" />
               <div className="text-3xl md:text-4xl font-extrabold font-serif text-gray-800">
-                {userStats ? userStats.emiApplications : 0}
+                {userStats ? userStats.emiApplications ?? 0 : 0}
               </div>
               <div className="text-sm text-gray-500 mt-1">EMI Applications</div>
-            </div>
+            </button>
 
             {/* <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center text-center">
               <Users className="w-6 h-6 text-[#A97C51] mb-2" />
@@ -554,6 +661,143 @@ const Profile = () => {
     </div>
   );
 
+  // EMI Applications Tab Component
+  const EmiApplicationsTab = () => {
+    return (
+      <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-3xl font-extrabold font-serif text-gray-900">
+            EMI Applications
+          </h2>
+          <button
+            className="inline-flex items-center px-4 py-2 bg-[#A97C51] text-white font-semibold rounded-lg hover:bg-[#8B6B42] transition-colors ml-4"
+            onClick={() => setShowEmiModal(true)}
+          >
+            Apply For EMI Options
+          </button>
+          {loadingEmi && <Loader2 className="w-6 h-6 animate-spin text-[#A97C51] ml-4" />}
+        </div>
+        {emiApplications.length === 0 ? (
+          <div className="text-center py-12">
+            <BsCash className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">
+              No EMI Applications Found
+            </h3>
+            <p className="text-gray-500 mb-6">
+              You haven't applied for any EMI plans yet.
+            </p>
+            <Link
+              href="/products"
+              className="inline-flex items-center px-6 py-3 bg-[#A97C51] text-white font-semibold rounded-lg hover:bg-[#8B6B42] transition-colors"
+            >
+              Browse Products
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {emiApplications.map((emi, index) => (
+              <div
+                key={emi._id || index}
+                className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow"
+              >
+                {/* Header */}
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {emi.fullName || emi.name}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {emi.email} • {emi.phoneNumber || emi.phone}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Applied on: {new Date(emi.createdAt || emi.submittedAt).toLocaleDateString("en-IN", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </p>
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
+                    {emi.status || "UNDER_REVIEW"}
+                  </span>
+                </div>
+                {/* Financial Details Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                      Total Amount
+                    </p>
+                    <p className="text-xl font-bold text-gray-900">
+                      ₹{(emi.totalAmount || 0).toLocaleString("en-IN")}
+                    </p>
+                    {emi.downPayment && (
+                      <p className="text-xs text-gray-600">
+                        Down Payment: ₹{emi.downPayment.toLocaleString("en-IN")}
+                      </p>
+                    )}
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                      Monthly EMI
+                    </p>
+                    <p className="text-xl font-bold text-[#A97C51] flex items-center gap-2">
+                      ₹{(emi.calculatedEMI || 0).toLocaleString("en-IN")}
+                      <span className="text-xs text-gray-500 font-normal">approx</span>
+                    </p>
+                    {emi.emiTenure && (
+                      <p className="text-xs text-gray-600">Tenure: {emi.emiTenure} months</p>
+                    )}
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                      Monthly Income
+                    </p>
+                    <p className="text-xl font-bold text-gray-900">
+                      ₹{(emi.monthlyIncome || 0).toLocaleString("en-IN")}
+                    </p>
+                    {emi.employmentType && (
+                      <p className="text-xs text-gray-600">{emi.employmentType}</p>
+                    )}
+                  </div>
+                </div>
+                {/* Additional Details */}
+                {(emi.address || emi.panNumber || emi.aadharNumber) && (
+                  <div className="border-t border-gray-100 pt-4">
+                    <h4 className="font-semibold text-gray-800 mb-2">Additional Details</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      {emi.address && (
+                        <div>
+                          <span className="font-medium text-gray-600">Address:</span>
+                          <p className="text-gray-700">{emi.address}</p>
+                        </div>
+                      )}
+                      {emi.panNumber && (
+                        <div>
+                          <span className="font-medium text-gray-600">PAN:</span>
+                          <p className="text-gray-700">{emi.panNumber}</p>
+                        </div>
+                      )}
+                      {emi.aadharNumber && (
+                        <div>
+                          <span className="font-medium text-gray-600">Aadhar:</span>
+                          <p className="text-gray-700">{emi.aadharNumber}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        {/* EMI Modal */}
+        {showEmiModal && (
+          <EMIApplicationModal isOpen={showEmiModal} onClose={() => setShowEmiModal(false)} />
+        )}
+      </div>
+    );
+  };
+
   // --- Helper Components & Functions ---
 
   const InfoCard = ({ title, value }) => (
@@ -627,6 +871,13 @@ const Profile = () => {
                 label="Order History"
                 icon={<ShoppingBag />}
               />
+              {session?.user?.role !== "admin" && (
+                <TabButton
+                  id="emi"
+                  label="EMI Applications"
+                  icon={<BsCash />}
+                />
+              )}
               {/* Logout button styled to stand out */}
               <button
                 onClick={() => signOut()}
@@ -642,6 +893,7 @@ const Profile = () => {
           <div className="lg:w-3/4 min-h-[600px]">
             {activeTab === "profile" && <ProfileDetailsTab data={session} />}
             {activeTab === "orders" && <OrderHistoryTab />}
+            {activeTab === "emi" && <EmiApplicationsTab />}
           </div>
         </div>
       </div>

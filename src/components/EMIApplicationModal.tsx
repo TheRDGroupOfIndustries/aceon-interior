@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 interface EMIApplicationModalProps {
   isOpen: boolean;
@@ -32,6 +33,8 @@ const EMIApplicationModal: React.FC<EMIApplicationModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const { data: session } = useSession();
+  
   const [formData, setFormData] = useState<FormData>({
     fullName: "",
     email: "",
@@ -49,6 +52,17 @@ const EMIApplicationModal: React.FC<EMIApplicationModalProps> = ({
 
   const [calculatedEMI, setCalculatedEMI] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Auto-fill email from session when component opens
+  useEffect(() => {
+    if (isOpen && session?.user?.email) {
+      setFormData(prev => ({
+        ...prev,
+        email: session.user.email,
+        fullName: session.user.name || ""
+      }));
+    }
+  }, [isOpen, session]);
   const [message, setMessage] = useState("");
 
   // Calculate EMI whenever relevant fields change
@@ -360,8 +374,9 @@ const EMIApplicationModal: React.FC<EMIApplicationModalProps> = ({
                   <p className="text-sm text-gray-600 font-medium">
                     Estimated Monthly EMI
                   </p>
-                  <p className="text-2xl text-[#A97C51] font-bold">
+                  <p className="text-2xl text-[#A97C51] font-bold flex items-center gap-2">
                     ₹{calculatedEMI.toLocaleString()}
+                    <span className="text-xs text-gray-500 font-normal">Approx</span>
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
                     Based on {formData.emiTenure} months tenure with{" "}

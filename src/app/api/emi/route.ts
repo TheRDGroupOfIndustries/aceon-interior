@@ -74,9 +74,12 @@ export async function POST(request: NextRequest) {
     const calculatedEMI = calculateEMI(principal, emiTenure);
 
     // Save application to database
+    const normalizedEmail = email.trim().toLowerCase();
+    console.log('EMI Application - Saving with email:', normalizedEmail);
+    
     const application = await EMIApplication.create({
       fullName: fullName.trim(),
-      email: email.trim().toLowerCase(),
+      email: normalizedEmail,
       phoneNumber: phoneNumber.trim(),
       interiorPackage: interiorPackage.trim(),
       totalAmount: Number(totalAmount),
@@ -89,6 +92,8 @@ export async function POST(request: NextRequest) {
       agreeTerms,
       agreeCreditCheck,
     });
+    
+    console.log('EMI Application - Saved successfully with ID:', application._id);
 
     // Create transporter for emails
     const transporter = nodemailer.createTransport({

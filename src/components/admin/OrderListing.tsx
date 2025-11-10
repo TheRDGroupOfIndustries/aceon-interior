@@ -128,20 +128,19 @@ const OrderDetailsModal = ({ order, onClose }) => {
               <Image
                 width={64}
                 height={64}
-                src={(order.productId as any).media.main_image}
-                alt={product.name}
+                src={(order.productId as any)?.media?.main_image || "/images/logo.png"}
+                alt={product?.name || "Product image"}
                 className="w-16 h-16 rounded-lg object-cover shadow-sm bg-gray-100"
                 onError={(e: any) => {
                   e.target.onerror = null;
-                  e.target.src =
-                    "https://placehold.co/64x64/e0e0e0/505050?text=P";
+                  e.target.src = "/images/logo.png";
                 }}
               />
               <div className="flex-grow space-y-1">
-                <DetailRow label="Product Name" value={product.name} />
+                <DetailRow label="Product Name" value={product?.name || "Unknown Product"} />
                 <DetailRow
                   label="Product Price"
-                  value={formatPrice(product.pricing.current_price)}
+                  value={formatPrice(product?.pricing?.current_price || 0)}
                 />
                 <DetailRow label="Quantity" value={order.quantity} />
               </div>
@@ -150,13 +149,17 @@ const OrderDetailsModal = ({ order, onClose }) => {
             <h4 className="text-lg font-semibold border-b pb-2 pt-4">
               Variants Ordered
             </h4>
-            {order.variant
-              ? order.variant === "Standard"
-                ? "Standard"
-                : Object.entries(order.variant).map(([type, value]) => (
-                    <DetailRow key={type} label={type} value={value} />
-                  ))
-              : "N/A"}
+            <div className="space-y-1">
+              {order.variant
+                ? order.variant === "Standard"
+                  ? <DetailRow label="Variant" value="Standard" />
+                  : typeof order.variant === 'object' && order.variant !== null
+                    ? Object.entries(order.variant).map(([type, value]) => (
+                        <DetailRow key={type} label={type} value={String(value)} />
+                      ))
+                    : <DetailRow label="Variant" value={String(order.variant || "N/A")} />
+                : <DetailRow label="Variant" value="N/A" />}
+            </div>
 
             <h4 className="text-lg font-semibold border-b pb-2 pt-4">
               Shipping Address
@@ -191,10 +194,12 @@ const OrderListing = () => {
   const ordersPerPage = 12;
 
   const handleStatusChange = async (orderId, newStatus) => {
-    console.log(`Updating Order ${orderId} to status: ${newStatus}`);
-    setUpdatingStatus(orderId);
-    await dispatch(updateOrderStatus({ orderId, status: newStatus }) as any);
-    setUpdatingStatus(null);
+  console.log(`Updating Order ${orderId} to status: ${newStatus}`);
+  setUpdatingStatus(orderId);
+  await dispatch(updateOrderStatus({ orderId, status: newStatus }) as any);
+  // Refetch orders after status update
+  await dispatch(fetchAllOrdersByAdmin({ page: currentPage, status: currentFilter }) as any);
+  setUpdatingStatus(null);
   };
 
   const handleDeleteOrder = async (orderId) => {
@@ -309,37 +314,35 @@ const OrderListing = () => {
                       width={60}
                       height={60}
                       className="h-14 w-14 rounded-lg object-cover bg-gray-200"
-                      src={(order.productId as any).media.main_image}
-                      alt={(order.productId as any).name}
+                      src={(order.productId as any)?.media?.main_image || "/images/logo.png"}
+                      alt={(order.productId as any)?.name || "Product image"}
                       onError={(e: any) => {
                         e.target.onerror = null;
-                        e.target.src =
-                          "https://placehold.co/60x60/e0e0e0/505050?text=P";
+                        e.target.src = "/images/logo.png";
                       }}
                     />
                     <div className="flex-1">
                       <p className="text-sm font-medium text-gray-900 line-clamp-2">
-                        {(order.productId as any).name}
+                        {(order.productId as any)?.name || "Unknown Product"}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
                         Qty: {order.quantity}
                       </p>
-                      {order.variant &&
-                        order.variant !== "Standard" &&
-                        Object.keys(order.variant).length > 0 && (
-                          <div className="text-xs text-gray-500 mt-1">
-                            {Object.entries(order.variant).map(
-                              ([key, value], idx) => (
-                                <span key={key}>
-                                  {key}: {value as string}
-                                  {idx <
-                                    Object.keys(order.variant).length - 1 &&
-                                    " • "}
-                                </span>
+                      {order.variant && order.variant !== "Standard" && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          {typeof order.variant === 'object' && order.variant !== null
+                            ? Object.entries(order.variant).map(
+                                ([key, value], idx) => (
+                                  <span key={key}>
+                                    {key}: {String(value)}
+                                    {idx < Object.keys(order.variant).length - 1 && " • "}
+                                  </span>
+                                )
                               )
-                            )}
-                          </div>
-                        )}
+                            : <span>Variant: {String(order.variant)}</span>
+                          }
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

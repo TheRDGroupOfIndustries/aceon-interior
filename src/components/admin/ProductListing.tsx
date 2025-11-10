@@ -91,13 +91,12 @@ const ProductDetailsModal = ({ product, onClose }) => {
             <Image
               height={400}
               width={400}
-              src={product.media.main_image}
-              alt={product.name}
+              src={product.media?.main_image || "/images/logo.png"}
+              alt={product.name || "Product image"}
               className=" rounded-lg shadow-md object-cover bg-gray-100"
               onError={(e: any) => {
                 e.target.onerror = null;
-                e.target.src =
-                  "https://placehold.co/400x300/e0e0e0/505050?text=No+Image";
+                e.target.src = "/images/logo.png";
               }}
             />
             {product?.media?.images && (
@@ -120,15 +119,15 @@ const ProductDetailsModal = ({ product, onClose }) => {
               </div>
             )}
             <div className="text-lg font-bold">
-              Price: {formatPrice(product.pricing.current_price)}
-              {product.pricing.is_on_sale && (
+              Price: {formatPrice(product.pricing?.current_price || 0)}
+              {product.pricing?.is_on_sale && (
                 <span className="ml-2 text-sm text-red-500 line-through font-normal">
-                  {formatPrice(product.pricing.original_price)}
+                  {formatPrice(product.pricing?.original_price || 0)}
                 </span>
               )}
             </div>
-            {renderDetail("Delivery", product.stock.estimated_delivery)}
-            {renderDetail("Warranty", product.specifications.warranty)}
+            {renderDetail("Delivery", product.stock?.estimated_delivery)}
+            {renderDetail("Warranty", product.specifications?.warranty)}
           </div>
 
           {/* Column 2: Core Details & Description & Specifications*/}
@@ -139,12 +138,12 @@ const ProductDetailsModal = ({ product, onClose }) => {
             {renderDetail("SKU", product.sku)}
             {renderDetail(
               "Category",
-              `${product.category} / ${product.subcategory}`
+              `${product.category} / ${product.subcategory || 'N/A'}`
             )}
-            {renderDetail("Stock Qty", product.stock.available_quantity)}
+            {renderDetail("Stock Qty", product.stock?.available_quantity || 0)}
             {renderDetail(
               "Avg. Rating",
-              `${product.reviews.average_rating || 0} (${product.reviews.rating_count || 0} reviews)`
+              `${product.reviews?.average_rating || 0} (${product.reviews?.rating_count || 0} reviews)`
             )}
 
             <h3 className="text-xl font-semibold border-b pb-2 pt-4">
@@ -338,14 +337,13 @@ export default function ProductListing() {
         {/* Product Image Section */}
         <div className="relative h-64 bg-gray-100">
           <Image
-            src={product.media.main_image}
-            alt={product.name}
+            src={product.media?.main_image || "/images/logo.png"}
+            alt={product.name || "Product image"}
             fill
             className="object-cover hover:scale-105 transition-transform duration-300"
             onError={(e: any) => {
               e.target.onerror = null;
-              e.target.src =
-                "https://placehold.co/400x300/e0e0e0/505050?text=No+Image";
+              e.target.src = "/images/logo.png";
             }}
           />
           {/* Category Badge */}
@@ -355,12 +353,12 @@ export default function ProductListing() {
           {/* Status Badge */}
           <span
             className={`absolute top-3 right-3 text-xs font-semibold px-3 py-1 rounded-full shadow ${
-              product.stock.available_quantity > 0
+              (product.stock?.available_quantity || 0) > 0
                 ? "bg-green-500 text-white"
                 : "bg-red-500 text-white"
             }`}
           >
-            {product.stock.available_quantity > 0 ? "In Stock" : "Out of Stock"}
+            {(product.stock?.available_quantity || 0) > 0 ? "In Stock" : "Out of Stock"}
           </span>
           {/* SKU Badge */}
           <span className="absolute bottom-3 left-3 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
@@ -378,22 +376,22 @@ export default function ProductListing() {
           <div className="flex justify-between items-center mb-1">
             <div className="flex flex-col">
               <span className="text-2xl font-bold text-amber-800">
-                {formatPrice(product.pricing.current_price)}
+                {formatPrice(product.pricing?.current_price || 0)}
               </span>
-              {product.pricing.is_on_sale && (
+              {product.pricing?.is_on_sale && (
                 <span className="text-sm text-gray-500 line-through">
-                  {formatPrice(product.pricing.original_price)}
+                  {formatPrice(product.pricing?.original_price || 0)}
                 </span>
               )}
             </div>
             <span
               className={`text-sm font-semibold px-3 py-1 rounded-full ${
-                product.stock.available_quantity > 0
+                (product.stock?.available_quantity || 0) > 0
                   ? "bg-green-100 text-green-800"
                   : "bg-red-100 text-red-800"
               }`}
             >
-              Stock: {product.stock.available_quantity}
+              Stock: {product.stock?.available_quantity || 0}
             </span>
           </div>
 
@@ -401,10 +399,10 @@ export default function ProductListing() {
           <div className="flex items-center mb-2 text-sm text-gray-600">
             <span className="text-yellow-500 mr-1">★</span>
             <span className="font-medium">
-              {product.reviews.average_rating.toFixed(1) || 0}
+              {product.reviews?.average_rating?.toFixed(1) || "0.0"}
             </span>
             <span className="ml-1">
-              ({product.reviews.rating_count || 0} reviews)
+              ({product.reviews?.rating_count || 0} reviews)
             </span>
           </div>
 
