@@ -3,7 +3,7 @@
 import { Mail, Phone, Clock, X, CornerLeftUp } from "lucide-react";
 import { useSearchParams } from 'next/navigation';
 import Footer from "@/components/footer";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import * as styles from "./page.styles";
 import ProductListing from "@/components/admin/ProductListing";
 import CategoryListing from "@/components/admin/CategoryListing";
@@ -75,7 +75,8 @@ interface AppItem {
 //   },
 // ];
 
-export default function AdminDashboard() {
+// Component that uses useSearchParams - needs to be wrapped in Suspense
+function AdminDashboardContent() {
   // Category state for demo interactivity
   const categories = [
     {
@@ -1134,5 +1135,14 @@ export default function AdminDashboard() {
       {/* Footer (match site-wide footer) */}
       <Footer />
     </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function AdminDashboard() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <AdminDashboardContent />
+    </Suspense>
   );
 }
