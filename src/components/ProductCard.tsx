@@ -11,6 +11,8 @@ export default function ProductCard({ product }: { product: IProduct }) {
   const router = useRouter();
   const { data: session }: any = useSession();
 
+  console.log("product", product)
+
   const redirectToCheckout = () => {
     console.log("session", session);
     if (!session) {
@@ -62,21 +64,21 @@ export default function ProductCard({ product }: { product: IProduct }) {
         <div className="flex justify-between items-center mb-1">
           {/* Category Tag */}
           <span className="text-sm font-medium font-playfair bg-[#a97c5127] text-[#A97C51] bg-primary/20 px-3 py-1 rounded-md">
-            {product.category}
+            {product?.category}
           </span>
 
           {/* Rating */}
           <div className="flex items-center text-primary">
             <BsStarFill className="w-4 h-4 mr-1" />
             <span className="text-sm font-semibold text-gray-700">
-              {product.reviews.average_rating.toFixed(1)}
+              {product?.reviews?.average_rating.toFixed(1)}
             </span>
           </div>
         </div>
 
         {/* Product Title */}
         <h2 className="text-xl font-bold font-playfair text-gray-900 mb-3 leading-snug line-clamp-1">
-          {product.name[0].toLocaleUpperCase() + product.name.slice(1)}
+          {product?.name[0].toLocaleUpperCase() + product?.name.slice(1)}
         </h2>
 
         {/* Price and Action Buttons */}
