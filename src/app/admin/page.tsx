@@ -1,6 +1,7 @@
 "use client";
 
 import { Mail, Phone, Clock, X, CornerLeftUp } from "lucide-react";
+import { useSearchParams } from 'next/navigation';
 import Footer from "@/components/footer";
 import { useState, useRef, useEffect } from "react";
 import * as styles from "./page.styles";
@@ -302,6 +303,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<
     "EMI" | "CONTACT" | "PRODUCTS" | "ORDERS" | "CATEGORY"
   >("EMI");
+  const searchParams = useSearchParams();
   const [emiFilter, setEmiFilter] = useState<"all" | Status>("all");
   const [statusUpdating, setStatusUpdating] = useState(null);
 
@@ -339,6 +341,22 @@ export default function AdminDashboard() {
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, [activeTab]);
+
+  // Read ?tab= from the URL and set initial tab
+  useEffect(() => {
+    try {
+      const tab = searchParams?.get?.("tab") || "";
+      if (!tab) return;
+      const normalized = tab.toString().toUpperCase();
+      if (normalized === "CONTACT") setActiveTab("CONTACT");
+      else if (normalized === "PRODUCTS") setActiveTab("PRODUCTS");
+      else if (normalized === "ORDERS") setActiveTab("ORDERS");
+      else if (normalized === "CATEGORY") setActiveTab("CATEGORY");
+      else if (normalized === "EMI") setActiveTab("EMI");
+    } catch (e) {
+      console.warn("Failed to parse admin tab from URL", e);
+    }
+  }, [searchParams]);
 
   interface ContactMsg {
     id: string;

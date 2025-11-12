@@ -5,6 +5,7 @@ import dbConnect from "@/lib/mongodb";
 import Order from "@/models/Order";
 import User from "@/models/User";
 import { Types } from "mongoose";
+import { generateDeliveredOrdersPDF, sendDeliveredOrdersEmail } from "@/lib/pdfGenerator";
 
 // GET /api/order/[orderId] - Get a specific order
 export async function GET(
@@ -180,6 +181,45 @@ export async function PUT(
     }
 
     await order.save();
+
+    // If order was marked as delivered, generate and send PDF report for this order only
+    if (action === "update_status" && status === "delivered") {
+      try {
+        console.log(`📧 Order ${orderId} marked as delivered. Generating PDF report...`);
+        
+        // Get only the updated order with populated product data
+        const updatedOrderForPdf = await Order.aggregate([
+          { $match: { _id: new Types.ObjectId(orderId) } },
+          {
+            $lookup: {
+              from: "products",
+              localField: "productId", 
+              foreignField: "_id",
+              as: "productId",
+            },
+          },
+          { $unwind: "$productId" }
+        ]);
+
+        if (updatedOrderForPdf.length > 0) {
+          console.log(`📄 Generating PDF for order ${orderId}...`);
+          
+          // Generate PDF (only on server side) - pass array with single order
+          const { generateDeliveredOrdersPDF, sendDeliveredOrdersEmail } = await import('@/lib/pdfGenerator');
+          const pdfBuffer = await generateDeliveredOrdersPDF(updatedOrderForPdf);
+          
+          // Send email to admin
+          await sendDeliveredOrdersEmail(user.email, pdfBuffer, 1);
+          
+          console.log(`✅ PDF report sent to admin: ${user.email} for order ${orderId}`);
+        } else {
+          console.log(`📄 Order ${orderId} not found for PDF generation.`);
+        }
+      } catch (pdfError) {
+        console.error("❌ Error generating/sending PDF report:", pdfError);
+        // Don't fail the order update if PDF generation fails
+      }
+    }
 
     // Populate the updated order
     const updatedOrder = await Order.aggregate([

@@ -44,10 +44,13 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: { slug: string } | any;
 }) {
+  // `params` may be a thenable in some Next.js runtimes — await it before using
+  const { slug } = await params;
+
   const creation = await client.fetch<Creation>(getCreationBySlugQuery, {
-    slug: params.slug,
+    slug,
   });
 
   if (!creation) {
@@ -65,10 +68,13 @@ export async function generateMetadata({
 export default async function CreationPage({
   params,
 }: {
-  params: { slug: string };
+  params: { slug: string } | any;
 }) {
+  // await params to support runtimes where params is a promise-like
+  const { slug } = await params;
+
   const creation = await client.fetch<Creation>(getCreationBySlugQuery, {
-    slug: params.slug,
+    slug,
   });
 
   if (!creation) {

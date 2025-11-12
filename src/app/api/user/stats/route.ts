@@ -25,16 +25,34 @@ export async function GET(req: NextRequest) {
 
     const userId = user._id;
 
-    // Fetch counts for user-specific data
-    const orderCount = await Order.countDocuments({ userId: userId });
-    const messageCount = await Message.countDocuments({ email: user.email });
-    const emiApplicationCount = await EMIApplication.countDocuments({ email: user.email });
+    // Check if user is admin
+    const isAdmin = user.role === "admin";
+
+    // Fetch counts - admins see all data, users see only their own
+    let orderCount, messageCount, emiApplicationCount;
+
+    if (isAdmin) {
+      // Admins see all data
+      orderCount = await Order.countDocuments({});
+      messageCount = await Message.countDocuments({});
+      emiApplicationCount = await EMIApplication.countDocuments({});
+      
+      console.log(`[Admin Stats] ${user.email}: Orders=${orderCount}, Messages=${messageCount}, EMI Apps=${emiApplicationCount}`);
+    } else {
+      // Regular users see only their own data
+      orderCount = await Order.countDocuments({ userId: userId });
+      messageCount = await Message.countDocuments({ email: user.email });
+      emiApplicationCount = await EMIApplication.countDocuments({ email: user.email });
+      
+      console.log(`[User Stats] ${user.email}: Orders=${orderCount}, Messages=${messageCount}, EMI Apps=${emiApplicationCount}`);
+    }
 
     return NextResponse.json(
       {
         orders: orderCount,
         messages: messageCount,
         emiApplications: emiApplicationCount,
+        role: user.role,
       },
       { status: 200 }
     );

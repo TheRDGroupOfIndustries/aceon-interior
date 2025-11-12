@@ -10,7 +10,7 @@ import { fetchUserOrders } from "./features/orderSlice";
 export default function StateInitializer() {
   const dispatch = useDispatch();
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -21,14 +21,21 @@ export default function StateInitializer() {
   }, [session?.user]);
 
   useEffect(() => {
-    console.log("Session changed:", session);
+    console.log("Session status:", status, "Session:", session);
     console.log("pathname:", pathname);
-    if (pathname === "/admin") {
+    
+    // Only check admin access when session loading is complete
+    if (pathname === "/admin" && status === "authenticated") {
       if (!session?.user?.role || session?.user?.role !== "admin") {
         router.push("/");
       }
     }
-  }, [session?.user, router, pathname]);
+    // If not authenticated and session loading is complete, redirect
+    else if (pathname === "/admin" && status === "unauthenticated") {
+      router.push("/");
+    }
+    // Don't redirect while session is still loading (status === "loading")
+  }, [session?.user, router, pathname, status]);
 
   useEffect(() => {
     // Dispatch any actions needed to initialize state here
