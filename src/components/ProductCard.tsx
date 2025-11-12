@@ -69,7 +69,7 @@ export default function ProductCard({ product }: { product: IProduct }) {
           <div className="flex items-center text-primary">
             <BsStarFill className="w-4 h-4 mr-1" />
             <span className="text-sm font-semibold text-gray-700">
-              {product.reviews.average_rating.toFixed(1)}
+              {product.reviews?.average_rating?.toFixed(1) || '0.0'}
             </span>
           </div>
         </div>

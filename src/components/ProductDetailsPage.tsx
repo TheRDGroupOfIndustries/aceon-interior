@@ -370,13 +370,13 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
             {/* Rating */}
             <div className="flex items-center mb-6">
               <div className="flex mr-2">
-                {ratingStars(product.reviews.average_rating)}
+                {ratingStars(product.reviews?.average_rating || 0)}
               </div>
               <span className="text-lg font-semibold text-gray-800 mr-2">
-                {product.reviews.average_rating.toFixed(1)}
+                {product.reviews?.average_rating?.toFixed(1) || '0.0'}
               </span>
               <span className="text-sm text-gray-500">
-                ({product.reviews.rating_count} reviews)
+                ({product.reviews?.rating_count || 0} reviews)
               </span>
             </div>
 
@@ -561,28 +561,28 @@ const ProductDetailsPage = ({ productId }: { productId: string }) => {
         {/* --- Customer Reviews Section --- */}
         <div className="mt-32 ">
           <h2 className="text-3xl font-bold text-gray-900 mb-6 border-b pb-2 font-playfair">
-            Customer Reviews ({product.reviews.rating_count})
+            Customer Reviews ({product.reviews?.rating_count || 0})
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
                 <div className="flex items-baseline">
                   <span className="text-5xl font-extrabold text-primary">
-                    {product.reviews.average_rating.toFixed(1)}
+                    {product.reviews?.average_rating?.toFixed(1) || '0.0'}
                   </span>
                   <span className="text-xl text-gray-600 ml-2">/ 5.0</span>
                 </div>
                 <div className="flex mt-2 sm:mt-0">
                   <div className="flex mr-4">
-                    {ratingStars(product.reviews.average_rating)}
+                    {ratingStars(product.reviews?.average_rating || 0)}
                   </div>
                 </div>
               </div>
 
               {/* Individual Reviews List */}
               <div className="space-y-8">
-                {product.reviews.review_list.length > 0 ? (
-                  product.reviews.review_list.map((review, index) => (
+                {product.reviews?.review_list?.length > 0 ? (
+                  product.reviews?.review_list?.map((review, index) => (
                     <div
                       key={index}
                       className="border-b border-gray-100 pb-6 last:border-b-0"
