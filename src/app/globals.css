@@ -47,6 +47,7 @@ button{
   cursor: pointer;
 }
 
+
 /* Deactivate button style used in admin product controls */
 .btn-deactivate {
   --btn-brown: #A97C51;
@@ -71,4 +72,44 @@ button{
 .footer-hovered {
   background-color: #A97C51 !important;
   color: white !important;
+}
+
+.glass-nav-container {
+    /* Layout */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content; /* Only take up space needed by content */
+    padding: 10px 20px;
+    margin: 20px auto; /* Center on the page */
+
+    /* Glass Effect */
+    background: rgba(255, 255, 255, 0.1); /* White background, 10% opacity */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle light border */
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    
+    /* THE GLASS EFFECT */
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px); /* Safari support */
+
+    /* Rounded Edges */
+    border-radius: 50px; /* High value for pill-shape */
+    
+    /* Text/Link Styling */
+    color: white;
+    font-family: sans-serif;
+}
+
+.glass-nav-container a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 8px 15px;
+    margin: 0 5px;
+    transition: background 0.3s;
+    border-radius: 40px;
+}
+
+.glass-nav-container a:hover {
+    background: rgba(255, 255, 255, 0.3); /* Slightly brighter on hover */
 }

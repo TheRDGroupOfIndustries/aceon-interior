@@ -4,9 +4,9 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { FaBars, FaX } from "react-icons/fa6";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeftIcon } from "lucide-react";
+import Link from "next/link";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -71,7 +71,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-white sticky top-0 z-30 shadow-sm">
+    <header className="w-full bg-gray-100 sticky top-0 z-30 shadow-sm">
       <div className="max-w-7xl mx-auto h-16 py-3 flex items-center justify-between px-4 md:px-8 gap-20 z-50">
         {/* Back button */}
         <button
@@ -83,7 +83,7 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex  md:flex-1 items-center justify-between w-full">
-          <div className="hidden md:flex items-center gap-8">
+          {/* <div className="hidden md:flex items-center gap-8">
             {links.map((item, i) => (
               <motion.button
                 key={i}
@@ -96,7 +96,103 @@ export default function Header() {
                 {item.name}
               </motion.button>
             ))}
-          </div>
+          </div> */}
+          <svg className="hidden">
+                  <filter id="lg-dist" x="0%" y="0%" width="100%" height="100%">
+                    <feTurbulence
+                      type="fractalNoise"
+                      baseFrequency="0.008 0.008"
+                      numOctaves="2"
+                      seed="92"
+                      result="noise"
+                    />
+                    <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+                    <feDisplacementMap
+                      in="SourceGraphic"
+                      in2="blurred"
+                      scale="70"
+                      xChannelSelector="R"
+                      yChannelSelector="G"
+                    />
+                  </filter>
+                </svg>
+          
+                {/* =========================================================
+                  2. DESKTOP NAVIGATION - LIQUID GLASS 
+                  (Replaces the old commented-out and the simple glass div)
+                  =========================================================
+                */}
+                <div className="md:flex items-center  hidden  w-full gap-8">
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    // Outer container styling. NOW LEFT-ALIGNED.
+                    className="
+                    max-w-fit 
+                    ml-4 md:ml-8 lg:ml-4 
+                    p-1 
+                    flex 
+                    items-center 
+                    justify-center 
+                    gap-6 
+                    rounded-full 
+                    shadow-2xl
+                    
+                    /* Core Liquid Glass Container Styles */
+                    relative 
+                    isolation-isolate 
+                    overflow-hidden 
+                    bg-transparent 
+                    border border-white/20
+                  "
+                  >
+                    {/* LAYER 1: The Distortion Layer */}
+                    <div
+                      className="absolute inset-0 z-0 rounded-full"
+                      style={{ filter: "url(#lg-dist)", backdropFilter: "blur(24px)" }}
+                    />
+          
+                    {/* LAYER 2: The Base Color/Overlay Layer */}
+                    <div className="absolute inset-0 z-10 bg-white/5 rounded-full" />
+          
+                    {/* LAYER 3: The Specular Highlight Layer */}
+                    <div
+                      className="absolute inset-0 z-20 rounded-full"
+                      style={{
+                        boxShadow:
+                          "inset 1px 1px 0 rgba(255, 255, 255, 0.75), inset 0 0 5px rgba(255, 255, 255, 0.75)",
+                      }}
+                    />
+          
+                    {/* LAYER 4: The Content Layer */}
+                    <div className="relative z-30 flex items-center  px-4 py-2">
+                      {links.map((items, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, delay: 0.3 + i * 0.1 }}
+                        >
+                          <Link
+                            className="
+                            text-black
+                            font-anta
+                            text-sm
+                            px-3 py-2 
+                            rounded-full
+                            hover:bg-white/30 
+                            transition-colors
+                          "
+                            href={items.link}
+                          >
+                            {items.name}
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                </div>
           <div className="">
             {!session?.user ? (
               <motion.button
@@ -106,7 +202,7 @@ export default function Header() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.3 + 2 * 0.1 }}
-                className="px-6 py-2.5 rounded-xl bg-[#A97C51] text-white text-lg font-playfair font-medium hover:bg-white hover:text-[#A97C51] border border-[#A97C51] transition-all"
+                className="px-6 py-2.5 whitespace-nowrap rounded-xl bg-[#A97C51] text-white text-lg font-playfair font-medium hover:bg-white hover:text-[#A97C51] border border-[#A97C51] transition-all"
               >
                 Get Started
               </motion.button>
