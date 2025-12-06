@@ -612,6 +612,7 @@ function Elements() {
     { name: "Products", link: "/products" },
     { name: "About", link: "#about" },
     { name: "Services", link: "#services" },
+    { name: "Portfolio", link: "/portfolio" },
     { name: "Contact", link: "#contact" },
   ]);
 
@@ -774,7 +775,7 @@ function Elements() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden fixed inset-0 bg-black/95 z-[90] flex flex-col items-center justify-center gap-8 px-6 pb-10 pt-16"
+            className="lg:hidden fixed inset-0 bg-black/95 z-[90] flex flex-col items-center justify-center gap-8 px-6 pb-10 pt-16"
           >
             {links.map((items, i) => (
               <motion.div
