@@ -21,7 +21,7 @@ const Creations: React.FC = async () => {
   const creationsData: Creation[] = await client.fetch(getCreationsQuery);
 
   return (
-    <section className="bg-white py-16 md:py-24 lg:px-36 px-4">
+    <section className="bg-white py-10 lg:px-36 px-4">
       <div className="container mx-auto text-center">
         <h2 className="font-playfair font-medium text-[#A97C51] text-4xl md:text-[68px] leading-tight">
           Best of our creations

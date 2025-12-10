@@ -104,7 +104,7 @@ export default function Philosophy() {
   };
 
   return (
-    <section id="about" className="bg-white py-16 md:py-20 px-6 md:px-12" ref={ref}>
+    <section id="about" className="bg-white py-10  px-6 md:px-12" ref={ref}>
       <div className="max-w-[1200px] mx-auto">
         {/* Centered heading */}
         <motion.div
