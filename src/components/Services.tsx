@@ -22,7 +22,7 @@ export default function Services() {
   };
 
   return (
-    <section id="services" className="bg-white py-16 md:py-20 px-6 md:px-12" ref={ref}>
+    <section id="services" className="bg-white py-10 px-6 md:px-12" ref={ref}>
       <div className="max-w-[1200px] mx-auto">
         <motion.div
           className="text-center mb-12"

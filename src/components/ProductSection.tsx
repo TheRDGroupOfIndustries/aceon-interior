@@ -30,7 +30,7 @@ export default function ProductSection() {
   return (
     <section
       id="services"
-      className="bg-white py-16 md:py-20 px-6 md:px-12"
+      className="bg-white py-10 px-6 md:px-12"
       ref={ref}
     >
       <div className="max-w-[1200px] mx-auto">

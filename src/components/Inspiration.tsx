@@ -87,7 +87,7 @@ const InspirationGallery: React.FC = () => {
   };
 
   return (
-    <section className="bg-white py-16 px-8" ref={sectionRef}>
+    <section className="bg-white py-10 px-8" ref={sectionRef}>
       <div className="container mx-auto">
         <motion.div
           className="text-center mb-12"

@@ -36,7 +36,7 @@ const PartnersSection: React.FC = () => {
   };
 
   return (
-    <section className="bg-white py-16 md:py-24" ref={sectionRef}>
+    <section className="bg-white py-10" ref={sectionRef}>
       <div className="container mx-auto px-4">
         <motion.div
           className="text-center mb-12 md:mb-16"

@@ -31,14 +31,27 @@ interface Creation {
   category?: string;
 }
 
+// export async function generateStaticParams() {
+//   const creations = await client.fetch<{ slug: string }[]>(
+//     getAllCreationSlugsQuery
+//   );
+
+//   return creations.map((creation) => ({
+//     slug: creation.slug,
+//   }));
+// }
+
+
 export async function generateStaticParams() {
   const creations = await client.fetch<{ slug: string }[]>(
     getAllCreationSlugsQuery
   );
 
-  return creations.map((creation) => ({
-    slug: creation.slug,
-  }));
+  return creations
+    .filter((c) => typeof c.slug === "string" && c.slug.length > 0) 
+    .map((c) => ({
+      slug: c.slug,
+    }));
 }
 
 export async function generateMetadata({
