@@ -115,7 +115,7 @@ const Contact: React.FC = () => {
             </p>
             <div className="mb-4 flex items-center gap-4">
               <IoPerson className="text-[#A97C51] text-lg" />
-              <span className="text-lg text-[#333]">Ankit Sandiliya</span>
+              <span className="text-lg text-[#333]">Ankit Sandilya</span>
             </div>
             <div className="mb-4 flex items-center gap-4">
               <MdLocalPhone className="text-[#A97C51] text-lg" />
